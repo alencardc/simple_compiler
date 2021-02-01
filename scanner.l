@@ -54,6 +54,16 @@ default { return TK_PR_DEFAULT; }
   /* SPECIAL CHARACTERS - e.g. ,;:() */
 {special_chars} {return yytext[0]; }
 
+  /* SPECIAL/COMPOSITE OPERATORS  */
+"<=" {return TK_OC_LE; }
+">=" {return TK_OC_GE; }
+"==" {return TK_OC_EQ; }
+"!=" {return TK_OC_NE; }
+"&&" {return TK_OC_AND; }
+"||" {return TK_OC_OR; }
+">>" {return TK_OC_SL; }
+"<<" {return TK_OC_SR; }
+
   /* IDENTIFIER */
 {identifier}/{id_end} { return TK_IDENTIFICADOR; }
 
