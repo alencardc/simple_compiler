@@ -1,4 +1,4 @@
-%option yylineno
+%option yylineno noyywrap
 
 %{
   #include "tokens.h"
