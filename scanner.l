@@ -19,6 +19,7 @@ string \"([^"\\]|\\.)*\"
 letter [_a-zA-Z]
 identifier {letter}({letter}|{digit})*
 id_end [^a-zA-Z0-9_]
+special_chars [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$]
 
 %%
   /* RESERVED WORDS */
@@ -49,6 +50,9 @@ public { return TK_PR_PUBLIC; }
 protected { return TK_PR_PROTECTED; }
 end { return TK_PR_END; }
 default { return TK_PR_DEFAULT; }
+
+  /* SPECIAL CHARACTERS - e.g. ,;:() */
+{special_chars} {return yytext[0]; }
 
   /* IDENTIFIER */
 {identifier}/{id_end} { return TK_IDENTIFICADOR; }
