@@ -85,6 +85,9 @@ true { return TK_LIT_TRUE; }
 {white_space}+ {}
 \n {}
 
+  /* ERROR IF NO PATTERN MATCHED */
+. { return TOKEN_ERRO; }
+
 %%
 
 int get_line_number(void) {
