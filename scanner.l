@@ -28,6 +28,8 @@ id_end [^a-zA-Z0-9_]
   /* TYPE LITERALS */
 {integer} { return TK_LIT_INT; }
 {float} { return TK_LIT_FLOAT; }
+false { return TK_LIT_FALSE; }
+true { return TK_LIT_TRUE; }
 {string} { return TK_LIT_STRING; }
 {char} { return TK_LIT_CHAR; }
 
