@@ -21,6 +21,10 @@ identifier {letter}({letter}|{digit})*
 id_end [^a-zA-Z0-9_]
 special_chars [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$]
 
+white_space [ \t\r\v\f]
+multiline_comment \/\*[^*]*\*+(?:[^/*][^/*][^*]*\*+)*\/
+singleline_comment \/\/.*
+
 %%
   /* RESERVED WORDS */
 int { return TK_PR_INT; }
@@ -74,6 +78,12 @@ false { return TK_LIT_FALSE; }
 true { return TK_LIT_TRUE; }
 {string} { return TK_LIT_STRING; }
 {char} { return TK_LIT_CHAR; }
+
+  /* COMMENTS AND CHARACTERS TO IGNORE */
+{multiline_comment} {}
+{singleline_comment} {}
+{white_space}+ {}
+\n {}
 
 %%
 
