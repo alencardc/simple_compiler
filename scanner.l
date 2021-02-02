@@ -27,6 +27,12 @@ multiline_comment \/\*[^*]*\*+(?:[^/*][^/*][^*]*\*+)*\/
 double_slash \/\/
 singleline_comment {double_slash}.*
 
+start_multiline \/\*
+all_except_asterisk [^*]
+asterisk_without_slash \*[^/]
+end_multiline (\*+\/)
+simpler_multiline_comment {start_multiline}({all_except_asterisk}|{asterisk_without_slash})*{end_multiline}
+
 %%
   /* RESERVED WORDS */
 int { return TK_PR_INT; }
@@ -82,7 +88,7 @@ true { return TK_LIT_TRUE; }
 {char} { return TK_LIT_CHAR; }
 
   /* COMMENTS AND CHARACTERS TO IGNORE */
-{multiline_comment} {}
+{simpler_multiline_comment} {}
 {singleline_comment} {}
 {white_space}+ {}
 \n {}
