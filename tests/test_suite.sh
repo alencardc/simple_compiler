@@ -17,7 +17,7 @@ cp etapa1 tests
 cp etapa1Gold tests
 
 cd tests
-
+mkdir saidas
 for file in $filesToTest 
 do
     cat $file | ./etapa1 > saidas/${file}.txt
