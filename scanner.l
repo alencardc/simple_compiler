@@ -29,7 +29,7 @@ singleline_comment {double_slash}.*
 
 start_multiline \/\*
 all_except_asterisk [^*]
-asterisk_without_slash \*[^/]
+asterisk_without_slash \*+[^/*]
 end_multiline (\*+\/)
 simpler_multiline_comment {start_multiline}({all_except_asterisk}|{asterisk_without_slash})*{end_multiline}
 
