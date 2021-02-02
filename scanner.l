@@ -63,6 +63,14 @@ protected { return TK_PR_PROTECTED; }
 end { return TK_PR_END; }
 default { return TK_PR_DEFAULT; }
 
+ /* TYPE LITERALS */
+{integer} { return TK_LIT_INT; }
+{float} { return TK_LIT_FLOAT; }
+false { return TK_LIT_FALSE; }
+true { return TK_LIT_TRUE; }
+{string} { return TK_LIT_STRING; }
+{char} { return TK_LIT_CHAR; }
+
   /* SPECIAL CHARACTERS - e.g. ,;:() */
 {special_chars} {return yytext[0]; }
 
@@ -78,14 +86,6 @@ default { return TK_PR_DEFAULT; }
 
   /* IDENTIFIER */
 {identifier}/{id_end} { return TK_IDENTIFICADOR; }
-
-  /* TYPE LITERALS */
-{integer} { return TK_LIT_INT; }
-{float} { return TK_LIT_FLOAT; }
-false { return TK_LIT_FALSE; }
-true { return TK_LIT_TRUE; }
-{string} { return TK_LIT_STRING; }
-{char} { return TK_LIT_CHAR; }
 
   /* COMMENTS AND CHARACTERS TO IGNORE */
 {simpler_multiline_comment} {}
