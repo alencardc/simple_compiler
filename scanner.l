@@ -85,7 +85,7 @@ true { return TK_LIT_TRUE; }
 "<<" {return TK_OC_SR; }
 
   /* IDENTIFIER */
-{identifier}/{id_end} { return TK_IDENTIFICADOR; }
+{identifier} { return TK_IDENTIFICADOR; }
 
   /* COMMENTS AND CHARACTERS TO IGNORE */
 {simpler_multiline_comment} {}
