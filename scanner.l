@@ -21,9 +21,11 @@ identifier {letter}({letter}|{digit})*
 id_end [^a-zA-Z0-9_]
 special_chars [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$]
 
+/*Comentários*/
 white_space [ \t\r\v\f]
 multiline_comment \/\*[^*]*\*+(?:[^/*][^/*][^*]*\*+)*\/
-singleline_comment \/\/.*
+double_slash \/\/
+singleline_comment {double_slash}.*
 
 %%
   /* RESERVED WORDS */
