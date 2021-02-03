@@ -64,7 +64,7 @@ end { return TK_PR_END; }
 default { return TK_PR_DEFAULT; }
 
  /* TYPE LITERALS */
-{integer} { return TK_LIT_INT; }
+{integer}/[^_a-zA-Z0-9] { return TK_LIT_INT; }
 {float} { return TK_LIT_FLOAT; }
 false { return TK_LIT_FALSE; }
 true { return TK_LIT_TRUE; }
