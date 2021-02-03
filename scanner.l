@@ -15,6 +15,7 @@ exponent [eE][+-]?{integer}
 float {integer}(("."{integer})|{exponent}|("."{integer}){exponent}) 
 char \'(\\.|[^\\])\'
 string \"([^"\\]|\\.)*\"
+chars_after_literals [^_a-zA-Z0-9]
 
 letter [_a-zA-Z]
 identifier {letter}({letter}|{digit})*
@@ -64,7 +65,7 @@ end { return TK_PR_END; }
 default { return TK_PR_DEFAULT; }
 
  /* TYPE LITERALS */
-{integer}/[^_a-zA-Z0-9] { return TK_LIT_INT; }
+{integer}/{chars_after_literals} { return TK_LIT_INT; }
 {float} { return TK_LIT_FLOAT; }
 false { return TK_LIT_FALSE; }
 true { return TK_LIT_TRUE; }
