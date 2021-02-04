@@ -66,11 +66,11 @@ default { return TK_PR_DEFAULT; }
 
  /* TYPE LITERALS */
 {integer}/{chars_after_literals} { return TK_LIT_INT; }
-{float} { return TK_LIT_FLOAT; }
+{float}/{chars_after_literals} { return TK_LIT_FLOAT; }
 false { return TK_LIT_FALSE; }
 true { return TK_LIT_TRUE; }
-{string} { return TK_LIT_STRING; }
-{char} { return TK_LIT_CHAR; }
+{string}/{chars_after_literals} { return TK_LIT_STRING; }
+{char}/{chars_after_literals} { return TK_LIT_CHAR; }
 
   /* SPECIAL CHARACTERS - e.g. ,;:() */
 {special_chars} {return yytext[0]; }
