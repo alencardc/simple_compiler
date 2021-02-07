@@ -104,8 +104,8 @@ true { return TK_LIT_TRUE; }
     BEGIN(ERROR_STATE);
   }
 
- /*When in error state, grab all chars until the end of the line*/
-<ERROR_STATE>[^  \n]* {
+ /*When in error state, grab all chars until the end of the line or ;*/
+<ERROR_STATE>[^  \n;]* {
   BEGIN(INITIAL);
   return TOKEN_ERRO;
 }
