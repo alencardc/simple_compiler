@@ -7,6 +7,8 @@
 
   #define print_token(TOKEN) \
     printf("Line: %d | Token identified: %s | Token: " #TOKEN "\n", get_line_number(), yytext);
+
+  
 %}
 
 digit [0-9]
@@ -14,7 +16,7 @@ integer {digit}+
 exponent [eE][+-]?{integer}
 float {integer}(("."{integer})|{exponent}|("."{integer}){exponent}) 
 char \'(\\.|[^\\])\'
-string \"([^"\\]|\\.)*\"
+string \"([^"\\\n]|\\.)*\"
 chars_after_literals [^_a-zA-Z0-9]
 
 letter [_a-zA-Z]
@@ -33,6 +35,8 @@ all_except_asterisk [^*]
 asterisk_without_slash \*+[^/*]
 end_multiline (\*+\/)
 simpler_multiline_comment {start_multiline}({all_except_asterisk}|{asterisk_without_slash})*{end_multiline}
+
+%x ERROR_STATE
 
 %%
   /* RESERVED WORDS */
@@ -95,8 +99,16 @@ true { return TK_LIT_TRUE; }
 \n {}
 
   /* ERROR IF NO PATTERN MATCHED */
-. { return TOKEN_ERRO; }
+. {
+    yyless(0); 
+    BEGIN(ERROR_STATE);
+  }
 
+ /*When in error state, grab all chars until the end of the line*/
+<ERROR_STATE>[^  \n]* {
+  BEGIN(INITIAL);
+  return TOKEN_ERRO;
+}
 %%
 
 int get_line_number(void) {
