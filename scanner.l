@@ -17,7 +17,7 @@ exponent [eE][+-]?{integer}
 float {integer}(("."{integer})|{exponent}|("."{integer}){exponent}) 
 char \'(\\.|[^\\])\'
 string \"([^"\\\n]|\\.)*\"
-chars_after_literals [^_a-zA-Z0-9]
+chars_after_literals [^_a-zA-Z0-9.]
 
 letter [_a-zA-Z]
 identifier {letter}({letter}|{digit})*
