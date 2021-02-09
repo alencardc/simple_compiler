@@ -13,7 +13,7 @@
 
 digit [0-9]
 integer [+-]?{digit}+
-exponent [eE][+-]?{integer}
+exponent [eE][+-]?(([1-9]{digit}*)+|[0]+[1-9]{digit}*)
 float [+-]?{integer}(("."{integer})|{exponent}|("."{integer}){exponent}) 
 char \'(\\.|[^\\])\'
 string \"([^"\\\n]|\\.)*\"
