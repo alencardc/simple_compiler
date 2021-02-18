@@ -7,5 +7,8 @@ all: flex bison
 flex: scanner.l
 	flex scanner.l
 
+bison: parser.y
+	bison -d parser.y
+
 clear:
-	rm -rf etapa* lex.yy.c parser.tab.* *.o
+	rm -rf etapa* lex.yy.c parser.tab.* parser.output *.o
