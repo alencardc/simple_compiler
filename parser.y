@@ -52,24 +52,52 @@ extern int get_line_number(void);
 
 %%
 
-programa: global_declr_list programa
-        | 
+programa: global_decl_list programa
+        | block programa
+        |
         ;
 
+var_storage_mod: TK_PR_STATIC | ;
+var_qualifier: TK_PR_CONST | ;
 type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
+literal: TK_LIT_INT | TK_LIT_FLOAT | TK_LIT_FALSE | TK_LIT_TRUE | TK_LIT_CHAR | TK_LIT_STRING;
 
 // Global variables declaration
-global_declr_list: global_var_mod type global_var_list ';' { printf("Identifiquei\n");};
+
+global_decl_list: var_storage_mod type global_var_list ';' { printf("Identifiquei\n");};
 
 global_var_list: global_var_id
                  | global_var_list ',' global_var_id
                  ;
 
-global_var_mod: TK_PR_STATIC | ;
-
 global_var_id: TK_IDENTIFICADOR
              | TK_IDENTIFICADOR '[' TK_LIT_INT ']'
              ;
+
+
+
+// Local variables declaration
+
+local_decl_list: local_decl
+               | local_decl_list local_decl
+               ;
+
+local_decl: var_storage_mod var_qualifier type local_var_list ';' { printf("Identifiquei\n");};
+
+local_var_list: local_var_init
+              | local_var_list ',' local_var_init
+              ;
+
+local_var_init: local_var_id
+              | local_var_id TK_OC_LE assign_expression 
+              ;
+local_var_id: TK_IDENTIFICADOR;
+
+// Expressions
+
+assign_expression: local_var_id | literal;
+
+block: '{' local_decl_list '}';
 
 %%
 
