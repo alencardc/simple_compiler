@@ -3,6 +3,7 @@
 
 int yylex(void);
 void yyerror (char const *s);
+extern int get_line_number(void);
 %}
 
 %token TK_PR_INT
@@ -51,10 +52,27 @@ void yyerror (char const *s);
 
 %%
 
-programa: ;
+programa: global_declr_list programa
+        | 
+        ;
+
+type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
+
+// Global variables declaration
+global_declr_list: global_var_mod type global_var_list ';' { printf("Identifiquei\n");};
+
+global_var_list: global_var_id
+                 | global_var_list ',' global_var_id
+                 ;
+
+global_var_mod: TK_PR_STATIC | ;
+
+global_var_id: TK_IDENTIFICADOR
+             | TK_IDENTIFICADOR '[' TK_LIT_INT ']'
+             ;
 
 %%
 
 void yyerror (char const *s) {
-  printf("Error: %s\n", s);
+  printf("Error: %s at line %d\n", s, get_line_number());
 }
