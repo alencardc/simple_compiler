@@ -1,7 +1,7 @@
 %option yylineno noyywrap
 
 %{
-  #include "tokens.h"
+  #include "parser.tab.h"
 
   int get_line_number(void);
 
