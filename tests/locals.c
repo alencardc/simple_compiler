@@ -1,5 +1,4 @@
-{ string s; }
-{
+int testLocalVar() {
   char c;
 
   //string s;

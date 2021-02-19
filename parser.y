@@ -62,8 +62,9 @@ var_qualifier: TK_PR_CONST | %empty;
 type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
 literal: TK_LIT_INT | TK_LIT_FLOAT | TK_LIT_FALSE | TK_LIT_TRUE | TK_LIT_CHAR | TK_LIT_STRING;
 
-// Global variables declaration
-
+/*************************************
+**** Global variables declaration ****
+*************************************/
 global_decl_list: storage_modifier type global_var_list ';' { printf("Identifiquei\n");};
 
 global_var_list: global_var_id
@@ -75,12 +76,9 @@ global_var_id: TK_IDENTIFICADOR
              ;
 
 
-
-// Local variables declaration
-
-local_decl_list: local_decl
-               | local_decl_list local_decl
-               ;
+/*************************************
+**** Local variables declaration ****
+*************************************/
 
 local_decl: storage_modifier var_qualifier type local_var_list ';' { printf("Identifiquei\n");};
 
@@ -93,9 +91,12 @@ local_var_init: local_var_id
               ;
 local_var_id: TK_IDENTIFICADOR;
 
-// Functions declarations
 
-func_decl: storage_modifier type TK_IDENTIFICADOR '(' params ')' block;
+/*************************************
+******* Functions declaration ********
+*************************************/
+
+func_decl: storage_modifier type TK_IDENTIFICADOR '(' params ')' control_block;
 
 params: param_list | %empty;
 
@@ -105,11 +106,28 @@ param_list: param
 
 param: var_qualifier type TK_IDENTIFICADOR;
 
-// Expressions
+
+/*************************************
+*********** Expressions **************
+*************************************/
 
 assign_expression: local_var_id | literal;
 
-block: '{' local_decl_list '}';
+
+/*************************************
+************* Commands ***************
+*************************************/
+
+command_list: command
+            | command_list command
+            ;
+
+command: local_decl
+       | block_command
+       ;
+
+control_block: '{' command_list '}' | '{' '}';
+block_command: control_block ';' ;
 
 %%
 
