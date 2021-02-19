@@ -124,10 +124,15 @@ command_list: command
 
 command: local_decl
        | block_command
+       | assign_command
        ;
 
 control_block: '{' command_list '}' | '{' '}';
 block_command: control_block ';' ;
+
+assign_command: TK_IDENTIFICADOR '=' assign_expression ';'
+              | TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' assign_expression ';'
+              ;
 
 %%
 
