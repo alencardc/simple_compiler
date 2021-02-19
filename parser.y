@@ -1,6 +1,14 @@
 %{
 #include <stdio.h>
 
+/*
+TODO
+- Verificar as gramaticas que usam TK_IDENTIFICADOR, pois
+essas podem ser que precisem aceitar a variação para vetor. 
+Ou seja, além de um TK_IDENTIFICADOR, aceitar tamém
+TK_IDENTIFICADOR '[' TK_LIT_INT ']'
+*/
+
 int yylex(void);
 void yyerror (char const *s);
 extern int get_line_number(void);
@@ -125,6 +133,7 @@ command_list: command
 command: local_decl
        | block_command
        | assign_command
+       | io_command
        ;
 
 control_block: '{' command_list '}' | '{' '}';
@@ -134,6 +143,11 @@ assign_command: TK_IDENTIFICADOR '=' assign_expression ';'
               | TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' assign_expression ';'
               ;
 
+input_command: TK_PR_INPUT TK_IDENTIFICADOR ';';
+output_command: TK_PR_OUTPUT TK_IDENTIFICADOR ';'
+              | TK_PR_OUTPUT literal ';'
+              ;
+io_command: input_command | output_command;
 %%
 
 void yyerror (char const *s) {
