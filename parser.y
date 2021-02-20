@@ -9,6 +9,7 @@ Ou seja, além de um TK_IDENTIFICADOR, aceitar tamém
 TK_IDENTIFICADOR '[' TK_LIT_INT ']'
 
 trocar TK_LIT_INT como expressao no shift
+trocar argument para aceitar expressões
 */
 
 int yylex(void);
@@ -137,6 +138,7 @@ command: local_decl
        | assign_command
        | io_command
        | shift_command
+       | function_call
        ;
 
 control_block: '{' command_list '}' | '{' '}';
@@ -152,10 +154,15 @@ output_command: TK_PR_OUTPUT TK_IDENTIFICADOR ';'
               ;
 io_command: input_command | output_command;
 
-/* */
 shift: TK_OC_SR | TK_OC_SL;
-shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' TK_LIT_INT ']';
+shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' TK_LIT_INT ']'; /*Substituir por uma expressao*/
 shift_command: shift_operand shift TK_LIT_INT ';' {printf("shiftzinho\n");};
+
+function_call: TK_IDENTIFICADOR '(' arguments ')' ';' {printf("chamou função\n");};
+/*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
+arguments: arguments_list | %empty;
+arguments_list: argument | argument ',' arguments_list;
+argument: assign_expression; /*Substituir por uma expressao*/
 
 %%
 
