@@ -139,13 +139,14 @@ command: local_decl
        | io_command
        | shift_command
        | function_call
+       | control_commands
        ;
 
 control_block: '{' command_list '}' | '{' '}';
 block_command: control_block;
 
 assign_command: TK_IDENTIFICADOR '=' assign_expression 
-              | TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' assign_expression 
+              | TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' assign_expression  /*Substituir por uma expressao*/
               ;
 
 input_command: TK_PR_INPUT TK_IDENTIFICADOR;
@@ -163,6 +164,9 @@ function_call: TK_IDENTIFICADOR '(' arguments ')'{printf("chamou função\n");};
 arguments: arguments_list | %empty;
 arguments_list: argument | argument ',' arguments_list;
 argument: assign_expression; /*Substituir por uma expressao*/
+
+control_commands: return | TK_PR_BREAK | TK_PR_CONTINUE;
+return: TK_PR_RETURN TK_LIT_INT; /*Substituir por uma expressao*/
 
 %%
 
