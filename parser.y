@@ -91,7 +91,7 @@ global_var_id: TK_IDENTIFICADOR
 **** Local variables declaration ****
 *************************************/
 
-local_decl: storage_modifier var_qualifier type local_var_list ';' { printf("Identifiquei\n");};
+local_decl: storage_modifier var_qualifier type local_var_list { printf("Identifiquei\n");};
 
 local_var_list: local_var_init
               | local_var_list ',' local_var_init
@@ -129,10 +129,10 @@ assign_expression: local_var_id | literal;
 ************* Commands ***************
 *************************************/
 
-command_list: command
-            | command_list command
+command_list: one_line_command
+            | command_list one_line_command
             ;
-
+one_line_command: command ';';
 command: local_decl
        | block_command
        | assign_command
@@ -142,23 +142,23 @@ command: local_decl
        ;
 
 control_block: '{' command_list '}' | '{' '}';
-block_command: control_block ';' ;
+block_command: control_block;
 
-assign_command: TK_IDENTIFICADOR '=' assign_expression ';'
-              | TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' assign_expression ';'
+assign_command: TK_IDENTIFICADOR '=' assign_expression 
+              | TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' assign_expression 
               ;
 
-input_command: TK_PR_INPUT TK_IDENTIFICADOR ';';
-output_command: TK_PR_OUTPUT TK_IDENTIFICADOR ';'
-              | TK_PR_OUTPUT literal ';'
+input_command: TK_PR_INPUT TK_IDENTIFICADOR;
+output_command: TK_PR_OUTPUT TK_IDENTIFICADOR 
+              | TK_PR_OUTPUT literal 
               ;
 io_command: input_command | output_command;
 
 shift: TK_OC_SR | TK_OC_SL;
 shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' TK_LIT_INT ']'; /*Substituir por uma expressao*/
-shift_command: shift_operand shift TK_LIT_INT ';' {printf("shiftzinho\n");};
+shift_command: shift_operand shift TK_LIT_INT{printf("shiftzinho\n");};
 
-function_call: TK_IDENTIFICADOR '(' arguments ')' ';' {printf("chamou função\n");};
+function_call: TK_IDENTIFICADOR '(' arguments ')'{printf("chamou função\n");};
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
 arguments: arguments_list | %empty;
 arguments_list: argument | argument ',' arguments_list;
