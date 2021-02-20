@@ -1,4 +1,7 @@
 lex.yy.c
+parser.tab.h
+parser.tab.c
+parser.output
 **/**.o
 etapa*
 saidas/*
