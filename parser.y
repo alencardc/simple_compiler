@@ -7,6 +7,8 @@ TODO
 essas podem ser que precisem aceitar a variação para vetor. 
 Ou seja, além de um TK_IDENTIFICADOR, aceitar tamém
 TK_IDENTIFICADOR '[' TK_LIT_INT ']'
+
+trocar TK_LIT_INT como expressao no shift
 */
 
 int yylex(void);
@@ -57,7 +59,6 @@ extern int get_line_number(void);
 %token TK_LIT_STRING
 %token TK_IDENTIFICADOR
 %token TOKEN_ERRO
-
 %%
 
 programa: global_decl_list programa
@@ -69,6 +70,7 @@ storage_modifier: TK_PR_STATIC | %empty;
 var_qualifier: TK_PR_CONST | %empty;
 type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
 literal: TK_LIT_INT | TK_LIT_FLOAT | TK_LIT_FALSE | TK_LIT_TRUE | TK_LIT_CHAR | TK_LIT_STRING;
+
 
 /*************************************
 **** Global variables declaration ****
@@ -134,6 +136,7 @@ command: local_decl
        | block_command
        | assign_command
        | io_command
+       | shift_command
        ;
 
 control_block: '{' command_list '}' | '{' '}';
@@ -148,6 +151,12 @@ output_command: TK_PR_OUTPUT TK_IDENTIFICADOR ';'
               | TK_PR_OUTPUT literal ';'
               ;
 io_command: input_command | output_command;
+
+/* */
+shift: TK_OC_SR | TK_OC_SL;
+shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' TK_LIT_INT ']';
+shift_command: shift_operand shift TK_LIT_INT ';' {printf("shiftzinho\n");};
+
 %%
 
 void yyerror (char const *s) {
