@@ -129,9 +129,12 @@ assign_expression: local_var_id | literal;
 ************* Commands ***************
 *************************************/
 
-command_list: one_line_command
-            | command_list one_line_command
+command_list: generic_command
+            | command_list generic_command
             ;
+
+generic_command: one_line_command | multiline_command;
+
 one_line_command: command ';';
 command: local_decl
        | block_command
@@ -168,6 +171,16 @@ argument: assign_expression; /*Substituir por uma expressao*/
 control_commands: return | TK_PR_BREAK | TK_PR_CONTINUE;
 return: TK_PR_RETURN TK_LIT_INT; /*Substituir por uma expressao*/
 
+
+/*************************************
+********* Controle de fluxo **********
+*************************************/
+multiline_command: if_simples | if_else | for | while;
+if_simples: TK_PR_IF '(' TK_LIT_INT ')' control_block {printf("Um if\n");}; /*Substituir por uma expressao*/
+if_else: if_simples TK_PR_ELSE control_block {printf("if e else né\n");};
+
+for: TK_PR_FOR '(' assign_command ':' TK_LIT_INT ':' assign_command ')' control_block {printf("Pegou um for\n");};  /*Substituir por uma expressao*/
+while: TK_PR_WHILE '(' TK_LIT_INT ')' TK_PR_DO control_block {printf("Pegou um while\n");};;  /*Substituir por uma expressao*/
 %%
 
 void yyerror (char const *s) {
