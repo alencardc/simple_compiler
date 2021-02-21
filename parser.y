@@ -17,6 +17,8 @@ void yyerror (char const *s);
 extern int get_line_number(void);
 %}
 
+%define parse.error verbose
+
 %token TK_PR_INT
 %token TK_PR_FLOAT
 %token TK_PR_BOOL
