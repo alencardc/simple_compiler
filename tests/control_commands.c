@@ -1,4 +1,5 @@
 int testControlCommands () {
 break; continue;
-return 42;
+return 42 - 64;
+return;
 }

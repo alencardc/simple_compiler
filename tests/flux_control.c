@@ -9,8 +9,8 @@ int foo (int c) {
     else{
 
     }
-    for(i = 0 : 0: i = 0){  
-        while (0) do {
+    for(i = 0 : 0 - 831 * 2 : i = 0){  
+        while (0 - 2) do {
           print();
         }
     }

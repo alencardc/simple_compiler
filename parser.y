@@ -193,7 +193,7 @@ control_block: '{' command_list '}' | '{' '}';
 block_command: control_block;
 
 assign_command: TK_IDENTIFICADOR '=' assign_expression 
-              | TK_IDENTIFICADOR '[' TK_LIT_INT ']' '=' assign_expression  /*Substituir por uma expressao*/
+              | TK_IDENTIFICADOR '[' assign_expression']' '=' assign_expression  
               ;
 
 input_command: TK_PR_INPUT TK_IDENTIFICADOR;
@@ -203,28 +203,28 @@ output_command: TK_PR_OUTPUT TK_IDENTIFICADOR
 io_command: input_command | output_command;
 
 shift: TK_OC_SR | TK_OC_SL;
-shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' TK_LIT_INT ']'; /*Substituir por uma expressao*/
+shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' assign_expression ']'; 
 shift_command: shift_operand shift TK_LIT_INT{printf("shiftzinho\n");};
 
 function_call: TK_IDENTIFICADOR '(' arguments ')'{printf("chamou função\n");};
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
 arguments: arguments_list | %empty;
 arguments_list: argument | argument ',' arguments_list;
-argument: assign_expression; /*Substituir por uma expressao*/
+argument: assign_expression; 
 
 control_commands: return | TK_PR_BREAK | TK_PR_CONTINUE;
-return: TK_PR_RETURN TK_LIT_INT; /*Substituir por uma expressao*/
+return: TK_PR_RETURN assign_expression; 
 
 
 /*************************************
 ********* Controle de fluxo **********
 *************************************/
 multiline_command: if_simples | if_else | for | while;
-if_simples: TK_PR_IF '(' TK_LIT_INT ')' control_block {printf("Um if\n");}; /*Substituir por uma expressao*/
+if_simples: TK_PR_IF '('assign_expression ')' control_block {printf("Um if\n");}; 
 if_else: if_simples TK_PR_ELSE control_block {printf("if e else né\n");};
 
-for: TK_PR_FOR '(' assign_command ':' TK_LIT_INT ':' assign_command ')' control_block {printf("Pegou um for\n");};  /*Substituir por uma expressao*/
-while: TK_PR_WHILE '(' TK_LIT_INT ')' TK_PR_DO control_block {printf("Pegou um while\n");};;  /*Substituir por uma expressao*/
+for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block {printf("Pegou um for\n");};  
+while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {printf("Pegou um while\n");};; 
 %%
 
 void yyerror (char const *s) {
