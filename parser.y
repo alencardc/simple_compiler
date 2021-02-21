@@ -76,7 +76,7 @@ literal: TK_LIT_INT | TK_LIT_FLOAT | TK_LIT_FALSE | TK_LIT_TRUE | TK_LIT_CHAR | 
 /*************************************
 **** Global variables declaration ****
 *************************************/
-global_decl_list: storage_modifier type global_var_list ';' { printf("Identifiquei\n");};
+global_decl_list: storage_modifier type global_var_list ';' { printf("Global var\n");};
 
 global_var_list: global_var_id
                  | global_var_list ',' global_var_id
@@ -91,7 +91,7 @@ global_var_id: TK_IDENTIFICADOR
 **** Local variables declaration ****
 *************************************/
 
-local_decl: storage_modifier var_qualifier type local_var_list { printf("Identifiquei\n");};
+local_decl: storage_modifier var_qualifier type local_var_list { printf("Local var decl\n");};
 
 local_var_list: local_var_init
               | local_var_list ',' local_var_init
@@ -122,8 +122,40 @@ param: var_qualifier type TK_IDENTIFICADOR;
 *********** Expressions **************
 *************************************/
 
-assign_expression: local_var_id | literal;
+assign_expression: additive_expression;
 
+additive_expression: multiplicative_expression
+                  | additive_expression additive_operator multiplicative_expression { printf("Add expression\n"); }
+                  ;
+
+additive_operator: '+' | '-';
+
+multiplicative_expression: unary_expression
+                         | multiplicative_expression multiplicative_operator unary_expression { printf("Mult expression\n"); }
+                         ;
+
+multiplicative_operator: '*'
+                       | '/'
+                       | '%'
+                       ;
+
+unary_expression: basic_expression { printf("Basic expression\n"); }
+                | unary_operator unary_expression { printf("Unary expression\n"); }
+                ;
+
+unary_operator: '+'
+              | '-'
+              | '!'
+              | '&'
+              | '*'
+              | '?'
+              | '#'
+              ;
+
+basic_expression: local_var_id { printf("[var id]\n"); }
+                | literal { printf("[literal]\n"); }
+                | '(' assign_expression ')' { printf("[()]\n"); }
+                ;
 
 /*************************************
 ************* Commands ***************
