@@ -122,34 +122,44 @@ param: var_qualifier type TK_IDENTIFICADOR;
 *********** Expressions **************
 *************************************/
 
-assign_expression: or_expression;
+assign_expression: ternary_expression;
 
-or_operator: TK_OC_OR
+ternary_expression: or_expression
+                  | or_expression '?' assign_expression ':' ternary_expression { printf("Ternary expression \n");}
+                  ;
+
 or_expression: and_expression
-                  | or_expression or_operator and_expression { printf("OR expression \n");}
-                  ;
+             | or_expression or_operator and_expression { printf("OR expression \n");}
+             ;
 
-and_operator:  TK_OC_AND
+or_operator: TK_OC_OR;
+
 and_expression: bit_or_expression
-                  | and_expression and_operator bit_or_expression { printf("AND expression \n");}
-                  ;
+              | and_expression and_operator bit_or_expression { printf("AND expression \n");}
+              ;
 
-bit_or_operator: '|'
+and_operator: TK_OC_AND;
+
 bit_or_expression: bit_and_expression
-                  | bit_or_expression bit_or_operator bit_and_expression { printf("Bitwise_or expression \n");}
+                 | bit_or_expression bit_or_operator bit_and_expression { printf("Bitwise_or expression \n");}
+                 ;
+
+bit_or_operator: '|';
+
+bit_and_expression: equality_expression 
+                  | bit_and_expression bit_and_operator equality_expression { printf("Bitwise_and expression \n");}
                   ;
 
-bit_and_operator:  '&'
-bit_and_expression: equational_expression 
-                  | bit_and_expression bit_and_operator equational_expression { printf("Bitwise_and expression \n");}
-                  ;
+bit_and_operator: '&';
 
-equational_operator: TK_OC_EQ
-                   | TK_OC_NE;
+equality_expression: relational_expression
+                   | equality_expression equality_operator relational_expression { printf("Equational expression \n");}
+                   ;
 
-equational_expression: relational_expression
-                      | equational_expression equational_operator relational_expression { printf("Equational expression \n");}
-                      ;
+equality_operator: TK_OC_EQ
+                 | TK_OC_NE
+                 ;
+
 relational_expression: additive_expression
                      | relational_expression relational_operator additive_expression { printf("Relational expression\n"); } 
                      ;
@@ -177,12 +187,11 @@ multiplicative_operator: '*'
                        | '%'
                        ;
 
-exponential_operator: '^';
-
 exponential_expression: unary_expression
                       | exponential_expression exponential_operator unary_expression {printf("Exponential expression\n");}
                       ;
 
+exponential_operator: '^';
 
 unary_expression: basic_expression { printf("Basic expression\n"); }
                 | unary_operator unary_expression { printf("Unary expression\n"); }

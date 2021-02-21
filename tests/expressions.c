@@ -59,5 +59,10 @@ int testExpressions() {
    //int logicalandBitwiseOr <= 63 | 9 && 7;
    //int logicalandBitwiseOr <= 63 & 8 | 9 && 7;
 
-  
+  // Testes com o operador ternario
+  //int ternary <= 3 || 1+2 ? 42*2 : 1|2; 
+  //int ternary <= isMarried ? (sheIsHot ? youRock : youFuckedUp) : itsOK; 
+  //int ternary <= isMarried ? sheIsHot ? youRock : youFuckedUp : itsOK;
+
+  int ternary <= isMarried ? sheIsHot ? youRock : youFuckedUp : haveSex ? isOK : youNerdola;
 }
