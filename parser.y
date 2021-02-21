@@ -122,7 +122,19 @@ param: var_qualifier type TK_IDENTIFICADOR;
 *********** Expressions **************
 *************************************/
 
-assign_expression: additive_expression;
+assign_expression: relational_expression;
+
+relational_expression: additive_expression
+                     | relational_expression relational_operator additive_expression { printf("Relational expression\n"); } 
+                     ;
+
+relational_operator: '<'
+                   | '>'
+                   | TK_OC_GE
+                   | TK_OC_LE
+                   ;
+
+// Expressoes de shift???
 
 additive_expression: multiplicative_expression
                   | additive_expression additive_operator multiplicative_expression { printf("Add expression\n"); }
