@@ -40,9 +40,17 @@ int testExpressions() {
   //int test6 <= -test3 * 2 + 1 <= test5; 
   
   // equational vem por ultimo 
-  int test6 <= test > test5 != test3; 
-   int test6 <= test / test5 < 2 == test3; 
+  //int test6 <= test > test5 != test3; 
+  //int test6 <= test / test5 < 2 == test3;
+  //A exponenciacao vem primeiro amiguinho
+  //int capitaoKirk <= 2 * 2 ^ 3; 
+  //é o mesmo que (69 ^69) * (69 ^69)
+  //int viihTubeCospeGato <= 69 ^ 69 * 69 ^ 69; 
+  //int erradao <= 29 ^;
 
-
+  //Primeiro equidade dps bitwise
+  //int bitwise <= 63 & 9 == 7;
+  //Primeiro and dps or
+  //int bitwise_or_and <= 63 | 9 & 7;
   
 }

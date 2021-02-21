@@ -122,7 +122,17 @@ param: var_qualifier type TK_IDENTIFICADOR;
 *********** Expressions **************
 *************************************/
 
-assign_expression: equational_expression;
+assign_expression: bit_or_expression;
+
+bit_or_operator: '|'
+bit_or_expression: bit_and_expression
+                  | bit_or_expression bit_or_operator bit_and_expression { printf("Bitwise_or expression \n");}
+                  ;
+
+bit_and_operator:  '&'
+bit_and_expression: equational_expression 
+                  | bit_and_expression bit_and_operator equational_expression { printf("Bitwise_and expression \n");}
+                  ;
 
 equational_operator: TK_OC_EQ
                    | TK_OC_NE;
@@ -148,14 +158,21 @@ additive_expression: multiplicative_expression
 
 additive_operator: '+' | '-';
 
-multiplicative_expression: unary_expression
-                         | multiplicative_expression multiplicative_operator unary_expression { printf("Mult expression\n"); }
+multiplicative_expression: exponential_expression
+                         | multiplicative_expression multiplicative_operator exponential_expression { printf("Mult expression\n"); }
                          ;
 
 multiplicative_operator: '*'
                        | '/'
                        | '%'
                        ;
+
+exponential_operator: '^';
+
+exponential_expression: unary_expression
+                      | exponential_expression exponential_operator unary_expression {printf("Exponential expression\n");}
+                      ;
+
 
 unary_expression: basic_expression { printf("Basic expression\n"); }
                 | unary_operator unary_expression { printf("Unary expression\n"); }
