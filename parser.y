@@ -122,8 +122,14 @@ param: var_qualifier type TK_IDENTIFICADOR;
 *********** Expressions **************
 *************************************/
 
-assign_expression: relational_expression;
+assign_expression: equational_expression;
 
+equational_operator: TK_OC_EQ
+                   | TK_OC_NE;
+
+equational_expression: relational_expression
+                      | equational_expression equational_operator relational_expression { printf("Equational expression \n");}
+                      ;
 relational_expression: additive_expression
                      | relational_expression relational_operator additive_expression { printf("Relational expression\n"); } 
                      ;

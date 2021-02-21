@@ -38,7 +38,11 @@ int testExpressions() {
   //int test6 <= -test3 - 123 * 2 + (&test % -(*test5));
 
   //int test6 <= -test3 * 2 + 1 <= test5; 
-  //int test6 <= test > test5 > test3; 
+  
+  // equational vem por ultimo 
+  int test6 <= test > test5 != test3; 
+   int test6 <= test / test5 < 2 == test3; 
+
 
   
 }
