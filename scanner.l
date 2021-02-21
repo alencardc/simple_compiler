@@ -12,9 +12,9 @@
 %}
 
 digit [0-9]
-integer [+-]?{digit}+
+integer {digit}+
 exponent [eE][+-]?(([1-9]{digit}*)+|[0]+[1-9]{digit}*)
-float [+-]?{integer}(("."{integer})|{exponent}|("."{integer}){exponent}) 
+float {integer}(("."{integer})|{exponent}|("."{integer}){exponent}) 
 char \'(\\.|[^\\])\'
 string \"([^"\\\n]|\\.)*\"
 chars_after_literals [^_a-zA-Z0-9.]
@@ -22,7 +22,7 @@ chars_after_literals [^_a-zA-Z0-9.]
 letter [_a-zA-Z]
 identifier {letter}({letter}|{digit})*
 id_end [^a-zA-Z0-9_]
-special_chars [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$]
+special_chars [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 
 /*Comentários*/
 white_space [ \t\r\v\f]
@@ -86,8 +86,8 @@ true { return TK_LIT_TRUE; }
 "!=" {return TK_OC_NE; }
 "&&" {return TK_OC_AND; }
 "||" {return TK_OC_OR; }
-">>" {return TK_OC_SL; }
-"<<" {return TK_OC_SR; }
+">>" {return TK_OC_SR; }
+"<<" {return TK_OC_SL; }
 
   /* IDENTIFIER */
 {identifier} { return TK_IDENTIFICADOR; }
