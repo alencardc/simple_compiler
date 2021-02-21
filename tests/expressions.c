@@ -59,5 +59,8 @@ int testExpressions() {
    //int logicalandBitwiseOr <= 63 | 9 && 7;
    //int logicalandBitwiseOr <= 63 & 8 | 9 && 7;
 
+   //int vetorzaoBrabo <= abc[vetorzaoBrabo[2] ^ 2] - 24;
+   int vetorzaumBrabissimo <= a[2 ^2] - 26 + 32;
+
   
 }

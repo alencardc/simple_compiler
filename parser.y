@@ -200,7 +200,7 @@ unary_operator: '+'
 basic_expression: local_var_id { printf("[var id]\n"); }
                 | literal { printf("[literal]\n"); }
                 | '(' assign_expression ')' { printf("[()]\n"); }
-                ;
+                | TK_IDENTIFICADOR '['assign_expression ']' {printf("Vetorzao brabu\n");};;
 
 /*************************************
 ************* Commands ***************
