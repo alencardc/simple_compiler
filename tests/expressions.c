@@ -65,4 +65,10 @@ int testExpressions() {
   //int ternary <= isMarried ? sheIsHot ? youRock : youFuckedUp : itsOK;
 
   int ternary <= isMarried ? sheIsHot ? youRock : youFuckedUp : haveSex ? isOK : youNerdola;
+
+  
+   //int vetorzaoBrabo <= abc[vetorzaoBrabo[2] ^ 2] - 24;
+   int vetorzaumBrabissimo <= a[2 ^2] - 26 + 32;
+
+  
 }
