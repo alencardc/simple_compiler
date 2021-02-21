@@ -122,7 +122,17 @@ param: var_qualifier type TK_IDENTIFICADOR;
 *********** Expressions **************
 *************************************/
 
-assign_expression: bit_or_expression;
+assign_expression: or_expression;
+
+or_operator: TK_OC_OR
+or_expression: and_expression
+                  | or_expression or_operator and_expression { printf("OR expression \n");}
+                  ;
+
+and_operator:  TK_OC_AND
+and_expression: bit_or_expression
+                  | and_expression and_operator bit_or_expression { printf("AND expression \n");}
+                  ;
 
 bit_or_operator: '|'
 bit_or_expression: bit_and_expression

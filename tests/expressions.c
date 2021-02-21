@@ -48,9 +48,16 @@ int testExpressions() {
   //int viihTubeCospeGato <= 69 ^ 69 * 69 ^ 69; 
   //int erradao <= 29 ^;
 
+  //Testes bitwise
   //Primeiro equidade dps bitwise
   //int bitwise <= 63 & 9 == 7;
   //Primeiro and dps or
   //int bitwise_or_and <= 63 | 9 & 7;
+
+  //Testes com logical and e or
+   //int logicaland <= 63 || 9 && 7;
+   //int logicalandBitwiseOr <= 63 | 9 && 7;
+   //int logicalandBitwiseOr <= 63 & 8 | 9 && 7;
+
   
 }
