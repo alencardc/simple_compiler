@@ -22,7 +22,7 @@ chars_after_literals [^_a-zA-Z0-9.]
 letter [_a-zA-Z]
 identifier {letter}({letter}|{digit})*
 id_end [^a-zA-Z0-9_]
-special_chars [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$]
+special_chars [\,\;\:\(\)\[\]\{\}\+\-\|\*\/\<\>\=\!\&\%\#\^\.\$\?]
 
 /*Comentários*/
 white_space [ \t\r\v\f]
