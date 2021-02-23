@@ -28,5 +28,8 @@ int testLocalVar() {
   static const int myconst <= 3;
   static const string s;
 
+  int n1, n2 <= 3;
+  int n1 <= 2, n3 <= 3;
+
   const string; // error
 }
