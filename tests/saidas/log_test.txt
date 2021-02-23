@@ -1,6 +1,6 @@
 assignment.c: Success
 control_commands.c: Error
-expressions.c: Success
+expressions.c: Error
 flux_control.c: Success
 function.c: Error
 function_call.c: Success
@@ -8,3 +8,4 @@ globals.c: Error
 io.c: Success
 locals.c: Error
 shift.c: Error
+testProgram.c: Success

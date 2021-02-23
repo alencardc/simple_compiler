@@ -5,3 +5,5 @@ parser.output
 **/**.o
 etapa*
 saidas/*
+submit
+**/**.tgz

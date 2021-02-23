@@ -1,74 +1,82 @@
 int testExpressions() {
-  /*int test <= 123;
-  float test <= 123.45;
-  char test <= 'a';
-  string test <= "aa";
-  bool test <= false;
+  test = 123;
+  test = 123.45;
+  //test = 'a'; // n pode atribuir char?
+  //test = "aa"; // n pode atribuir string?
+  //test = false; // n pode atribuir boolean?
 
-  int test2 <= test;
+  test2 = test;
 
-  int test3 <= (test);
-  int test3 <= (12345);
+  test3 = (test);
+  test3 = (12345);
 
-  int test4 <= -test;
-  int test4 <= -12345;
-  int test4 <= -(test);
-  int test4 <= -(*test);
-  int test4 <= #123;
-  int test4 <= &test;
-  int test4 <= &(?test);
+  test4 = -test;
+  test4 = -12345;
+  test4 = -(test);
+  test4 = -(*test);
+  test4 = #123;
+  test4 = &test;
+  test4 = &(?test);
 
-  int test5 <= !!test;
-  int test5 <= *&test; */
+  test5 = !!test;
+  test5 = *&test; 
 
-  /*int test6 <= 123 * 2;
-  int test6 <= 123 / 2;
-  int test6 <= 123 % 2;
-  int test6 <= 123 % test5;
-  int test6 <= 123 % -test5;
-  int test6 <= 123 % -(*test5);
-  int test6 <= &test % -(*test5);
-  */
+  test6 = 123 * 2;
+  test6 = 123 / 2;
+  test6 = 123 % 2;
+  test6 = 123 % test5;
+  test6 = 123 % -test5;
+  test6 = 123 % -(*test5);
+  test6 = &test % -(*test5);
+  
 
   // Nesse exemplo: ele reconhece -test3, dps 123 e 2, entao 123 * 2 e
   // junta tudo fazendo  -test3 - 123 * 2
   // Depois reconhece &test, então *test5, daí -(*test5) e só entao (&test % -(*test5))
   // Termina reconhecedno a soma de  -test3 - 123 * 2 com (&test % -(*test5))
   // E por fim a declaração da variavel
-  //int test6 <= -test3 - 123 * 2 + (&test % -(*test5));
+  test6 = -test3 - 123 * 2 + (&test % -(*test5));
 
-  //int test6 <= -test3 * 2 + 1 <= test5; 
+  test6 = -test3 * 2 + 1 <= test5; 
   
   // equational vem por ultimo 
-  //int test6 <= test > test5 != test3; 
-  //int test6 <= test / test5 < 2 == test3;
+  test6 = test > test5 != test3; 
+  test6 = test / test5 < 2 == test3;
   //A exponenciacao vem primeiro amiguinho
-  //int capitaoKirk <= 2 * 2 ^ 3; 
+  capitaoKirk = 2 * 2 ^ 3; 
   //é o mesmo que (69 ^69) * (69 ^69)
-  //int viihTubeCospeGato <= 69 ^ 69 * 69 ^ 69; 
-  //int erradao <= 29 ^;
+  viihTubeCospeGato = 69 ^ 69 * 69 ^ 69; 
+  //erradao = 29 ^;
 
   //Testes bitwise
   //Primeiro equidade dps bitwise
-  //int bitwise <= 63 & 9 == 7;
+  bitwise = 63 & 9 == 7;
   //Primeiro and dps or
-  //int bitwise_or_and <= 63 | 9 & 7;
+  bitwise_or_and = 63 | 9 & 7;
 
   //Testes com logical and e or
-   //int logicaland <= 63 || 9 && 7;
-   //int logicalandBitwiseOr <= 63 | 9 && 7;
-   //int logicalandBitwiseOr <= 63 & 8 | 9 && 7;
+   logicaland = 63 || 9 && 7;
+   logicalandBitwiseOr = 63 | 9 && 7;
+   logicalandBitwiseOr = 63 & 8 | 9 && 7;
 
   // Testes com o operador ternario
-  //int ternary <= 3 || 1+2 ? 42*2 : 1|2; 
-  //int ternary <= isMarried ? (sheIsHot ? youRock : youFuckedUp) : itsOK; 
-  //int ternary <= isMarried ? sheIsHot ? youRock : youFuckedUp : itsOK;
+  ternary = 3 || 1+2 ? 42*2 : 1|2; 
+  ternary = isMarried ? (sheIsHot ? youRock : youFuckedUp) : itsOK; 
+  ternary = isMarried ? sheIsHot ? youRock : youFuckedUp : itsOK;
 
+<<<<<<< HEAD
   //int ternary <= isMarried ? sheIsHot ? youRock : youFuckedUp : haveSex ? isOK : youNerdola;
 
   
    //int vetorzaoBrabo <= abc[vetorzaoBrabo[2] ^ 2] - 24;
    //int vetorzaumBrabissimo <= a[2 ^2] - 26 + 32;
+=======
+  ternary = isMarried ? sheIsHot ? youRock : youFuckedUp : haveSex ? isOK : youNerdola;
 
   
+   vetorzaoBrabo = abc[vetorzaoBrabo[2] ^ 2] - 24;
+  vetorzaumBrabissimo = a[2 ^2] - 26 + 32;
+>>>>>>> 8f8aa84075a635b010a28e3bc06b41b30555385d
+
+  testFunction = incVar(test) * 2;
 }

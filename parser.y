@@ -17,6 +17,8 @@ void yyerror (char const *s);
 extern int get_line_number(void);
 %}
 
+%define parse.error verbose
+
 %token TK_PR_INT
 %token TK_PR_FLOAT
 %token TK_PR_BOOL
@@ -98,9 +100,11 @@ local_var_list: local_var_init
               ;
 
 local_var_init: local_var_id
-              | local_var_id TK_OC_LE assign_expression 
+              | local_var_id TK_OC_LE local_var_value 
               ;
+
 local_var_id: TK_IDENTIFICADOR;
+local_var_value: TK_IDENTIFICADOR | literal ;
 
 
 /*************************************
@@ -207,9 +211,13 @@ unary_operator: '+'
               ;
 
 basic_expression: local_var_id { printf("[var id]\n"); }
-                | literal { printf("[literal]\n"); }
+                | TK_IDENTIFICADOR '['assign_expression ']' {printf("Vetorzao brabu\n");}
+                | constant { printf("[constant]\n"); }
+                | function_call
                 | '(' assign_expression ')' { printf("[()]\n"); }
-                | TK_IDENTIFICADOR '['assign_expression ']' {printf("Vetorzao brabu\n");};;
+                ;
+
+constant: TK_LIT_INT | TK_LIT_FLOAT ;
 
 /*************************************
 ************* Commands ***************
@@ -235,7 +243,7 @@ control_block: '{' command_list '}' | '{' '}';
 block_command: control_block;
 
 assign_command: TK_IDENTIFICADOR '=' assign_expression 
-              | TK_IDENTIFICADOR '[' assign_expression']' '=' assign_expression  
+              | TK_IDENTIFICADOR '[' assign_expression ']' '=' assign_expression  
               ;
 
 input_command: TK_PR_INPUT TK_IDENTIFICADOR;
@@ -249,6 +257,7 @@ shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' assign_expression ']';
 shift_command: shift_operand shift TK_LIT_INT{printf("shiftzinho\n");};
 
 function_call: TK_IDENTIFICADOR '(' arguments ')'{printf("chamou função\n");};
+
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
 arguments: arguments_list | %empty;
 arguments_list: argument | argument ',' arguments_list;
@@ -262,11 +271,13 @@ return: TK_PR_RETURN assign_expression;
 ********* Controle de fluxo **********
 *************************************/
 multiline_command: if_simples | if_else | for | while;
+
 if_simples: TK_PR_IF '('assign_expression ')' control_block {printf("Um if\n");}; 
 if_else: if_simples TK_PR_ELSE control_block {printf("if e else né\n");};
 
 for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block {printf("Pegou um for\n");};  
 while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {printf("Pegou um while\n");};; 
+
 %%
 
 void yyerror (char const *s) {
