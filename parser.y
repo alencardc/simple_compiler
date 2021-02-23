@@ -78,7 +78,7 @@ literal: TK_LIT_INT | TK_LIT_FLOAT | TK_LIT_FALSE | TK_LIT_TRUE | TK_LIT_CHAR | 
 /*************************************
 **** Global variables declaration ****
 *************************************/
-global_decl_list: storage_modifier type global_var_list ';' { printf("Global var\n");};
+global_decl_list: storage_modifier type global_var_list ';';
 
 global_var_list: global_var_id
                  | global_var_list ',' global_var_id
@@ -93,7 +93,7 @@ global_var_id: TK_IDENTIFICADOR
 **** Local variables declaration ****
 *************************************/
 
-local_decl: storage_modifier var_qualifier type local_var_list { printf("Local var decl\n");};
+local_decl: storage_modifier var_qualifier type local_var_list;
 
 local_var_list: local_var_init
               | local_var_list ',' local_var_init
@@ -129,35 +129,35 @@ param: var_qualifier type TK_IDENTIFICADOR;
 assign_expression: ternary_expression;
 
 ternary_expression: or_expression
-                  | or_expression '?' assign_expression ':' ternary_expression { printf("Ternary expression \n");}
+                  | or_expression '?' assign_expression ':' ternary_expression
                   ;
 
 or_expression: and_expression
-             | or_expression or_operator and_expression { printf("OR expression \n");}
+             | or_expression or_operator and_expression
              ;
 
 or_operator: TK_OC_OR;
 
 and_expression: bit_or_expression
-              | and_expression and_operator bit_or_expression { printf("AND expression \n");}
+              | and_expression and_operator bit_or_expression 
               ;
 
 and_operator: TK_OC_AND;
 
 bit_or_expression: bit_and_expression
-                 | bit_or_expression bit_or_operator bit_and_expression { printf("Bitwise_or expression \n");}
+                 | bit_or_expression bit_or_operator bit_and_expression
                  ;
 
 bit_or_operator: '|';
 
 bit_and_expression: equality_expression 
-                  | bit_and_expression bit_and_operator equality_expression { printf("Bitwise_and expression \n");}
+                  | bit_and_expression bit_and_operator equality_expression 
                   ;
 
 bit_and_operator: '&';
 
 equality_expression: relational_expression
-                   | equality_expression equality_operator relational_expression { printf("Equational expression \n");}
+                   | equality_expression equality_operator relational_expression
                    ;
 
 equality_operator: TK_OC_EQ
@@ -165,7 +165,7 @@ equality_operator: TK_OC_EQ
                  ;
 
 relational_expression: additive_expression
-                     | relational_expression relational_operator additive_expression { printf("Relational expression\n"); } 
+                     | relational_expression relational_operator additive_expression
                      ;
 
 relational_operator: '<'
@@ -177,13 +177,13 @@ relational_operator: '<'
 // Expressoes de shift???
 
 additive_expression: multiplicative_expression
-                  | additive_expression additive_operator multiplicative_expression { printf("Add expression\n"); }
+                  | additive_expression additive_operator multiplicative_expression 
                   ;
 
 additive_operator: '+' | '-';
 
 multiplicative_expression: exponential_expression
-                         | multiplicative_expression multiplicative_operator exponential_expression { printf("Mult expression\n"); }
+                         | multiplicative_expression multiplicative_operator exponential_expression
                          ;
 
 multiplicative_operator: '*'
@@ -192,13 +192,13 @@ multiplicative_operator: '*'
                        ;
 
 exponential_expression: unary_expression
-                      | exponential_expression exponential_operator unary_expression {printf("Exponential expression\n");}
+                      | exponential_expression exponential_operator unary_expression 
                       ;
 
 exponential_operator: '^';
 
-unary_expression: basic_expression { printf("Basic expression\n"); }
-                | unary_operator unary_expression { printf("Unary expression\n"); }
+unary_expression: basic_expression 
+                | unary_operator unary_expression
                 ;
 
 unary_operator: '+'
@@ -210,11 +210,11 @@ unary_operator: '+'
               | '#'
               ;
 
-basic_expression: local_var_id { printf("[var id]\n"); }
-                | TK_IDENTIFICADOR '['assign_expression ']' {printf("Vetorzao brabu\n");}
-                | constant { printf("[constant]\n"); }
+basic_expression: local_var_id 
+                | TK_IDENTIFICADOR '['assign_expression ']' 
+                | constant 
                 | function_call
-                | '(' assign_expression ')' { printf("[()]\n"); }
+                | '(' assign_expression ')' 
                 ;
 
 constant: TK_LIT_INT | TK_LIT_FLOAT ;
@@ -254,9 +254,9 @@ io_command: input_command | output_command;
 
 shift: TK_OC_SR | TK_OC_SL;
 shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' assign_expression ']'; 
-shift_command: shift_operand shift TK_LIT_INT{printf("shiftzinho\n");};
+shift_command: shift_operand shift TK_LIT_INT;
 
-function_call: TK_IDENTIFICADOR '(' arguments ')'{printf("chamou função\n");};
+function_call: TK_IDENTIFICADOR '(' arguments ')';
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
 arguments: arguments_list | %empty;
@@ -272,11 +272,11 @@ return: TK_PR_RETURN assign_expression;
 *************************************/
 multiline_command: if_simples | if_else | for | while;
 
-if_simples: TK_PR_IF '('assign_expression ')' control_block {printf("Um if\n");}; 
-if_else: if_simples TK_PR_ELSE control_block {printf("if e else né\n");};
+if_simples: TK_PR_IF '('assign_expression ')' control_block; 
+if_else: if_simples TK_PR_ELSE control_block;
 
-for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block {printf("Pegou um for\n");};  
-while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {printf("Pegou um while\n");};; 
+for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block;  
+while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block; 
 
 %%
 
