@@ -31,5 +31,8 @@ int testLocalVar() {
   int n1, n2 <= 3;
   int n1 <= 2, n3 <= 3;
 
+  int n1 <= vec[3+4*n1], n2<= 2, n3 <= vec[3];
+  int n1 <= vec[3];
+
   const string; // error
 }

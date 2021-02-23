@@ -104,7 +104,7 @@ local_var_init: local_var_id
               ;
 
 local_var_id: TK_IDENTIFICADOR;
-local_var_value: TK_IDENTIFICADOR | literal ;
+local_var_value: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' assign_expression ']' | literal ;
 
 
 /*************************************
