@@ -74,8 +74,10 @@ global_var_list: global_var_id
                  ;
 
 global_var_id: TK_IDENTIFICADOR
-             | TK_IDENTIFICADOR '[' TK_LIT_INT ']'
+             | TK_IDENTIFICADOR '[' vector_length ']'
              ;
+
+vector_length: TK_LIT_INT | '+' TK_LIT_INT;
 
 
 /*************************************
