@@ -1,17 +1,6 @@
 %{
 #include <stdio.h>
 
-/*
-TODO
-- Verificar as gramaticas que usam TK_IDENTIFICADOR, pois
-essas podem ser que precisem aceitar a variação para vetor. 
-Ou seja, além de um TK_IDENTIFICADOR, aceitar tamém
-TK_IDENTIFICADOR '[' TK_LIT_INT ']'
-
-trocar TK_LIT_INT como expressao no shift
-trocar argument para aceitar expressões
-*/
-
 int yylex(void);
 void yyerror (char const *s);
 extern int get_line_number(void);
