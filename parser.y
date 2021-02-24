@@ -250,7 +250,10 @@ function_call: TK_IDENTIFICADOR '(' arguments ')';
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
 arguments: arguments_list | %empty;
 arguments_list: argument | argument ',' arguments_list;
-argument: assign_expression; 
+argument: assign_expression | function_call_literals;
+
+function_call_literals: TK_LIT_FALSE | TK_LIT_TRUE | TK_LIT_CHAR | TK_LIT_STRING;
+
 
 control_commands: return | TK_PR_BREAK | TK_PR_CONTINUE;
 return: TK_PR_RETURN assign_expression; 
