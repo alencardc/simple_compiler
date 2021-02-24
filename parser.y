@@ -243,7 +243,8 @@ io_command: input_command | output_command;
 
 shift: TK_OC_SR | TK_OC_SL;
 shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' assign_expression ']'; 
-shift_command: shift_operand shift TK_LIT_INT;
+shift_command: shift_operand shift shift_number;
+shift_number: TK_LIT_INT | '+' TK_LIT_INT;
 
 function_call: TK_IDENTIFICADOR '(' arguments ')';
 
