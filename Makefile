@@ -1,13 +1,15 @@
 CC = gcc
 CFLAGS =
 
-SUBMITION_NUMBER=2
+SUBMITION_NUMBER = 3
+
+UTIL_FILES = $(wildcard utils/*.c)
 
 all: flex bison
-	$(CC) $(CFLAGS) -o etapa$(SUBMITION_NUMBER) lex.yy.c parser.tab.c main.c -lfl
+	$(CC) $(CFLAGS) -o etapa$(SUBMITION_NUMBER) lex.yy.c parser.tab.c $(UTIL_FILES) main.c -lfl
 
 debug: flex bison
-	$(CC) $(CFLAGS) -o etapa$(SUBMITION_NUMBER) lex.yy.c parser.tab.c main.c -lfl -DDEBUG
+	$(CC) $(CFLAGS) -o etapa$(SUBMITION_NUMBER) lex.yy.c parser.tab.c $(UTIL_FILES) main.c -lfl -DDEBUG
 
 flex: scanner.l
 	flex scanner.l
