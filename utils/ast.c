@@ -1,14 +1,15 @@
 #include <stdlib.h>
-#include <stdio.h>
+#include <string.h>
 #include "ast.h"
 
-Node* create_node(Value *data) {
+Node* create_node(Value *data, const char *label) {
   Node *node;
   node = (Node*) malloc(sizeof(Node));
   if (node == NULL) {
     return NULL;
   }
 
+  node->label = strdup(label);
   node->data = data;
   node->parent = NULL;
   node->next = NULL;
@@ -80,15 +81,16 @@ static void free_node_rec(Node *node) {
     free_node_rec(node->next);
   } 
 
+  free(node->label);
   free(node);
   node = NULL;
 }
 
 
-void exporta(void *root) {
+void exporta(void *arvore) {
   //todo
 }
 
-void libera(void *root) {
-  //todo
+void libera(void *arvore) {
+  free_node((Node*)arvore);
 }

@@ -11,13 +11,13 @@ int main() {
   Value v11 = {.f_value=11.0f, .i_value=11};
   Value v12 = {.f_value=12.0f, .i_value=12};
   Value v21 = {.f_value=21.0f, .i_value=21};
-  Node* p = create_node(&vp);
-  Node* c1 = create_node(&v1);
-  Node* c2 = create_node(&v2);
-  Node* c3 = create_node(&v3);
-  Node* c11 = create_node(&v11);
-  Node* c12 = create_node(&v12);
-  Node* c21 = create_node(&v21);
+  Node* p = create_node(&vp, "Parent");
+  Node* c1 = create_node(&v1, "Node 1");
+  Node* c2 = create_node(&v2, "Node 2");
+  Node* c3 = create_node(&v3, "Node 3");
+  Node* c11 = create_node(&v11, "Node 1.1");
+  Node* c12 = create_node(&v12, "Node 1.2");
+  Node* c21 = create_node(&v21, "Node 2,1");
 
   if (!p || !c1 || !c2 || !c3 || !c11 || !c12 || !c21) {
     printf("Error creating node\n");
@@ -39,12 +39,5 @@ int main() {
   printf("Child 21: %d\n", c2->children->data->i_value);
 
   free_node(p);
-  // free(p);
-  // free(c1);
-  // free(c2);
-  // free(c3);
-  // free(c11);
-  // free(c12);
-  // free(c21);
   return 0;
 }
