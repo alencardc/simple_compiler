@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "tree.h"
+#include "ast.h"
 
 Node* create_node(Value *data) {
   Node *node;
