@@ -2,7 +2,7 @@
 #include <string.h>
 #include "ast.h"
 
-Node* create_node(Value *data, const char *label) {
+Node* create_node(LexValue *data, const char *label) {
   Node *node;
   node = (Node*) malloc(sizeof(Node));
   if (node == NULL) {

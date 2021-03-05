@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include "utils/ast.h"
 
 int yylex(void);
 void yyerror (char const *s);
@@ -7,6 +8,10 @@ extern int get_line_number(void);
 %}
 
 %define parse.error verbose
+
+%union {
+  LexValue lexical_value;
+}
 
 %token TK_PR_INT
 %token TK_PR_FLOAT
@@ -43,13 +48,13 @@ extern int get_line_number(void);
 %token TK_OC_OR
 %token TK_OC_SL
 %token TK_OC_SR
-%token TK_LIT_INT
-%token TK_LIT_FLOAT
-%token TK_LIT_FALSE
-%token TK_LIT_TRUE
-%token TK_LIT_CHAR
-%token TK_LIT_STRING
-%token TK_IDENTIFICADOR
+%token <lexical_value> TK_LIT_INT
+%token <lexical_value> TK_LIT_FLOAT
+%token <lexical_value> TK_LIT_FALSE
+%token <lexical_value> TK_LIT_TRUE
+%token <lexical_value> TK_LIT_CHAR
+%token <lexical_value> TK_LIT_STRING
+%token <lexical_value> TK_IDENTIFICADOR
 %token TOKEN_ERRO
 %%
 
