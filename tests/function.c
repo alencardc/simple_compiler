@@ -18,6 +18,7 @@ static int foo (int c, char d, float f, string s) {
   };
   {/*aaaaaa*/};
   {        };
+  {};
   char a <= 'a';
   { char a;};
   char a <= 'a';
