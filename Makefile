@@ -6,6 +6,9 @@ SUBMITION_NUMBER=2
 all: flex bison
 	$(CC) $(CFLAGS) -o etapa$(SUBMITION_NUMBER) lex.yy.c parser.tab.c main.c -lfl
 
+debug: flex bison
+	$(CC) $(CFLAGS) -o etapa$(SUBMITION_NUMBER) lex.yy.c parser.tab.c main.c -lfl -DDEBUG
+
 flex: scanner.l
 	flex scanner.l
 
