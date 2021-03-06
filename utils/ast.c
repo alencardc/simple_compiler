@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "ast.h"
 
 LexValue create_lex_value(TokenType token_type, TokenValue value, TokenValueType val_type, int line) {
@@ -48,7 +49,7 @@ Node* append_child(Node *parent, Node *child) {
   sibling->next = child;
   child->prev = sibling;
 
-  return child;
+  return parent;
 }
 
 bool is_root(Node *node) {
@@ -117,4 +118,20 @@ Node* create_io_node(Node* child, const char *label) {
 Node* create_id_node(LexValue data){
   Node* id_node = create_node(&data, "identificador");
   return id_node;
+}
+
+Node* create_shift_node(LexValue shift, Node *id, Node* literal){
+  Node* shift_node = create_node(&shift,shift.token_value.s_value);
+  append_child(shift_node, id);
+  append_child(shift_node, literal);
+}
+
+char* integerToString(int a){
+  //Minimum integer: -2147483646 = 12 digitos + 1 para o \n
+  int maxDigits = 12 + 1;
+  
+  char* integerInString = (char*) malloc(12 * sizeof(char));
+  sprintf(integerInString,"%d",a);
+  
+  return integerInString;
 }

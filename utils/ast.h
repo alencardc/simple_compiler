@@ -22,7 +22,7 @@ typedef union sTokenValue {
 typedef enum eTokenType {
   TOKEN_LITERAL,
   TOKEN_IDENTIFIER,
-  TOKEN_OUTPUT
+  TOKEN_COMPOSTO
 } TokenType;
 
 typedef struct sLexValue {
@@ -59,5 +59,8 @@ void libera(void *arvore);
 /*Funções específicas*/
 Node* create_io_node(Node* child, const char *label);
 Node* create_id_node(LexValue data);
+Node* create_shift_node(LexValue shift, Node *id, Node* literal);
+
+char* integerToString(int a);
 
 #endif // __AST_H__

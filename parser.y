@@ -47,8 +47,8 @@ extern int get_line_number(void);
 %token TK_OC_NE
 %token TK_OC_AND
 %token TK_OC_OR
-%token TK_OC_SL
-%token TK_OC_SR
+%token <lexical_value> TK_OC_SL
+%token <lexical_value> TK_OC_SR
 %token <lexical_value> TK_LIT_INT
 %token <lexical_value> TK_LIT_FLOAT
 %token <lexical_value> TK_LIT_FALSE
@@ -60,9 +60,25 @@ extern int get_line_number(void);
 %token TOKEN_ERRO
 
 %type <node> literal
-%type<node> output_command
+%type <node> output_command
 %type <node> input_command
 %type <node> io_command
+%type <node> command
+%type <node> command_list
+%type <node> one_line_command
+%type <node> generic_command
+%type <node> multiline_command
+%type <node> local_decl
+%type <node> block_command
+%type <node> assign_command
+%type <node> function_call
+%type <node> control_commands
+
+%type <lexical_value> shift;
+%type <node> shift_operand;
+%type <node> shift_command;
+%type <node> shift_number;
+
 
 %%
 
@@ -234,12 +250,13 @@ constant: TK_LIT_INT | TK_LIT_FLOAT ;
 *************************************/
 
 command_list: generic_command
-            | command_list generic_command
+              {$$ = $1;}
+            | command_list generic_command{$$ = append_child($1,$2);}
             ;
 
-generic_command: one_line_command | multiline_command;
+generic_command: one_line_command | multiline_command {$$ = $1;};
 
-one_line_command: command ';';
+one_line_command: command ';' {$$ = $1;};
 command: local_decl
        | block_command
        | assign_command
@@ -247,9 +264,24 @@ command: local_decl
        | shift_command
        | function_call
        | control_commands
+       {
+         $$ = $1;
+       }
        ;
 
-control_block: '{' command_list '}' | '{' '}';
+control_block: '{' command_list '}'  
+{
+  Node* current_command = $2;
+  int i = 1;
+  printf("Comando %i: %s\n", i, current_command->label);
+  current_command = current_command->children->next;
+  i++;
+  while(current_command != NULL){
+    printf("Comando %i: %s\n", i,current_command->label);
+    current_command = current_command->next; 
+    i++;
+  }
+};
 block_command: control_block;
 
 assign_command: TK_IDENTIFICADOR '=' assign_expression 
@@ -259,32 +291,40 @@ assign_command: TK_IDENTIFICADOR '=' assign_expression
 input_command: TK_PR_INPUT TK_IDENTIFICADOR 
               {
                 Node* id_node = create_id_node($2);
-                $$ = create_io_node(id_node, "input_command");
+                $$ = create_io_node(id_node, "input");
                 printf("Nó formado: %s\n", $$->label);
                 printf("\tSua criança: %s\n", $$->children->label);
               };
 output_command: TK_PR_OUTPUT TK_IDENTIFICADOR
               {
                 Node* id_node = create_id_node($2);
-                $$ = create_io_node(id_node, "output_command");
+                $$ = create_io_node(id_node, "output");
                 printf("Nó formado: %s\n", $$->label);
                 printf("\tSua criança: %s\n", $$->children->label);
               }
                |  TK_PR_OUTPUT literal
               {
-                $$ = create_io_node($2, "output_command");
+                $$ = create_io_node($2, "output");
 
                 printf("Nó formado: %s\n", $$->label);
                 printf("\tSua criança: %s\n", $$->children->label);
                }
               ;
               
-io_command: input_command | output_command;
+io_command: input_command | output_command {$$ = $1;};
 
-shift: TK_OC_SR | TK_OC_SL;
-shift_operand: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' assign_expression ']'; 
-shift_command: shift_operand shift shift_number;
-shift_number: TK_LIT_INT | '+' TK_LIT_INT;
+shift: TK_OC_SR | TK_OC_SL { $$ = $1;};
+shift_operand: TK_IDENTIFICADOR {$$ = create_id_node($1);} | TK_IDENTIFICADOR '[' assign_expression ']'; 
+shift_command: shift_operand shift shift_number { $$ = create_shift_node($2,$1,$3);};
+shift_number: TK_LIT_INT {
+                char* integerInString = integerToString($1.token_value.i_val);
+                $$ = create_node(&$1, integerInString);
+            };
+            | '+' TK_LIT_INT 
+            {
+                char* integerInString = integerToString($2.token_value.i_val);
+                $$ = create_node(&$2, integerInString);
+            };
 
 function_call: TK_IDENTIFICADOR '(' arguments ')';
 
@@ -294,7 +334,8 @@ arguments_list: argument | argument ',' arguments_list;
 argument: assign_expression;
 
 
-control_commands: return | TK_PR_BREAK | TK_PR_CONTINUE;
+control_commands: return | TK_PR_BREAK{$$ = create_node(NULL, "break");};  | TK_PR_CONTINUE {$$ = create_node(NULL, "continue");};
+
 return: TK_PR_RETURN assign_expression; 
 
 
