@@ -122,8 +122,18 @@ Node* create_id_node(LexValue data){
 
 Node* create_shift_node(LexValue shift, Node *id, Node* literal){
   Node* shift_node = create_node(&shift,shift.token_value.s_value);
+  
   append_child(shift_node, id);
   append_child(shift_node, literal);
+}
+
+Node* create_id_vector_node(Node* id, Node* expression){
+  Node* id_vector = create_node(NULL, "[]");
+  
+  append_child(id_vector,id);
+  append_child(id_vector, expression);
+
+  return id_vector;
 }
 
 char* integerToString(int a){
