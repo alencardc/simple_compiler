@@ -71,12 +71,12 @@ default { return TK_PR_DEFAULT; }
 
  /* TYPE LITERALS */
 {integer}/{chars_after_literals} { 
-  yylval.lexical_value = create_lex_value(TOKEN_LITERAL, (TokenValue)atoi(yytext), INTEGER_VAL, get_line_number());
+  yylval.lexical_value = create_integer(atoi(yytext), get_line_number());
   return TK_LIT_INT; 
 }
 
 {float}/{chars_after_literals} { 
-  yylval.lexical_value =  create_lex_value(TOKEN_LITERAL, (TokenValue)atof(yytext), FLOAT_VAL, get_line_number());
+  yylval.lexical_value = create_float(atof(yytext), get_line_number());
   return TK_LIT_FLOAT; 
 }
 
@@ -96,11 +96,11 @@ true { return TK_LIT_TRUE; }
 "&&" {return TK_OC_AND; }
 "||" {return TK_OC_OR; }
 ">>" {
-  yylval.lexical_value =  create_lex_value(TOKEN_COMPOSTO, (TokenValue)strdup(yytext), STRING_VAL, get_line_number());
+  yylval.lexical_value = create_compound_op(strdup(yytext), get_line_number());
   return TK_OC_SR; 
 }
 "<<" {
-  yylval.lexical_value =  create_lex_value(TOKEN_COMPOSTO, (TokenValue)strdup(yytext), STRING_VAL, get_line_number());
+  yylval.lexical_value = create_compound_op(strdup(yytext), get_line_number());
   return TK_OC_SL; 
 }
 
