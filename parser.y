@@ -59,6 +59,7 @@ extern int get_line_number(void);
 
 %token TOKEN_ERRO
 
+%type <node> identifier
 %type <node> literal
 %type <node> output_command
 %type <node> input_command
@@ -88,8 +89,13 @@ programa: global_decl_list programa
         ;
 
 storage_modifier: TK_PR_STATIC | %empty;
+
 var_qualifier: TK_PR_CONST | %empty;
+
+identifier: TK_IDENTIFICADOR { $$ = create_node_with_lex($1); };
+
 type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
+
 literal: TK_LIT_INT { $$ = create_node(&$1, "some int"); }
        | TK_LIT_FLOAT { $$ = create_node(&$1, "some float"); }
        | TK_LIT_FALSE { }
@@ -108,8 +114,8 @@ global_var_list: global_var_id
                  | global_var_list ',' global_var_id
                  ;
 
-global_var_id: TK_IDENTIFICADOR
-             | TK_IDENTIFICADOR '[' vector_length ']'
+global_var_id: identifier
+             | identifier '[' vector_length ']'
              ;
 
 vector_length: TK_LIT_INT | '+' TK_LIT_INT;
@@ -119,7 +125,7 @@ vector_length: TK_LIT_INT | '+' TK_LIT_INT;
 **** Local variables declaration ****
 *************************************/
 
-local_decl: storage_modifier var_qualifier type local_var_list;
+local_decl: storage_modifier var_qualifier type local_var_list {};
 
 local_var_list: local_var_init
               | local_var_list ',' local_var_init
@@ -236,7 +242,7 @@ unary_operator: '+'
               | '#'
               ;
 
-basic_expression: local_var_id 
+basic_expression: identifier
                 | TK_IDENTIFICADOR '['assign_expression ']' 
                 | constant 
                 | function_call
@@ -283,10 +289,10 @@ control_block: '{' command_list '}'
   //   i++;
   // }
 };
-block_command: control_block;
+block_command: control_block {};
 
-assign_command: TK_IDENTIFICADOR '=' assign_expression 
-              | TK_IDENTIFICADOR '[' assign_expression ']' '=' assign_expression  
+assign_command: TK_IDENTIFICADOR '=' assign_expression {}
+              | TK_IDENTIFICADOR '[' assign_expression ']' '=' assign_expression {}
               ;
 
 input_command: TK_PR_INPUT TK_IDENTIFICADOR 
@@ -315,7 +321,9 @@ output_command: TK_PR_OUTPUT TK_IDENTIFICADOR
 io_command: input_command | output_command {$$ = $1;};
 
 shift: TK_OC_SR | TK_OC_SL { $$ = $1;};
-shift_operand: TK_IDENTIFICADOR {$$ = create_id_node($1);} | TK_IDENTIFICADOR '[' assign_expression ']'; 
+shift_operand: TK_IDENTIFICADOR {$$ = create_id_node($1);} 
+             | TK_IDENTIFICADOR '[' assign_expression ']' {}
+             ; 
 shift_command: shift_operand shift shift_number { $$ = create_shift_node($2,$1,$3);};
 shift_number: TK_LIT_INT {
                 char* integerInString = integerToString($1.token_value.i_val);
@@ -327,7 +335,7 @@ shift_number: TK_LIT_INT {
                 $$ = create_node(&$2, integerInString);
             };
 
-function_call: TK_IDENTIFICADOR '(' arguments ')';
+function_call: TK_IDENTIFICADOR '(' arguments ')' {};
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
 arguments: arguments_list | %empty;
@@ -335,7 +343,10 @@ arguments_list: argument | argument ',' arguments_list;
 argument: assign_expression;
 
 
-control_commands: return | TK_PR_BREAK{$$ = create_node(NULL, "break");};  | TK_PR_CONTINUE {$$ = create_node(NULL, "continue");};
+control_commands: return {}
+                | TK_PR_BREAK {$$ = create_node(NULL, "break");}
+                | TK_PR_CONTINUE {$$ = create_node(NULL, "continue");}
+                ;
 
 return: TK_PR_RETURN assign_expression; 
 
@@ -343,7 +354,11 @@ return: TK_PR_RETURN assign_expression;
 /*************************************
 ********* Controle de fluxo **********
 *************************************/
-multiline_command: if_simples | if_else | for | while;
+multiline_command: if_simples {}
+                 | if_else {}
+                 | for {}
+                 | while {}
+                 ;
 
 if_simples: TK_PR_IF '('assign_expression ')' control_block; 
 if_else: if_simples TK_PR_ELSE control_block;

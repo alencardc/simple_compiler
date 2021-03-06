@@ -19,6 +19,8 @@ Node* append_child(Node *parent, Node *child);
 void free_node(Node *node);
 static void free_node_rec(Node *node);
 
+void export_labels(Node *root);
+void export_relations(Node *root);
 
 void exporta(void *arvore);
 void libera(void *arvore);
