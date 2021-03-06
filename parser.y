@@ -272,6 +272,7 @@ command: local_decl
 control_block: '{' command_list '}'  
 {
   Node* current_command = $2;
+  exporta((void*)current_command);
   // int i = 1;
   // printf("Comando %i: %s\n", i, current_command->label);
   // current_command = current_command->children->next;

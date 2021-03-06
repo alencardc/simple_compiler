@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "ast.h"
@@ -21,17 +22,13 @@ Node* append_child(Node *parent, Node *child) {
   if (parent == NULL || child == NULL) {
     return NULL;
   }
-  //child->parent = parent;
+
   parent->children_amount += 1;
   parent->children = realloc(parent->children, parent->children_amount * sizeof(Node));
   parent->children[parent->children_amount - 1] = child;
 
   return parent;
 }
-
-// bool is_root(Node *node) {
-//   return node != NULL && node->parent == NULL;
-// }
 
 void free_node(Node *node) {
   if (node == NULL) {
@@ -57,9 +54,33 @@ void free_node(Node *node) {
   free(node);
 }
 
+void export_labels(Node *root) {
+  if (root == NULL) {
+    return;
+  }
+  // Quebrar ou nao a linha?
+  printf("%p [label=\"%s\"];\n", root, root->label);
+  for (int i = 0; i < root->children_amount; i += 1) {
+    export_labels(root->children[i]);
+  }
+}
+
+void export_relations(Node *root) {
+  if (root == NULL) {
+    return;
+  }
+
+  for (int i = 0; i < root->children_amount; i += 1) {
+    // Quebrar ou nao a linha?
+    printf("%p, %p\n", root, root->children[i]);
+    export_relations(root->children[i]);
+  }
+}
 
 void exporta(void *arvore) {
-  //todo
+  export_relations((Node*) arvore);
+  printf("\n");
+  export_labels((Node*) arvore);
 }
 
 void libera(void *arvore) {
