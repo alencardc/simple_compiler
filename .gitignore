@@ -9,5 +9,4 @@ saidas/*
 submit
 **/**.tgz
 
-!utils/tests/*.c
-!utils/tests/*.h
+utils/tests/test

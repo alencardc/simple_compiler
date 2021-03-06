@@ -7,16 +7,14 @@
 typedef struct sNode {
   LexValue *data;
   char *label;
-  struct sNode *parent;
-  struct sNode *next;
-  struct sNode *prev;
-  struct sNode *children;
+  int children_amount;
+  struct sNode **children;
 } Node;
 
 Node* create_node(LexValue *data, const char *label);
 Node* append_child(Node *parent, Node *child);
 
-bool is_root(Node *node);
+//bool is_root(Node *node);
 
 void free_node(Node *node);
 static void free_node_rec(Node *node);

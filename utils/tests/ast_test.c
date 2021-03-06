@@ -6,6 +6,7 @@
 LexValue* copy(LexValue val) {
   LexValue* lex = (LexValue*) malloc(sizeof(LexValue));
   memcpy(lex, &val, sizeof(LexValue));
+  lex->token_value.s_value = strdup(lex->token_value.s_value);
 
   return lex;
 }
@@ -13,9 +14,9 @@ LexValue* copy(LexValue val) {
 int main() {
   LexValue lex_val = {
     .line_number=0, 
-    .token_type=TOKEN_LITERAL, 
-    .token_value.i_val=0,
-    .value_type=INTEGER_VAL
+    .token_type=TOKEN_IDENTIFIER, 
+    .token_value.s_value="aa",
+    .value_type=NO_VAL
   };
 
   Node* p = create_node(copy(lex_val), "Parent");
@@ -38,12 +39,12 @@ int main() {
   append_child(c2, c21);
 
   printf("Parent -> %s\n", p->label);
-  printf("Child 1 -> %s\n", p->children->label);
-  printf("Child 2 -> %s\n", p->children->next->label);
-  printf("Child 3 -> %s\n", p->children->next->next->label);
-  printf("Child 11 -> %s\n", c1->children->label);
-  printf("Child 12 -> %s\n", c1->children->next->label);
-  printf("Child 21 -> %s\n", c2->children->label);
+  printf("Child 1 -> %s\n", p->children[0]->label);
+  printf("Child 2 -> %s\n", p->children[1]->label);
+  printf("Child 3 -> %s\n", p->children[2]->label);
+  printf("Child 11 -> %s\n", c1->children[0]->label);
+  printf("Child 12 -> %s\n", c1->children[1]->label);
+  printf("Child 21 -> %s\n", c2->children[0]->label);
 
   free_node(p);
   return 0;

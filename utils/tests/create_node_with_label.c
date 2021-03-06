@@ -31,12 +31,12 @@ int main() {
   append_child(c2, c21);
 
   printf("Parent -> %s\n", p->label);
-  printf("Child 1 -> %s\n", p->children->label);
-  printf("Child 2 -> %s\n", p->children->next->label);
-  printf("Child 3 -> %s\n", p->children->next->next->label);
-  printf("Child 11 -> %s\n", c1->children->label);
-  printf("Child 12 -> %s\n", c1->children->next->label);
-  printf("Child 21 -> %s\n", c2->children->label);
+  printf("Child 1 -> %s\n", p->children[0]->label);
+  printf("Child 2 -> %s\n", p->children[1]->label);
+  printf("Child 3 -> %s\n", p->children[2]->label);
+  printf("Child 11 -> %s\n", c1->children[0]->label);
+  printf("Child 12 -> %s\n", c1->children[1]->label);
+  printf("Child 21 -> %s\n", c2->children[0]->label);
 
   free_node(p);
   return 0;
