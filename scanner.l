@@ -74,16 +74,26 @@ default { return TK_PR_DEFAULT; }
   yylval.lexical_value = create_integer(atoi(yytext), get_line_number());
   return TK_LIT_INT; 
 }
-
 {float}/{chars_after_literals} { 
   yylval.lexical_value = create_float(atof(yytext), get_line_number());
   return TK_LIT_FLOAT; 
 }
-
-false { return TK_LIT_FALSE; }
-true { return TK_LIT_TRUE; }
-{string}/{chars_after_literals} { return TK_LIT_STRING; }
-{char}/{chars_after_literals} { return TK_LIT_CHAR; }
+false { 
+  yylval.lexical_value = create_bool(false, get_line_number());
+  return TK_LIT_FALSE;
+}
+true {
+  yylval.lexical_value = create_bool(true, get_line_number());
+  return TK_LIT_TRUE;
+}
+{string}/{chars_after_literals} {
+  yylval.lexical_value = create_string(strdup(yytext), get_line_number());
+  return TK_LIT_STRING;
+}
+{char}/{chars_after_literals} {
+  yylval.lexical_value = create_char(strdup(yytext), get_line_number());
+  return TK_LIT_CHAR;
+}
 
   /* SPECIAL CHARACTERS - e.g. ,;:() */
 {special_chars} {return yytext[0]; }
