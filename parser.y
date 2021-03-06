@@ -56,9 +56,13 @@ extern int get_line_number(void);
 %token <lexical_value> TK_LIT_CHAR
 %token <lexical_value> TK_LIT_STRING
 %token <lexical_value> TK_IDENTIFICADOR
+
 %token TOKEN_ERRO
 
 %type <node> literal
+%type<node> output_command
+%type <node> input_command
+%type <node> io_command
 
 %%
 
@@ -252,10 +256,29 @@ assign_command: TK_IDENTIFICADOR '=' assign_expression
               | TK_IDENTIFICADOR '[' assign_expression ']' '=' assign_expression  
               ;
 
-input_command: TK_PR_INPUT TK_IDENTIFICADOR;
-output_command: TK_PR_OUTPUT TK_IDENTIFICADOR 
-              | TK_PR_OUTPUT literal 
+input_command: TK_PR_INPUT TK_IDENTIFICADOR 
+              {
+                Node* id_node = create_id_node($2);
+                $$ = create_io_node(id_node, "input_command");
+                printf("Nó formado: %s\n", $$->label);
+                printf("\tSua criança: %s\n", $$->children->label);
+              };
+output_command: TK_PR_OUTPUT TK_IDENTIFICADOR
+              {
+                Node* id_node = create_id_node($2);
+                $$ = create_io_node(id_node, "output_command");
+                printf("Nó formado: %s\n", $$->label);
+                printf("\tSua criança: %s\n", $$->children->label);
+              }
+               |  TK_PR_OUTPUT literal
+              {
+                $$ = create_io_node($2, "output_command");
+
+                printf("Nó formado: %s\n", $$->label);
+                printf("\tSua criança: %s\n", $$->children->label);
+               }
               ;
+              
 io_command: input_command | output_command;
 
 shift: TK_OC_SR | TK_OC_SL;

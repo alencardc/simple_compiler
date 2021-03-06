@@ -104,3 +104,17 @@ void exporta(void *arvore) {
 void libera(void *arvore) {
   free_node((Node*)arvore);
 }
+
+/*Funções específicas*/
+
+Node* create_io_node(Node* child, const char *label) {
+  Node* output_node = create_node(NULL, label);
+  append_child(output_node,child);
+
+  return output_node;
+}
+
+Node* create_id_node(LexValue data){
+  Node* id_node = create_node(&data, "identificador");
+  return id_node;
+}

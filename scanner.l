@@ -51,7 +51,7 @@ then { return TK_PR_THEN; }
 else { return TK_PR_ELSE; }
 while { return TK_PR_WHILE; }
 do { return TK_PR_DO; }
-input { return TK_PR_INPUT; }
+input {return TK_PR_INPUT; }
 output { return TK_PR_OUTPUT; }
 return { return TK_PR_RETURN; }
 const { return TK_PR_CONST; }

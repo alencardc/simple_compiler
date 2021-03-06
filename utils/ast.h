@@ -22,6 +22,7 @@ typedef union sTokenValue {
 typedef enum eTokenType {
   TOKEN_LITERAL,
   TOKEN_IDENTIFIER,
+  TOKEN_OUTPUT
 } TokenType;
 
 typedef struct sLexValue {
@@ -45,6 +46,7 @@ LexValue create_lex_value(TokenType token_type, TokenValue value, TokenValueType
 Node* create_node(LexValue *data, const char *label);
 Node* append_child(Node *parent, Node *child);
 
+
 bool is_root(Node *node);
 
 void free_node(Node *node);
@@ -53,5 +55,9 @@ static void free_node_rec(Node *node);
 
 void exporta(void *arvore);
 void libera(void *arvore);
+
+/*Funções específicas*/
+Node* create_io_node(Node* child, const char *label);
+Node* create_id_node(LexValue data);
 
 #endif // __AST_H__
