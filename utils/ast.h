@@ -14,7 +14,7 @@ typedef enum eTokenValueType {
 
 typedef union sTokenValue {
   int i_val;
-  float f_val;
+  double f_val;
   bool b_val;
   char* s_value;
 } TokenValue;
@@ -40,7 +40,7 @@ typedef struct sNode {
   struct sNode *children;
 } Node;
 
-LexValue create_lex_value(TokenType token_type, const char* text, TokenValueType val_type, int line);
+LexValue create_lex_value(TokenType token_type, TokenValue value, TokenValueType val_type, int line);
 
 Node* create_node(LexValue *data, const char *label);
 Node* append_child(Node *parent, Node *child);

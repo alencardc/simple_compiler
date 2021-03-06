@@ -1,6 +1,7 @@
 %option yylineno noyywrap
 
 %{
+  #include "utils/ast.h"
   #include "parser.tab.h"
 
   int get_line_number(void);
@@ -69,8 +70,16 @@ end { return TK_PR_END; }
 default { return TK_PR_DEFAULT; }
 
  /* TYPE LITERALS */
-{integer}/{chars_after_literals} { return TK_LIT_INT; }
-{float}/{chars_after_literals} { return TK_LIT_FLOAT; }
+{integer}/{chars_after_literals} { 
+  yylval.lexical_value = create_lex_value(TOKEN_LITERAL, (TokenValue)atoi(yytext), INTEGER_VAL, get_line_number());
+  return TK_LIT_INT; 
+}
+
+{float}/{chars_after_literals} { 
+  yylval.lexical_value =  create_lex_value(TOKEN_LITERAL, (TokenValue)atof(yytext), FLOAT_VAL, get_line_number());
+  return TK_LIT_FLOAT; 
+}
+
 false { return TK_LIT_FALSE; }
 true { return TK_LIT_TRUE; }
 {string}/{chars_after_literals} { return TK_LIT_STRING; }

@@ -11,6 +11,7 @@ extern int get_line_number(void);
 
 %union {
   LexValue lexical_value;
+  Node* node;
 }
 
 %token TK_PR_INT
@@ -56,6 +57,9 @@ extern int get_line_number(void);
 %token <lexical_value> TK_LIT_STRING
 %token <lexical_value> TK_IDENTIFICADOR
 %token TOKEN_ERRO
+
+%type <node> literal
+
 %%
 
 programa: global_decl_list programa
@@ -66,7 +70,13 @@ programa: global_decl_list programa
 storage_modifier: TK_PR_STATIC | %empty;
 var_qualifier: TK_PR_CONST | %empty;
 type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
-literal: TK_LIT_INT | TK_LIT_FLOAT | TK_LIT_FALSE | TK_LIT_TRUE | TK_LIT_CHAR | TK_LIT_STRING;
+literal: TK_LIT_INT { $$ = create_node(&$1, "some int"); }
+       | TK_LIT_FLOAT { $$ = create_node(&$1, "some float"); }
+       | TK_LIT_FALSE { }
+       | TK_LIT_TRUE { }
+       | TK_LIT_CHAR { }
+       | TK_LIT_STRING { }
+       ;
 
 
 /*************************************
