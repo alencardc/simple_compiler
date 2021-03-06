@@ -89,12 +89,30 @@ true { return TK_LIT_TRUE; }
 {special_chars} {return yytext[0]; }
 
   /* SPECIAL/COMPOSITE OPERATORS  */
-"<=" {return TK_OC_LE; }
-">=" {return TK_OC_GE; }
-"==" {return TK_OC_EQ; }
-"!=" {return TK_OC_NE; }
-"&&" {return TK_OC_AND; }
-"||" {return TK_OC_OR; }
+"<=" {
+  yylval.lexical_value = create_compound_op(strdup(yytext), get_line_number());
+  return TK_OC_LE;
+}
+">=" {
+  yylval.lexical_value = create_compound_op(strdup(yytext), get_line_number());
+  return TK_OC_GE; 
+}
+"==" {
+  yylval.lexical_value = create_compound_op(strdup(yytext), get_line_number());
+  return TK_OC_EQ;
+}
+"!=" {
+  yylval.lexical_value = create_compound_op(strdup(yytext), get_line_number());
+  return TK_OC_NE;
+}
+"&&" {
+  yylval.lexical_value = create_compound_op(strdup(yytext), get_line_number());
+  return TK_OC_AND;
+}
+"||" {
+  yylval.lexical_value = create_compound_op(strdup(yytext), get_line_number());
+  return TK_OC_OR;
+}
 ">>" {
   yylval.lexical_value = create_compound_op(strdup(yytext), get_line_number());
   return TK_OC_SR; 
@@ -105,7 +123,10 @@ true { return TK_LIT_TRUE; }
 }
 
   /* IDENTIFIER */
-{identifier} { return TK_IDENTIFICADOR; }
+{identifier} { 
+  yylval.lexical_value = create_identifier(strdup(yytext), get_line_number());
+  return TK_IDENTIFICADOR; 
+}
 
   /* COMMENTS AND CHARACTERS TO IGNORE */
 {simpler_multiline_comment} {}
