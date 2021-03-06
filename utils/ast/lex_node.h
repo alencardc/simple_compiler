@@ -13,6 +13,7 @@ char* get_label(LexValue lex_value);
 Node* create_io_node(Node* child, const char *label);
 Node* create_id_node(LexValue data);
 Node* create_shift_node(LexValue shift, Node *id, Node* literal);
+Node* create_id_vector_node(Node* id, Node* expression);
 
 char* integerToString(int a);
 

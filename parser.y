@@ -79,6 +79,7 @@ extern int get_line_number(void);
 %type <node> shift_operand;
 %type <node> shift_command;
 %type <node> shift_number;
+%type <node> assign_expression;
 
 
 %%
@@ -321,9 +322,17 @@ output_command: TK_PR_OUTPUT TK_IDENTIFICADOR
 io_command: input_command | output_command {$$ = $1;};
 
 shift: TK_OC_SR | TK_OC_SL { $$ = $1;};
-shift_operand: TK_IDENTIFICADOR {$$ = create_id_node($1);} 
-             | TK_IDENTIFICADOR '[' assign_expression ']' {}
-             ; 
+shift_operand: TK_IDENTIFICADOR 
+                  {
+                    $$ = create_id_node($1);
+                  } 
+              | TK_IDENTIFICADOR '[' assign_expression ']'
+                  {
+                    Node* id = create_id_node($1);
+                    Node* id_vector = create_id_vector_node(id,$3);
+                    $$ = id_vector;
+                  };
+
 shift_command: shift_operand shift shift_number { $$ = create_shift_node($2,$1,$3);};
 shift_number: TK_LIT_INT {
                 char* integerInString = integerToString($1.token_value.i_val);

@@ -76,6 +76,15 @@ Node* create_shift_node(LexValue shift, Node *id, Node* literal){
   append_child(shift_node, literal);
 }
 
+Node* create_id_vector_node(Node* id, Node* expression){
+  Node* id_vector = create_node(NULL, "[]");
+  
+  append_child(id_vector,id);
+  append_child(id_vector, expression);
+
+  return id_vector;
+}
+
 char* integerToString(int a){
   //Minimum integer: -2147483646 = 12 digitos + 1 para o \n
   int maxDigits = 12 + 1;
