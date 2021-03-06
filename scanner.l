@@ -1,7 +1,7 @@
 %option yylineno noyywrap
 
 %{
-  #include "utils/ast.h"
+  #include "utils/ast/ast.h"
   #include "parser.tab.h"
 
   int get_line_number(void);

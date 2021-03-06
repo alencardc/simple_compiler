@@ -4,6 +4,9 @@ parser.tab.c
 parser.output
 **/**.o
 etapa*
+
 saidas/*
 submit
 **/**.tgz
+
+utils/tests/test

@@ -1,6 +1,6 @@
 %{
 #include <stdio.h>
-#include "utils/ast.h"
+#include "utils/ast/ast.h"
 
 int yylex(void);
 void yyerror (char const *s);
@@ -272,15 +272,15 @@ command: local_decl
 control_block: '{' command_list '}'  
 {
   Node* current_command = $2;
-  int i = 1;
-  printf("Comando %i: %s\n", i, current_command->label);
-  current_command = current_command->children->next;
-  i++;
-  while(current_command != NULL){
-    printf("Comando %i: %s\n", i,current_command->label);
-    current_command = current_command->next; 
-    i++;
-  }
+  // int i = 1;
+  // printf("Comando %i: %s\n", i, current_command->label);
+  // current_command = current_command->children->next;
+  // i++;
+  // while(current_command != NULL){
+  //   printf("Comando %i: %s\n", i,current_command->label);
+  //   current_command = current_command->next; 
+  //   i++;
+  // }
 };
 block_command: control_block;
 
@@ -293,21 +293,21 @@ input_command: TK_PR_INPUT TK_IDENTIFICADOR
                 Node* id_node = create_id_node($2);
                 $$ = create_io_node(id_node, "input");
                 printf("Nó formado: %s\n", $$->label);
-                printf("\tSua criança: %s\n", $$->children->label);
+                printf("\tSua criança: %s\n", $$->children[0]->label);
               };
 output_command: TK_PR_OUTPUT TK_IDENTIFICADOR
               {
                 Node* id_node = create_id_node($2);
                 $$ = create_io_node(id_node, "output");
                 printf("Nó formado: %s\n", $$->label);
-                printf("\tSua criança: %s\n", $$->children->label);
+                printf("\tSua criança: %s\n", $$->children[0]->label);
               }
                |  TK_PR_OUTPUT literal
               {
                 $$ = create_io_node($2, "output");
 
                 printf("Nó formado: %s\n", $$->label);
-                printf("\tSua criança: %s\n", $$->children->label);
+                printf("\tSua criança: %s\n", $$->children[0]->label);
                }
               ;
               
