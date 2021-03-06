@@ -3,13 +3,6 @@
 #include <string.h>
 #include "../ast/ast.h"
 
-LexValue* copy(LexValue val) {
-  LexValue* lex = (LexValue*) malloc(sizeof(LexValue));
-  memcpy(lex, &val, sizeof(LexValue));
-
-  return lex;
-}
-
 int main() {
   LexValue lex_val = {
     .line_number=0, 
@@ -18,13 +11,13 @@ int main() {
     .value_type=INTEGER_VAL
   };
 
-  Node* p = create_node(copy(lex_val), "Parent");
-  Node* c1 = create_node(copy(lex_val), "Node 1");
-  Node* c2 = create_node(copy(lex_val), "Node 2");
-  Node* c3 = create_node(copy(lex_val), "Node 3");
-  Node* c11 = create_node(copy(lex_val), "Node 1.1");
-  Node* c12 = create_node(copy(lex_val), "Node 1.2");
-  Node* c21 = create_node(copy(lex_val), "Node 2.1");
+  Node* p = create_node_with_label("Parent");
+  Node* c1 = create_node_with_label("Node 1");
+  Node* c2 = create_node_with_label("Node 2");
+  Node* c3 = create_node_with_label("Node 3");
+  Node* c11 = create_node_with_label("Node 1.1");
+  Node* c12 = create_node_with_label("Node 1.2");
+  Node* c21 = create_node_with_label("Node 2.1");
 
   if (!p || !c1 || !c2 || !c3 || !c11 || !c12 || !c21) {
     printf("Error creating node\n");

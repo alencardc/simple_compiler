@@ -2,16 +2,6 @@
 #include <string.h>
 #include "ast.h"
 
-LexValue create_lex_value(TokenType token_type, TokenValue value, TokenValueType val_type, int line) {
-
-  return (LexValue){
-    .line_number = line,
-    .token_type = token_type,
-    .value_type = val_type,
-    .token_value = value,
-  };
-}
-
 Node* create_node(LexValue *data, const char *label) {
   Node *node;
   node = (Node*) malloc(sizeof(Node));
@@ -92,6 +82,7 @@ static void free_node_rec(Node *node) {
   } 
 
   free(node->label);
+  free(node->data);
   free(node);
   node = NULL;
 }
