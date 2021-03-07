@@ -92,15 +92,19 @@ extern int get_line_number(void);
 %type <node> local_decl
 %type <node> block_command
 %type <node> assign_command
-%type <node> function_call
 %type <node> control_commands
 
-%type <lexical_value> shift;
-%type <node> shift_operand;
-%type <node> shift_command;
-%type <node> shift_number;
+%type <lexical_value> shift
+%type <node> shift_operand
+%type <node> shift_command
+%type <node> shift_number
 
-%type <node> return;
+%type <node> function_call
+%type <node> arguments
+%type <node> arguments_list
+%type <node> argument
+
+%type <node> return
 
 %%
 
@@ -355,12 +359,12 @@ shift_number: TK_LIT_INT {
                 $$ = create_node(&$2, integerInString);
             };
 
-function_call: TK_IDENTIFICADOR '(' arguments ')' {  };
+function_call: TK_IDENTIFICADOR '(' arguments ')' { $$ = create_func_call_node($1,$3); };
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
-arguments: arguments_list | %empty;
-arguments_list: argument | argument ',' arguments_list;
-argument: assign_expression;
+arguments: arguments_list {$$ = $1;} | %empty {$$ = NULL;};
+arguments_list: argument {$$ = $1;} | argument ',' arguments_list {$$ = $1; append_child($$,$3);};
+argument: assign_expression {$$ = $1;};
 
 
 control_commands: return {}

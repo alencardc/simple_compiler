@@ -1,6 +1,5 @@
 int testIOCommand() {
   output 2;
-  aiaiai << 32313132;
-  aiai[2] << 3;
-  return !2;
+  shiftzim << 32313132;
+  bambam_o_maior(666,666,666);
 }

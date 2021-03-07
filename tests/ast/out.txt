@@ -1,27 +1,21 @@
-0x7fffcb7ce560, 0x7fffcb7ce510
-0x7fffcb7ce560, 0x7fffcb7ce700
-0x7fffcb7ce700, 0x7fffcb7ce660
-0x7fffcb7ce700, 0x7fffcb7ce6b0
-0x7fffcb7ce700, 0x7fffcb7ce9d0
-0x7fffcb7ce9d0, 0x7fffcb7ce8c0
-0x7fffcb7ce8c0, 0x7fffcb7ce800
-0x7fffcb7ce8c0, 0x7fffcb7ce870
-0x7fffcb7ce9d0, 0x7fffcb7ce980
-0x7fffcb7ce9d0, 0x7fffcb7ceb80
-0x7fffcb7ceb80, 0x7fffcb7cea70
-0x7fffcb7cea70, 0x7fffcb7ceb00
+0x7fffd1101560, 0x7fffd1101510
+0x7fffd1101560, 0x7fffd1101700
+0x7fffd1101700, 0x7fffd1101660
+0x7fffd1101700, 0x7fffd11016b0
+0x7fffd1101700, 0x7fffd11018d0
+0x7fffd11018d0, 0x7fffd11017f0
+0x7fffd11017f0, 0x7fffd1101880
+0x7fffd11017f0, 0x7fffd1101920
+0x7fffd1101920, 0x7fffd1101990
 
-0x7fffcb7ce560 [label="output"];
-0x7fffcb7ce510 [label="some int"];
-0x7fffcb7ce700 [label="<<"];
-0x7fffcb7ce660 [label="aiaiai"];
-0x7fffcb7ce6b0 [label="32313132"];
-0x7fffcb7ce9d0 [label="<<"];
-0x7fffcb7ce8c0 [label="[]"];
-0x7fffcb7ce800 [label="aiai"];
-0x7fffcb7ce870 [label="2"];
-0x7fffcb7ce980 [label="3"];
-0x7fffcb7ceb80 [label="return"];
-0x7fffcb7cea70 [label="!"];
-0x7fffcb7ceb00 [label="2"];
+0x7fffd1101560 [label="output"];
+0x7fffd1101510 [label="some int"];
+0x7fffd1101700 [label="<<"];
+0x7fffd1101660 [label="shiftzim"];
+0x7fffd11016b0 [label="32313132"];
+0x7fffd11018d0 [label="call ROGERIM_LINGUICA_DE_FEIJAO_QUEIMADO_ENAO_MUDANADA_E_PONTOCOM"];
+0x7fffd11017f0 [label="!"];
+0x7fffd1101880 [label="666"];
+0x7fffd1101920 [label="666"];
+0x7fffd1101990 [label="666"];
 

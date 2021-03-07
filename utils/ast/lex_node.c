@@ -102,3 +102,15 @@ Node* create_binary_tree(const char* parentLabel, Node *leftChild, Node *rightCh
 
   return parent;
 }
+
+Node* create_func_call_node(LexValue function_id, Node* expression){
+  char* id = get_label(function_id);
+  char* call = "call ";
+  char* callPlusId = (char*) malloc(sizeof(char) * (strlen(call) + strlen(id)));
+  strcpy(callPlusId, call);
+  strcat(callPlusId, id);
+  
+  Node* function_call = create_node_with_label(callPlusId);
+  append_child(function_call, expression);
+  return function_call;
+}
