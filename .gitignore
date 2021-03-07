@@ -9,4 +9,6 @@ saidas/*
 submit
 **/**.tgz
 
+**/**.txt
+**/**.png
 utils/tests/test

@@ -47,6 +47,7 @@ extern int get_line_number(void);
 %token TK_OC_NE
 %token TK_OC_AND
 %token TK_OC_OR
+
 %token <lexical_value> TK_OC_SL
 %token <lexical_value> TK_OC_SR
 %token <lexical_value> TK_LIT_INT
@@ -60,7 +61,26 @@ extern int get_line_number(void);
 %token TOKEN_ERRO
 
 %type <node> identifier
+%type <node> vector_identifier
 %type <node> literal
+
+%type <node> assign_expression;
+%type <node> ternary_expression
+%type <node> or_expression
+%type <node> and_expression
+%type <node> bit_or_expression
+%type <node> bit_and_expression
+%type <node> equality_expression
+%type <node> relational_expression
+%type <node> additive_expression
+%type <node> multiplicative_expression
+%type <node> exponential_expression
+%type <node> exponential_operator
+%type <node> unary_operator
+%type <node> unary_expression
+%type <node> basic_expression
+%type <node> constant 
+
 %type <node> output_command
 %type <node> input_command
 %type <node> io_command
@@ -79,7 +99,6 @@ extern int get_line_number(void);
 %type <node> shift_operand;
 %type <node> shift_command;
 %type <node> shift_number;
-%type <node> assign_expression;
 
 
 %%
@@ -94,6 +113,8 @@ storage_modifier: TK_PR_STATIC | %empty;
 var_qualifier: TK_PR_CONST | %empty;
 
 identifier: TK_IDENTIFICADOR { $$ = create_node_with_lex($1); };
+
+vector_identifier: identifier '[' assign_expression ']' { $$ = create_id_vector_node($1,$3); };
 
 type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
 
@@ -137,7 +158,7 @@ local_var_init: local_var_id
               ;
 
 local_var_id: TK_IDENTIFICADOR;
-local_var_value: TK_IDENTIFICADOR | TK_IDENTIFICADOR '[' assign_expression ']' | literal ;
+local_var_value: identifier | vector_identifier | literal ;
 
 
 /*************************************
@@ -159,37 +180,37 @@ param: var_qualifier type TK_IDENTIFICADOR;
 *********** Expressions **************
 *************************************/
 
-assign_expression: ternary_expression;
+assign_expression: ternary_expression { $$ = $1; };
 
-ternary_expression: or_expression
+ternary_expression: or_expression { $$ = $1; }
                   | or_expression '?' assign_expression ':' ternary_expression
                   ;
 
-or_expression: and_expression
+or_expression: and_expression { $$ = $1; }
              | or_expression or_operator and_expression
              ;
 
 or_operator: TK_OC_OR;
 
-and_expression: bit_or_expression
+and_expression: bit_or_expression { $$ = $1; }
               | and_expression and_operator bit_or_expression 
               ;
 
 and_operator: TK_OC_AND;
 
-bit_or_expression: bit_and_expression
+bit_or_expression: bit_and_expression { $$ = $1; }
                  | bit_or_expression bit_or_operator bit_and_expression
                  ;
 
 bit_or_operator: '|';
 
-bit_and_expression: equality_expression 
+bit_and_expression: equality_expression { $$ = $1; }
                   | bit_and_expression bit_and_operator equality_expression 
                   ;
 
 bit_and_operator: '&';
 
-equality_expression: relational_expression
+equality_expression: relational_expression { $$ = $1; }
                    | equality_expression equality_operator relational_expression
                    ;
 
@@ -197,7 +218,7 @@ equality_operator: TK_OC_EQ
                  | TK_OC_NE
                  ;
 
-relational_expression: additive_expression
+relational_expression: additive_expression { $$ = $1; }
                      | relational_expression relational_operator additive_expression
                      ;
 
@@ -209,13 +230,13 @@ relational_operator: '<'
 
 // Expressoes de shift???
 
-additive_expression: multiplicative_expression
+additive_expression: multiplicative_expression { $$ = $1; }
                   | additive_expression additive_operator multiplicative_expression 
                   ;
 
 additive_operator: '+' | '-';
 
-multiplicative_expression: exponential_expression
+multiplicative_expression: exponential_expression { $$ = $1; }
                          | multiplicative_expression multiplicative_operator exponential_expression
                          ;
 
@@ -224,33 +245,35 @@ multiplicative_operator: '*'
                        | '%'
                        ;
 
-exponential_expression: unary_expression
+exponential_expression: unary_expression { $$ = $1; }
                       | exponential_expression exponential_operator unary_expression 
                       ;
 
-exponential_operator: '^';
+exponential_operator: '^' { $$ = create_node_with_label("^"); } ;
 
-unary_expression: basic_expression 
-                | unary_operator unary_expression
+unary_expression: basic_expression { $$ = $1; }
+                | unary_operator unary_expression { $$ = $1; append_child($$, $2); }
                 ;
 
-unary_operator: '+'
-              | '-'
-              | '!'
-              | '&'
-              | '*'
-              | '?'
-              | '#'
+unary_operator: '+' { $$ = create_node_with_label("+"); }
+              | '-' { $$ = create_node_with_label("-"); }
+              | '!' { $$ = create_node_with_label("!"); }
+              | '&' { $$ = create_node_with_label("&"); }
+              | '*' { $$ = create_node_with_label("*"); }
+              | '?' { $$ = create_node_with_label("?"); }
+              | '#' { $$ = create_node_with_label("#"); }
               ;
 
-basic_expression: identifier
-                | TK_IDENTIFICADOR '['assign_expression ']' 
-                | constant 
+basic_expression: identifier { $$ = $1; }
+                | vector_identifier { $$ = $1; }
+                | constant { $$ = $1; }
                 | function_call
                 | '(' assign_expression ')' 
                 ;
 
-constant: TK_LIT_INT | TK_LIT_FLOAT ;
+constant: TK_LIT_INT { $$ = create_node_with_lex($1); }
+        | TK_LIT_FLOAT { $$ = create_node_with_lex($1); }
+        ;
 
 /*************************************
 ************* Commands ***************
@@ -279,7 +302,7 @@ command: local_decl
 control_block: '{' command_list '}'  
 {
   Node* current_command = $2;
-  exporta((void*)current_command);
+  //exporta((void*)current_command);
   // int i = 1;
   // printf("Comando %i: %s\n", i, current_command->label);
   // current_command = current_command->children->next;
@@ -292,19 +315,17 @@ control_block: '{' command_list '}'
 };
 block_command: control_block {};
 
-assign_command: TK_IDENTIFICADOR '=' assign_expression {}
-              | TK_IDENTIFICADOR '[' assign_expression ']' '=' assign_expression {}
+assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); exporta((void*)$$);  }
+              | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
               ;
 
-input_command: TK_PR_INPUT TK_IDENTIFICADOR 
+input_command: TK_PR_INPUT identifier 
               {
-                Node* id_node = create_id_node($2);
-                $$ = create_io_node(id_node, "input");
+                $$ = create_io_node($2, "input");
               };
-output_command: TK_PR_OUTPUT TK_IDENTIFICADOR
+output_command: TK_PR_OUTPUT identifier
               {
-                Node* id_node = create_id_node($2);
-                $$ = create_io_node(id_node, "output");
+                $$ = create_io_node($2, "output");
                 
               }
                |  TK_PR_OUTPUT literal
@@ -313,21 +334,13 @@ output_command: TK_PR_OUTPUT TK_IDENTIFICADOR
                }
               ;
               
-io_command: input_command | output_command {$$ = $1;};
+io_command: input_command | output_command { $$ = $1; };
 
 shift: TK_OC_SR | TK_OC_SL { $$ = $1;};
-shift_operand: TK_IDENTIFICADOR 
-                  {
-                    $$ = create_id_node($1);
-                  } 
-              | TK_IDENTIFICADOR '[' assign_expression ']'
-                  {
-                    Node* id = create_id_node($1);
-                    Node* id_vector = create_id_vector_node(id,$3);
-                    $$ = id_vector;
-                  };
+shift_operand: identifier { $$ = $1; } 
+              | vector_identifier { $$ = $1; };
 
-shift_command: shift_operand shift shift_number { $$ = create_shift_node($2,$1,$3);};
+shift_command: shift_operand shift shift_number { $$ = create_shift_node($2,$1,$3); };
 shift_number: TK_LIT_INT {
                 char* integerInString = integerToString($1.token_value.i_val);
                 $$ = create_node(&$1, integerInString);
@@ -338,7 +351,7 @@ shift_number: TK_LIT_INT {
                 $$ = create_node(&$2, integerInString);
             };
 
-function_call: TK_IDENTIFICADOR '(' arguments ')' {};
+function_call: TK_IDENTIFICADOR '(' arguments ')' {  };
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
 arguments: arguments_list | %empty;

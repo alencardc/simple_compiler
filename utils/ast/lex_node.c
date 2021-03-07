@@ -94,3 +94,11 @@ char* integerToString(int a){
   
   return integerInString;
 }
+
+Node* create_binary_tree(const char* parentLabel, Node *leftChild, Node *rightChild) {
+  Node *parent = create_node_with_label(parentLabel);
+  append_child(parent, leftChild);
+  append_child(parent, rightChild);
+
+  return parent;
+}
