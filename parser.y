@@ -72,7 +72,9 @@ extern int get_line_number(void);
 %type <node> bit_and_expression
 %type <node> equality_expression
 %type <node> relational_expression
+%type <node> relational_operator
 %type <node> additive_expression
+%type <node> additive_operator
 %type <node> multiplicative_expression
 %type <node> multiplicative_operator
 %type <node> exponential_expression
@@ -220,22 +222,24 @@ equality_operator: TK_OC_EQ
                  ;
 
 relational_expression: additive_expression { $$ = $1; }
-                     | relational_expression relational_operator additive_expression
+                     | relational_expression relational_operator additive_expression { $$ = create_binary_exp($2, $1, $3); }
                      ;
 
-relational_operator: '<'
-                   | '>'
-                   | TK_OC_GE
-                   | TK_OC_LE
+relational_operator: '<' { $$ = create_node_with_label("<"); }
+                   | '>' { $$ = create_node_with_label(">"); }
+                   | TK_OC_GE { $$ = create_node_with_label(">="); }
+                   | TK_OC_LE { $$ = create_node_with_label("<="); }
                    ;
 
 // Expressoes de shift???
 
 additive_expression: multiplicative_expression { $$ = $1; }
-                  | additive_expression additive_operator multiplicative_expression 
+                  | additive_expression additive_operator multiplicative_expression { $$ = create_binary_exp($2, $1, $3); }
                   ;
 
-additive_operator: '+' | '-';
+additive_operator: '+' { $$ = create_node_with_label("+"); }
+                 | '-' { $$ = create_node_with_label("-"); }
+                 ;
 
 multiplicative_expression: exponential_expression { $$ = $1; }
                          | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3); }
