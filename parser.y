@@ -71,6 +71,7 @@ extern int get_line_number(void);
 %type <node> bit_or_expression
 %type <node> bit_and_expression
 %type <node> equality_expression
+%type <node> equality_operator
 %type <node> relational_expression
 %type <node> relational_operator
 %type <node> additive_expression
@@ -214,11 +215,11 @@ bit_and_expression: equality_expression { $$ = $1; }
 bit_and_operator: '&';
 
 equality_expression: relational_expression { $$ = $1; }
-                   | equality_expression equality_operator relational_expression
+                   | equality_expression equality_operator relational_expression { $$ = create_binary_exp($2, $1, $3); }
                    ;
 
-equality_operator: TK_OC_EQ
-                 | TK_OC_NE
+equality_operator: TK_OC_EQ { $$ = create_node_with_label("=="); }
+                 | TK_OC_NE { $$ = create_node_with_label("!="); }
                  ;
 
 relational_expression: additive_expression { $$ = $1; }
