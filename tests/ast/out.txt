@@ -1,33 +1,37 @@
-0x7fffea83caf0, 0x7fffea83cac0
+0x7fffe21fe720, 0x7fffe21fe6d0
 
-0x7fffea83caf0 [label="output"];
-0x7fffea83cac0 [label="some int"];
-0x7fffea83c560, 0x7fffea83c510
-0x7fffea83c560, 0x7fffea83c700
-0x7fffea83c700, 0x7fffea83c660
-0x7fffea83c700, 0x7fffea83c6b0
-0x7fffea83c700, 0x7fffea83c9b0
-0x7fffea83c9b0, 0x7fffea83c800
-0x7fffea83c800, 0x7fffea83c870
-0x7fffea83c870, 0x7fffea83c8e0
-0x7fffea83c9b0, 0x7fffea83cd80
-0x7fffea83cd80, 0x7fffea83ca70
-0x7fffea83cd80, 0x7fffea83caf0
-0x7fffea83caf0, 0x7fffea83cac0
-0x7fffea83cd80, 0x7fffea83ce80
+0x7fffe21fe720 [label="output"];
+0x7fffe21fe6d0 [label="carecaDesgracado"];
+0x7fffe21feb70, 0x7fffe21feb20
 
-0x7fffea83c560 [label="output"];
-0x7fffea83c510 [label="some int"];
-0x7fffea83c700 [label="<<"];
-0x7fffea83c660 [label="shiftzim"];
-0x7fffea83c6b0 [label="32313132"];
-0x7fffea83c9b0 [label="call bambam_o_maior"];
-0x7fffea83c800 [label="666"];
-0x7fffea83c870 [label="666"];
-0x7fffea83c8e0 [label="666"];
-0x7fffea83cd80 [label="while"];
-0x7fffea83ca70 [label="2"];
-0x7fffea83caf0 [label="output"];
-0x7fffea83cac0 [label="some int"];
-0x7fffea83ce80 [label="call abc"];
+0x7fffe21feb70 [label="output"];
+0x7fffe21feb20 [label="Parceiro"];
+0x7fffe21fed20, 0x7fffe21fecd0
+
+0x7fffe21fed20 [label="output"];
+0x7fffe21fecd0 [label="deBoa"];
+0x7fffe21fe560, 0x7fffe21fe510
+0x7fffe21fe560, 0x7fffe21fe990
+0x7fffe21fe990, 0x7fffe21fe640
+0x7fffe21fe990, 0x7fffe21fe720
+0x7fffe21fe720, 0x7fffe21fe6d0
+0x7fffe21fe990, 0x7fffe21febd0
+0x7fffe21febd0, 0x7fffe21fea90
+0x7fffe21febd0, 0x7fffe21feb70
+0x7fffe21feb70, 0x7fffe21feb20
+0x7fffe21febd0, 0x7fffe21fed20
+0x7fffe21fed20, 0x7fffe21fecd0
+
+0x7fffe21fe560 [label="output"];
+0x7fffe21fe510 [label="some int"];
+0x7fffe21fe990 [label="if"];
+0x7fffe21fe640 [label="schnorr"];
+0x7fffe21fe720 [label="output"];
+0x7fffe21fe6d0 [label="carecaDesgracado"];
+0x7fffe21febd0 [label="if"];
+0x7fffe21fea90 [label="caco"];
+0x7fffe21feb70 [label="output"];
+0x7fffe21feb20 [label="Parceiro"];
+0x7fffe21fed20 [label="output"];
+0x7fffe21fecd0 [label="deBoa"];
 

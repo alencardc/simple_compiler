@@ -122,3 +122,12 @@ Node* create_while_node(Node* expressao, Node* command){
 
   return whileNode;
 }
+
+Node* create_partial_if_node(Node* expressao, Node* command){
+  Node* ifNode = create_node_with_label("if");
+  append_child(ifNode, expressao);
+  append_child(ifNode, command);
+
+  return ifNode;
+}
+
