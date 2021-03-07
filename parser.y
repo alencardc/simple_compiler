@@ -67,8 +67,11 @@ extern int get_line_number(void);
 %type <node> assign_expression;
 %type <node> ternary_expression
 %type <node> or_expression
+%type <node> or_operator
 %type <node> and_expression
+%type <node> and_operator
 %type <node> bit_or_expression
+%type <node> bit_or_operator
 %type <node> bit_and_expression
 %type <node> bit_and_operator
 %type <node> equality_expression
@@ -204,10 +207,10 @@ and_expression: bit_or_expression { $$ = $1; }
 and_operator: TK_OC_AND;
 
 bit_or_expression: bit_and_expression { $$ = $1; }
-                 | bit_or_expression bit_or_operator bit_and_expression
+                 | bit_or_expression bit_or_operator bit_and_expression { $$ = create_binary_exp($2, $1, $3); }
                  ;
 
-bit_or_operator: '|';
+bit_or_operator: '|' { $$ = create_node_with_label("|"); };
 
 bit_and_expression: equality_expression { $$ = $1; }
                   | bit_and_expression bit_and_operator equality_expression { $$ = create_binary_exp($2, $1, $3); }
