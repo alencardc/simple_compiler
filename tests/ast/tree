@@ -8,7 +8,10 @@ n5 -> n6;
 n6 -> n7;
 n6 -> n8;
 n5 -> n9;
-n10n10;
+n5 -> n10;
+n10 -> n11;
+n11 -> n12;
+n13n13;
 n0 [label="output"];
 n1 [label="some int"];
 n2 [label="<<"];
@@ -19,6 +22,9 @@ n6 [label="[]"];
 n7 [label="aiai"];
 n8 [label="2"];
 n9 [label="3"];
-n10n10;
+n10 [label="return"];
+n11 [label="!"];
+n12 [label="2"];
+n13n13;
 
 }

@@ -100,6 +100,7 @@ extern int get_line_number(void);
 %type <node> shift_command;
 %type <node> shift_number;
 
+%type <node> return;
 
 %%
 
@@ -363,11 +364,11 @@ argument: assign_expression;
 
 
 control_commands: return {}
-                | TK_PR_BREAK {$$ = create_node(NULL, "break");}
-                | TK_PR_CONTINUE {$$ = create_node(NULL, "continue");}
+                | TK_PR_BREAK {$$ = create_node_with_label("break");}
+                | TK_PR_CONTINUE {$$ = create_node_with_label("continue");}
                 ;
 
-return: TK_PR_RETURN assign_expression; 
+return: TK_PR_RETURN assign_expression { $$ = create_node_with_label("return"); append_child($$, $2);}; 
 
 
 /*************************************
