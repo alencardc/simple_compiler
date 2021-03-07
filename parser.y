@@ -246,7 +246,7 @@ multiplicative_operator: '*'
                        ;
 
 exponential_expression: unary_expression { $$ = $1; }
-                      | exponential_expression exponential_operator unary_expression 
+                      | exponential_expression exponential_operator unary_expression { $$ = $2; append_child($$, $1); append_child($$, $3); }
                       ;
 
 exponential_operator: '^' { $$ = create_node_with_label("^"); } ;
@@ -268,7 +268,7 @@ basic_expression: identifier { $$ = $1; }
                 | vector_identifier { $$ = $1; }
                 | constant { $$ = $1; }
                 | function_call
-                | '(' assign_expression ')' 
+                | '(' assign_expression ')' { $$ = $2 ; }
                 ;
 
 constant: TK_LIT_INT { $$ = create_node_with_lex($1); }

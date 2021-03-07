@@ -1,3 +1,3 @@
 int main() {
-  var = !myvar;
+  var = !myvar ^ 2 ^ 3;
 }
