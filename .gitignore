@@ -12,3 +12,4 @@ submit
 **/**.txt
 **/**.png
 utils/tests/test
+tests/ast/tree

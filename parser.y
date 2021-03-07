@@ -382,7 +382,7 @@ arguments_list: argument {$$ = $1;} | argument ',' arguments_list {$$ = $1; appe
 argument: assign_expression {$$ = $1;};
 
 
-control_commands: return {}
+control_commands: return { $$ = $1; }
                 | TK_PR_BREAK {$$ = create_node_with_label("break");}
                 | TK_PR_CONTINUE {$$ = create_node_with_label("continue");}
                 ;
@@ -399,7 +399,7 @@ multiline_command: if_simples {$$ = $1;}
                  | while {$$ = $1;}
                  ;
 
-if_simples: TK_PR_IF '('assign_expression ')' control_block {$$ = create_partial_if_node($3,$5);}; 
+if_simples: TK_PR_IF '(' assign_expression ')' control_block {$$ = create_partial_if_node($3,$5);}; 
 if_else: if_simples TK_PR_ELSE control_block {append_child($1,$3); $$ = $1;};
 
 for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block 
