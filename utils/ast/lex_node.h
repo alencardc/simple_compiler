@@ -15,6 +15,7 @@ Node* create_id_node(LexValue data);
 Node* create_shift_node(LexValue shift, Node *id, Node* literal);
 Node* create_id_vector_node(Node* id, Node* expression);
 Node* create_binary_tree(const char* parentLabel, Node *leftChild, Node *rightChild);
+Node* create_binary_exp(Node *parent, Node *leftChild, Node *rightChild);
 
 char* integerToString(int a);
 

@@ -1,3 +1,3 @@
 int main() {
-  var = !myvar ^ 2 ^ 3;
+  var = !myvar ^ 2 * var2^3;
 }

@@ -102,3 +102,10 @@ Node* create_binary_tree(const char* parentLabel, Node *leftChild, Node *rightCh
 
   return parent;
 }
+
+Node* create_binary_exp(Node *parent, Node *leftChild, Node *rightChild) {
+  append_child(parent, leftChild);
+  append_child(parent, rightChild);
+
+  return parent;
+}

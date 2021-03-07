@@ -74,6 +74,7 @@ extern int get_line_number(void);
 %type <node> relational_expression
 %type <node> additive_expression
 %type <node> multiplicative_expression
+%type <node> multiplicative_operator
 %type <node> exponential_expression
 %type <node> exponential_operator
 %type <node> unary_operator
@@ -237,16 +238,16 @@ additive_expression: multiplicative_expression { $$ = $1; }
 additive_operator: '+' | '-';
 
 multiplicative_expression: exponential_expression { $$ = $1; }
-                         | multiplicative_expression multiplicative_operator exponential_expression
+                         | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3); }
                          ;
 
-multiplicative_operator: '*'
-                       | '/'
-                       | '%'
+multiplicative_operator: '*' { $$ = create_node_with_label("*"); }
+                       | '/' { $$ = create_node_with_label("/"); }
+                       | '%' { $$ = create_node_with_label("%"); }
                        ;
 
 exponential_expression: unary_expression { $$ = $1; }
-                      | exponential_expression exponential_operator unary_expression { $$ = $2; append_child($$, $1); append_child($$, $3); }
+                      | exponential_expression exponential_operator unary_expression { $$ = create_binary_exp($2, $1, $3); }
                       ;
 
 exponential_operator: '^' { $$ = create_node_with_label("^"); } ;
