@@ -382,7 +382,7 @@ arguments_list: argument {$$ = $1;} | argument ',' arguments_list {$$ = $1; appe
 argument: assign_expression {$$ = $1;};
 
 
-control_commands: return {}
+control_commands: return {$$ = $1;}
                 | TK_PR_BREAK {$$ = create_node_with_label("break");}
                 | TK_PR_CONTINUE {$$ = create_node_with_label("continue");}
                 ;

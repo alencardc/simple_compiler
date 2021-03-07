@@ -61,7 +61,7 @@ char* get_label(LexValue lex_value) {
 Node* create_io_node(Node* child, const char *label) {
   Node* output_node = create_node(NULL, label);
   append_child(output_node,child);
-
+  
   return output_node;
 }
 

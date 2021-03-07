@@ -11,3 +11,7 @@ create_node_with_lex:
 
 create_node_with_label: 
 	gcc -o test create_node_with_label.c ../ast/tree.c ../ast/lex_value.c ../ast/lex_node.c
+
+remove_delimiters:
+	gcc -o test remove_quotation.c ../ast/tree.c ../ast/lex_value.c ../ast/lex_node.c
+
