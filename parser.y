@@ -300,22 +300,16 @@ input_command: TK_PR_INPUT TK_IDENTIFICADOR
               {
                 Node* id_node = create_id_node($2);
                 $$ = create_io_node(id_node, "input");
-                printf("Nó formado: %s\n", $$->label);
-                printf("\tSua criança: %s\n", $$->children[0]->label);
               };
 output_command: TK_PR_OUTPUT TK_IDENTIFICADOR
               {
                 Node* id_node = create_id_node($2);
                 $$ = create_io_node(id_node, "output");
-                printf("Nó formado: %s\n", $$->label);
-                printf("\tSua criança: %s\n", $$->children[0]->label);
+                
               }
                |  TK_PR_OUTPUT literal
               {
                 $$ = create_io_node($2, "output");
-
-                printf("Nó formado: %s\n", $$->label);
-                printf("\tSua criança: %s\n", $$->children[0]->label);
                }
               ;
               
