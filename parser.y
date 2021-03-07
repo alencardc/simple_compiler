@@ -45,11 +45,11 @@ extern void *arvore;
 %token TK_PR_END
 %token TK_PR_DEFAULT
 %token <lexical_value> TK_OC_LE
-%token TK_OC_GE
-%token TK_OC_EQ
-%token TK_OC_NE
-%token TK_OC_AND
-%token TK_OC_OR
+%token <lexical_value> TK_OC_GE
+%token <lexical_value> TK_OC_EQ
+%token <lexical_value> TK_OC_NE
+%token <lexical_value> TK_OC_AND
+%token <lexical_value> TK_OC_OR
 
 %token <lexical_value> TK_OC_SL
 %token <lexical_value> TK_OC_SR
@@ -221,13 +221,13 @@ or_expression: and_expression { $$ = $1; }
              | or_expression or_operator and_expression { $$ = create_binary_exp($2, $1, $3); }
              ;
 
-or_operator: TK_OC_OR { $$ = create_node_with_label("||"); };
+or_operator: TK_OC_OR { $$ = create_node_with_lex($1); };
 
 and_expression: bit_or_expression { $$ = $1; }
               | and_expression and_operator bit_or_expression { $$ = create_binary_exp($2, $1, $3); }
               ;
 
-and_operator: TK_OC_AND { $$ = create_node_with_label("&&"); };
+and_operator: TK_OC_AND { $$ = create_node_with_lex($1); };
 
 bit_or_expression: bit_and_expression { $$ = $1; }
                  | bit_or_expression bit_or_operator bit_and_expression { $$ = create_binary_exp($2, $1, $3); }
@@ -245,8 +245,8 @@ equality_expression: relational_expression { $$ = $1; }
                    | equality_expression equality_operator relational_expression { $$ = create_binary_exp($2, $1, $3); }
                    ;
 
-equality_operator: TK_OC_EQ { $$ = create_node_with_label("=="); }
-                 | TK_OC_NE { $$ = create_node_with_label("!="); }
+equality_operator: TK_OC_EQ { $$ = create_node_with_lex($1); }
+                 | TK_OC_NE { $$ = create_node_with_lex($1); }
                  ;
 
 relational_expression: additive_expression { $$ = $1; }
@@ -255,8 +255,8 @@ relational_expression: additive_expression { $$ = $1; }
 
 relational_operator: '<' { $$ = create_node_with_label("<"); }
                    | '>' { $$ = create_node_with_label(">"); }
-                   | TK_OC_GE { $$ = create_node_with_label(">="); }
-                   | TK_OC_LE { $$ = create_node_with_label("<="); }
+                   | TK_OC_GE { $$ = create_node_with_lex($1); }
+                   | TK_OC_LE { $$ = create_node_with_lex($1); }
                    ;
 
 // Expressoes de shift???
@@ -356,19 +356,9 @@ assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", 
               | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
               ;
 
-input_command: TK_PR_INPUT identifier 
-              {
-                $$ = create_io_node($2, "input");
-              };
-output_command: TK_PR_OUTPUT identifier
-              {
-                $$ = create_io_node($2, "output");
-                
-              }
-               |  TK_PR_OUTPUT literal
-              {
-                $$ = create_io_node($2, "output");
-               }
+input_command: TK_PR_INPUT identifier { $$ = create_io_node($2, "input"); };
+output_command: TK_PR_OUTPUT identifier { $$ = create_io_node($2, "output"); }
+               |  TK_PR_OUTPUT literal { $$ = create_io_node($2, "output"); }
               ;
               
 io_command: input_command | output_command { $$ = $1; };
@@ -377,22 +367,15 @@ shift: TK_OC_SR | TK_OC_SL { $$ = $1;};
 shift_operand: identifier { $$ = $1; } 
               | vector_identifier { $$ = $1; };
 
-shift_command: shift_operand shift shift_number { $$ = create_shift_node($2,$1,$3); };
-shift_number: TK_LIT_INT {
-                char* integerInString = integerToString($1.token_value.i_val);
-                $$ = create_node(&$1, integerInString);
-            };
-            | '+' TK_LIT_INT 
-            {
-                char* integerInString = integerToString($2.token_value.i_val);
-                $$ = create_node(&$2, integerInString);
-            };
+shift_command: shift_operand shift shift_number { $$ = create_shift_node($2, $1, $3); };
+shift_number: TK_LIT_INT { $$ = create_node_with_lex($1); };
+            | '+' TK_LIT_INT { $$ = create_node_with_lex($2); };
 
-function_call: TK_IDENTIFICADOR '(' arguments ')' { $$ = create_func_call_node($1,$3); };
+function_call: TK_IDENTIFICADOR '(' arguments ')' { $$ = create_func_call_node($1, $3); };
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
 arguments: arguments_list {$$ = $1;} | %empty {$$ = NULL;};
-arguments_list: argument {$$ = $1;} | argument ',' arguments_list {$$ = $1; append_child($$,$3);};
+arguments_list: argument {$$ = $1;} | argument ',' arguments_list {$$ = $1; append_child($$, $3);};
 argument: assign_expression {$$ = $1;};
 
 

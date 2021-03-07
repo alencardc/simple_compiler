@@ -71,7 +71,7 @@ Node* create_id_node(LexValue data){
 }
 
 Node* create_shift_node(LexValue shift, Node *id, Node* literal){
-  Node* shift_node = create_node(&shift,shift.token_value.s_value);
+  Node* shift_node = create_node_with_lex(shift);
   append_child(shift_node, id);
   append_child(shift_node, literal);
 }
