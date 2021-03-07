@@ -281,8 +281,11 @@ constant: TK_LIT_INT { $$ = create_node_with_lex($1); }
 
 command_list: generic_command
               {$$ = $1;}
-            | command_list generic_command{$$ = append_child($1,$2);}
-            ;
+            |  generic_command command_list
+                                          { 
+                                            append_child($1,$2);
+                                            $$ = $1; 
+                                          };
 
 generic_command: one_line_command | multiline_command {$$ = $1;};
 
@@ -302,7 +305,7 @@ command: local_decl
 control_block: '{' command_list '}'  
 {
   Node* current_command = $2;
-  //exporta((void*)current_command);
+  exporta((void*)current_command);
   // int i = 1;
   // printf("Comando %i: %s\n", i, current_command->label);
   // current_command = current_command->children->next;
@@ -315,7 +318,7 @@ control_block: '{' command_list '}'
 };
 block_command: control_block {};
 
-assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); exporta((void*)$$);  }
+assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); /*exporta((void*)$$);*/  }
               | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
               ;
 

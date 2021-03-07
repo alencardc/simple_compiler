@@ -1,0 +1,21 @@
+0x7fffbb32e560, 0x7fffbb32e510
+0x7fffbb32e560, 0x7fffbb32e700
+0x7fffbb32e700, 0x7fffbb32e660
+0x7fffbb32e700, 0x7fffbb32e6b0
+0x7fffbb32e700, 0x7fffbb32e9d0
+0x7fffbb32e9d0, 0x7fffbb32e8c0
+0x7fffbb32e8c0, 0x7fffbb32e800
+0x7fffbb32e8c0, 0x7fffbb32e870
+0x7fffbb32e9d0, 0x7fffbb32e980
+
+0x7fffbb32e560 [label="output"];
+0x7fffbb32e510 [label="some int"];
+0x7fffbb32e700 [label="<<"];
+0x7fffbb32e660 [label="aiaiai"];
+0x7fffbb32e6b0 [label="32313132"];
+0x7fffbb32e9d0 [label="<<"];
+0x7fffbb32e8c0 [label="[]"];
+0x7fffbb32e800 [label="aiai"];
+0x7fffbb32e870 [label="2"];
+0x7fffbb32e980 [label="3"];
+
