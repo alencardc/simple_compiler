@@ -5,6 +5,9 @@
 int yylex(void);
 void yyerror (char const *s);
 extern int get_line_number(void);
+
+extern void *arvore;
+
 %}
 
 %define parse.error verbose
@@ -57,8 +60,9 @@ extern int get_line_number(void);
 %token <lexical_value> TK_LIT_CHAR
 %token <lexical_value> TK_LIT_STRING
 %token <lexical_value> TK_IDENTIFICADOR
-
 %token TOKEN_ERRO
+
+%type <node> programa
 
 %type <node> identifier
 %type <node> vector_identifier
@@ -107,6 +111,7 @@ extern int get_line_number(void);
 %type <node> shift_command
 %type <node> shift_number
 
+%type <node> func_decl
 %type <node> function_call
 %type <node> arguments
 %type <node> arguments_list
@@ -117,11 +122,15 @@ extern int get_line_number(void);
 
 %type <node> return
 
+%start root
+
 %%
 
-programa: global_decl_list programa
-        | func_decl programa
-        | %empty
+root: programa { arvore = (void*)$1; }
+
+programa: global_decl_list programa {}
+        | func_decl programa { $$ = $1; append_child($$, $2); }
+        | %empty { $$ = NULL; }
         ;
 
 storage_modifier: TK_PR_STATIC | %empty;
@@ -134,12 +143,12 @@ vector_identifier: identifier '[' assign_expression ']' { $$ = create_id_vector_
 
 type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
 
-literal: TK_LIT_INT { $$ = create_node(&$1, "some int"); }
-       | TK_LIT_FLOAT { $$ = create_node(&$1, "some float"); }
-       | TK_LIT_FALSE { }
-       | TK_LIT_TRUE { }
-       | TK_LIT_CHAR { }
-       | TK_LIT_STRING { }
+literal: TK_LIT_INT { $$ = create_node_with_lex($1); }
+       | TK_LIT_FLOAT { $$ = create_node_with_lex($1); }
+       | TK_LIT_FALSE { $$ = create_node_with_lex($1); }
+       | TK_LIT_TRUE { $$ = create_node_with_lex($1); }
+       | TK_LIT_CHAR { $$ = create_node_with_lex($1); }
+       | TK_LIT_STRING { $$ = create_node_with_lex($1); }
        ;
 
 
@@ -181,7 +190,7 @@ local_var_value: identifier | vector_identifier | literal ;
 ******* Functions declaration ********
 *************************************/
 
-func_decl: storage_modifier type TK_IDENTIFICADOR '(' params ')' control_block;
+func_decl: storage_modifier type identifier '(' params ')' control_block { $$ = $3; append_child($$, $7); };
 
 params: param_list | %empty;
 
@@ -189,7 +198,7 @@ param_list: param
           | param_list ',' param
           ;
 
-param: var_qualifier type TK_IDENTIFICADOR;
+param: var_qualifier type identifier { free_node($3); };
 
 
 /*************************************
@@ -323,7 +332,7 @@ command: local_decl
 control_block: '{' command_list '}'  
 {
   Node* current_command = $2;
-  exporta((void*)current_command);
+  //exporta((void*)current_command);
   $$ = $2;
   // int i = 1;
   // printf("Comando %i: %s\n", i, current_command->label);
@@ -337,7 +346,7 @@ control_block: '{' command_list '}'
 };
 block_command: control_block {};
 
-assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); /*exporta((void*)$$);*/  }
+assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
               | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
               ;
 
