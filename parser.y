@@ -191,20 +191,20 @@ param: var_qualifier type TK_IDENTIFICADOR;
 assign_expression: ternary_expression { $$ = $1; };
 
 ternary_expression: or_expression { $$ = $1; }
-                  | or_expression '?' assign_expression ':' ternary_expression
+                  | or_expression '?' assign_expression ':' ternary_expression { $$ = create_ternary_tree("?:", $1, $3, $5); }
                   ;
 
 or_expression: and_expression { $$ = $1; }
-             | or_expression or_operator and_expression
+             | or_expression or_operator and_expression { $$ = create_binary_exp($2, $1, $3); }
              ;
 
-or_operator: TK_OC_OR;
+or_operator: TK_OC_OR { $$ = create_node_with_label("||"); };
 
 and_expression: bit_or_expression { $$ = $1; }
-              | and_expression and_operator bit_or_expression 
+              | and_expression and_operator bit_or_expression { $$ = create_binary_exp($2, $1, $3); }
               ;
 
-and_operator: TK_OC_AND;
+and_operator: TK_OC_AND { $$ = create_node_with_label("&&"); };
 
 bit_or_expression: bit_and_expression { $$ = $1; }
                  | bit_or_expression bit_or_operator bit_and_expression { $$ = create_binary_exp($2, $1, $3); }

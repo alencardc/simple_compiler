@@ -109,3 +109,12 @@ Node* create_binary_exp(Node *parent, Node *leftChild, Node *rightChild) {
 
   return parent;
 }
+
+Node* create_ternary_tree(const char* parentLabel, Node *leftChild, Node *middleChild, Node *rightChild) {
+  Node *parent = create_node_with_label(parentLabel);
+  append_child(parent, leftChild);
+  append_child(parent, middleChild);
+  append_child(parent, rightChild);
+
+  return parent;
+}
