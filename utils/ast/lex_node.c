@@ -103,6 +103,21 @@ Node* create_binary_tree(const char* parentLabel, Node *leftChild, Node *rightCh
   return parent;
 }
 
+Node* create_binary_exp(Node *parent, Node *leftChild, Node *rightChild) {
+  append_child(parent, leftChild);
+  append_child(parent, rightChild);
+
+  return parent;
+}
+
+Node* create_ternary_tree(const char* parentLabel, Node *leftChild, Node *middleChild, Node *rightChild) {
+  Node *parent = create_node_with_label(parentLabel);
+  append_child(parent, leftChild);
+  append_child(parent, middleChild);
+  append_child(parent, rightChild);
+
+  return parent;
+}
 Node* create_func_call_node(LexValue function_id, Node* expression){
   char* id = get_label(function_id);
   char* call = "call ";

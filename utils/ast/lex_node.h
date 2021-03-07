@@ -18,6 +18,8 @@ Node* create_func_call_node(LexValue function_id, Node* expression);
 Node* create_while_node(Node* expressao, Node* command);
 Node* create_partial_if_node(Node* expressao, Node* command);
 Node* create_binary_tree(const char* parentLabel, Node *leftChild, Node *rightChild);
+Node* create_binary_exp(Node *parent, Node *leftChild, Node *rightChild);
+Node* create_ternary_tree(const char* parentLabel, Node *leftChild, Node *middleChild, Node *rightChild);
 
 char* integerToString(int a);
 

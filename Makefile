@@ -23,4 +23,4 @@ submit: clean
 	tar cvzf submit/etapa$(SUBMITION_NUMBER).tgz --exclude=.gitignore --exclude=.git --exclude=tests --exclude=submit .
 
 clean:
-	rm -rf etapa* lex.yy.c parser.tab.* parser.output *.o submit *.tgz ./tests/ast/*.png *.txt
+	rm -rf etapa* lex.yy.c parser.tab.* parser.output *.o submit *.tgz ./tests/ast/*.png ./tests/ast/*.txt

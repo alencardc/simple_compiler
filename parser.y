@@ -67,13 +67,21 @@ extern int get_line_number(void);
 %type <node> assign_expression;
 %type <node> ternary_expression
 %type <node> or_expression
+%type <node> or_operator
 %type <node> and_expression
+%type <node> and_operator
 %type <node> bit_or_expression
+%type <node> bit_or_operator
 %type <node> bit_and_expression
+%type <node> bit_and_operator
 %type <node> equality_expression
+%type <node> equality_operator
 %type <node> relational_expression
+%type <node> relational_operator
 %type <node> additive_expression
+%type <node> additive_operator
 %type <node> multiplicative_expression
+%type <node> multiplicative_operator
 %type <node> exponential_expression
 %type <node> exponential_operator
 %type <node> unary_operator
@@ -193,70 +201,72 @@ param: var_qualifier type TK_IDENTIFICADOR;
 assign_expression: ternary_expression { $$ = $1; };
 
 ternary_expression: or_expression { $$ = $1; }
-                  | or_expression '?' assign_expression ':' ternary_expression
+                  | or_expression '?' assign_expression ':' ternary_expression { $$ = create_ternary_tree("?:", $1, $3, $5); }
                   ;
 
 or_expression: and_expression { $$ = $1; }
-             | or_expression or_operator and_expression
+             | or_expression or_operator and_expression { $$ = create_binary_exp($2, $1, $3); }
              ;
 
-or_operator: TK_OC_OR;
+or_operator: TK_OC_OR { $$ = create_node_with_label("||"); };
 
 and_expression: bit_or_expression { $$ = $1; }
-              | and_expression and_operator bit_or_expression 
+              | and_expression and_operator bit_or_expression { $$ = create_binary_exp($2, $1, $3); }
               ;
 
-and_operator: TK_OC_AND;
+and_operator: TK_OC_AND { $$ = create_node_with_label("&&"); };
 
 bit_or_expression: bit_and_expression { $$ = $1; }
-                 | bit_or_expression bit_or_operator bit_and_expression
+                 | bit_or_expression bit_or_operator bit_and_expression { $$ = create_binary_exp($2, $1, $3); }
                  ;
 
-bit_or_operator: '|';
+bit_or_operator: '|' { $$ = create_node_with_label("|"); };
 
 bit_and_expression: equality_expression { $$ = $1; }
-                  | bit_and_expression bit_and_operator equality_expression 
+                  | bit_and_expression bit_and_operator equality_expression { $$ = create_binary_exp($2, $1, $3); }
                   ;
 
-bit_and_operator: '&';
+bit_and_operator: '&' { $$ = create_node_with_label("&"); };
 
 equality_expression: relational_expression { $$ = $1; }
-                   | equality_expression equality_operator relational_expression
+                   | equality_expression equality_operator relational_expression { $$ = create_binary_exp($2, $1, $3); }
                    ;
 
-equality_operator: TK_OC_EQ
-                 | TK_OC_NE
+equality_operator: TK_OC_EQ { $$ = create_node_with_label("=="); }
+                 | TK_OC_NE { $$ = create_node_with_label("!="); }
                  ;
 
 relational_expression: additive_expression { $$ = $1; }
-                     | relational_expression relational_operator additive_expression
+                     | relational_expression relational_operator additive_expression { $$ = create_binary_exp($2, $1, $3); }
                      ;
 
-relational_operator: '<'
-                   | '>'
-                   | TK_OC_GE
-                   | TK_OC_LE
+relational_operator: '<' { $$ = create_node_with_label("<"); }
+                   | '>' { $$ = create_node_with_label(">"); }
+                   | TK_OC_GE { $$ = create_node_with_label(">="); }
+                   | TK_OC_LE { $$ = create_node_with_label("<="); }
                    ;
 
 // Expressoes de shift???
 
 additive_expression: multiplicative_expression { $$ = $1; }
-                  | additive_expression additive_operator multiplicative_expression 
+                  | additive_expression additive_operator multiplicative_expression { $$ = create_binary_exp($2, $1, $3); }
                   ;
 
-additive_operator: '+' | '-';
+additive_operator: '+' { $$ = create_node_with_label("+"); }
+                 | '-' { $$ = create_node_with_label("-"); }
+                 ;
 
 multiplicative_expression: exponential_expression { $$ = $1; }
-                         | multiplicative_expression multiplicative_operator exponential_expression
+                         | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3); }
                          ;
 
-multiplicative_operator: '*'
-                       | '/'
-                       | '%'
+multiplicative_operator: '*' { $$ = create_node_with_label("*"); }
+                       | '/' { $$ = create_node_with_label("/"); }
+                       | '%' { $$ = create_node_with_label("%"); }
                        ;
 
 exponential_expression: unary_expression { $$ = $1; }
-                      | exponential_expression exponential_operator unary_expression 
+                      | exponential_expression exponential_operator unary_expression { $$ = create_binary_exp($2, $1, $3); }
                       ;
 
 exponential_operator: '^' { $$ = create_node_with_label("^"); } ;
@@ -278,7 +288,7 @@ basic_expression: identifier { $$ = $1; }
                 | vector_identifier { $$ = $1; }
                 | constant { $$ = $1; }
                 | function_call
-                | '(' assign_expression ')' 
+                | '(' assign_expression ')' { $$ = $2 ; }
                 ;
 
 constant: TK_LIT_INT { $$ = create_node_with_lex($1); }
