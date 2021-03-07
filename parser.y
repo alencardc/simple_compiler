@@ -104,6 +104,9 @@ extern int get_line_number(void);
 %type <node> arguments_list
 %type <node> argument
 
+%type <node> while
+%type <node> control_block
+
 %type <node> return
 
 %%
@@ -311,6 +314,7 @@ control_block: '{' command_list '}'
 {
   Node* current_command = $2;
   exporta((void*)current_command);
+  $$ = $2;
   // int i = 1;
   // printf("Comando %i: %s\n", i, current_command->label);
   // current_command = current_command->children->next;
@@ -381,14 +385,14 @@ return: TK_PR_RETURN assign_expression { $$ = create_node_with_label("return"); 
 multiline_command: if_simples {}
                  | if_else {}
                  | for {}
-                 | while {}
+                 | while {$$ = $1;}
                  ;
 
 if_simples: TK_PR_IF '('assign_expression ')' control_block; 
 if_else: if_simples TK_PR_ELSE control_block;
 
 for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block;  
-while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block; 
+while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {$$ = create_while_node($3,$6);}; 
 
 %%
 

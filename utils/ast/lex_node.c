@@ -114,3 +114,11 @@ Node* create_func_call_node(LexValue function_id, Node* expression){
   append_child(function_call, expression);
   return function_call;
 }
+
+Node* create_while_node(Node* expressao, Node* command){
+  Node* whileNode = create_node_with_label("while");
+  append_child(whileNode, expressao);
+  append_child(whileNode, command);
+
+  return whileNode;
+}
