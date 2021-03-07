@@ -14,6 +14,8 @@ Node* create_io_node(Node* child, const char *label);
 Node* create_id_node(LexValue data);
 Node* create_shift_node(LexValue shift, Node *id, Node* literal);
 Node* create_id_vector_node(Node* id, Node* expression);
+Node* create_func_call_node(LexValue function_id, Node* expression);
+Node* create_while_node(Node* expressao, Node* command);
 Node* create_binary_tree(const char* parentLabel, Node *leftChild, Node *rightChild);
 Node* create_binary_exp(Node *parent, Node *leftChild, Node *rightChild);
 Node* create_ternary_tree(const char* parentLabel, Node *leftChild, Node *middleChild, Node *rightChild);

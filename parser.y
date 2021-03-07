@@ -100,14 +100,22 @@ extern int get_line_number(void);
 %type <node> local_decl
 %type <node> block_command
 %type <node> assign_command
-%type <node> function_call
 %type <node> control_commands
 
-%type <lexical_value> shift;
-%type <node> shift_operand;
-%type <node> shift_command;
-%type <node> shift_number;
+%type <lexical_value> shift
+%type <node> shift_operand
+%type <node> shift_command
+%type <node> shift_number
 
+%type <node> function_call
+%type <node> arguments
+%type <node> arguments_list
+%type <node> argument
+
+%type <node> while
+%type <node> control_block
+
+%type <node> return
 
 %%
 
@@ -291,8 +299,11 @@ constant: TK_LIT_INT { $$ = create_node_with_lex($1); }
 
 command_list: generic_command
               {$$ = $1;}
-            | command_list generic_command{$$ = append_child($1,$2);}
-            ;
+            |  generic_command command_list
+                                          { 
+                                            append_child($1,$2);
+                                            $$ = $1; 
+                                          };
 
 generic_command: one_line_command | multiline_command {$$ = $1;};
 
@@ -312,7 +323,8 @@ command: local_decl
 control_block: '{' command_list '}'  
 {
   Node* current_command = $2;
-  //exporta((void*)current_command);
+  exporta((void*)current_command);
+  $$ = $2;
   // int i = 1;
   // printf("Comando %i: %s\n", i, current_command->label);
   // current_command = current_command->children->next;
@@ -325,7 +337,7 @@ control_block: '{' command_list '}'
 };
 block_command: control_block {};
 
-assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); exporta((void*)$$);  }
+assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); /*exporta((void*)$$);*/  }
               | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
               ;
 
@@ -361,20 +373,20 @@ shift_number: TK_LIT_INT {
                 $$ = create_node(&$2, integerInString);
             };
 
-function_call: TK_IDENTIFICADOR '(' arguments ')' {  };
+function_call: TK_IDENTIFICADOR '(' arguments ')' { $$ = create_func_call_node($1,$3); };
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
-arguments: arguments_list | %empty;
-arguments_list: argument | argument ',' arguments_list;
-argument: assign_expression;
+arguments: arguments_list {$$ = $1;} | %empty {$$ = NULL;};
+arguments_list: argument {$$ = $1;} | argument ',' arguments_list {$$ = $1; append_child($$,$3);};
+argument: assign_expression {$$ = $1;};
 
 
 control_commands: return {}
-                | TK_PR_BREAK {$$ = create_node(NULL, "break");}
-                | TK_PR_CONTINUE {$$ = create_node(NULL, "continue");}
+                | TK_PR_BREAK {$$ = create_node_with_label("break");}
+                | TK_PR_CONTINUE {$$ = create_node_with_label("continue");}
                 ;
 
-return: TK_PR_RETURN assign_expression; 
+return: TK_PR_RETURN assign_expression { $$ = create_node_with_label("return"); append_child($$, $2);}; 
 
 
 /*************************************
@@ -383,14 +395,14 @@ return: TK_PR_RETURN assign_expression;
 multiline_command: if_simples {}
                  | if_else {}
                  | for {}
-                 | while {}
+                 | while {$$ = $1;}
                  ;
 
 if_simples: TK_PR_IF '('assign_expression ')' control_block; 
 if_else: if_simples TK_PR_ELSE control_block;
 
 for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block;  
-while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block; 
+while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {$$ = create_while_node($3,$6);}; 
 
 %%
 
