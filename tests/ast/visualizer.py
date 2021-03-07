@@ -1,3 +1,9 @@
+# How to use:
+# Run make
+# Run ./etapa3 < {file_path} > tests/ast/out.txt | python3 tests/ast/visualizer.py tests/ast/out.txt
+# Where {file_path} is the test file path
+# Image output at tests/ast/tree.png
+
 import sys
 from graphviz import Source
 
@@ -27,4 +33,4 @@ for line in out_f:
 
 graph_description = graph_description + "\n}"
 source = Source(graph_description)
-source.render("tests/ast/tree", format="png")
+source.render("tests/ast/tree", format="png", cleanup=True)
