@@ -137,3 +137,22 @@ Node* create_while_node(Node* expressao, Node* command){
 
   return whileNode;
 }
+
+Node* create_partial_if_node(Node* expressao, Node* command){
+  Node* ifNode = create_node_with_label("if");
+  append_child(ifNode, expressao);
+  append_child(ifNode, command);
+
+  return ifNode;
+}
+
+Node* create_for_node(Node* init, Node* expressao, Node* atualizacao, Node* command){
+  Node* forNode = create_node_with_label("for");
+  append_child(forNode, init);
+  append_child(forNode, expressao);
+  append_child(forNode, atualizacao);
+  append_child(forNode, command);
+  
+  return forNode;
+}
+

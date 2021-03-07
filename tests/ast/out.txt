@@ -1,9 +1,0 @@
-AAAAA: 3
-0x564833fdb390, 0x564833fdc530
-0x564833fdc530, 0x564833fdb440
-0x564833fdc530, 0x564833fdb4b0
-
-0x564833fdb390 [label="main"];
-0x564833fdc530 [label="<<"];
-0x564833fdb440 [label="a"];
-0x564833fdb4b0 [label="3"];

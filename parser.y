@@ -123,6 +123,9 @@ extern void *arvore;
 
 %type <node> while
 %type <node> control_block
+%type <node> if_simples
+%type <node> if_else
+%type <node> for
 
 %type <node> return
 
@@ -390,16 +393,19 @@ return: TK_PR_RETURN assign_expression { $$ = create_node_with_label("return"); 
 /*************************************
 ********* Controle de fluxo **********
 *************************************/
-multiline_command: if_simples {}
-                 | if_else {}
-                 | for {}
+multiline_command: if_simples {$$ = $1;}
+                 | if_else {$$ = $1;}
+                 | for {$$ = $1;}
                  | while {$$ = $1;}
                  ;
 
-if_simples: TK_PR_IF '('assign_expression ')' control_block; 
-if_else: if_simples TK_PR_ELSE control_block;
+if_simples: TK_PR_IF '('assign_expression ')' control_block {$$ = create_partial_if_node($3,$5);}; 
+if_else: if_simples TK_PR_ELSE control_block {append_child($1,$3); $$ = $1;};
 
-for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block;  
+for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block 
+  {
+    $$ = create_for_node($3,$5,$7,$9);
+  };  
 while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {$$ = create_while_node($3,$6);}; 
 
 %%
