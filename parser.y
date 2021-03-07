@@ -44,7 +44,7 @@ extern void *arvore;
 %token TK_PR_PROTECTED
 %token TK_PR_END
 %token TK_PR_DEFAULT
-%token TK_OC_LE
+%token <lexical_value> TK_OC_LE
 %token TK_OC_GE
 %token TK_OC_EQ
 %token TK_OC_NE
@@ -67,6 +67,11 @@ extern void *arvore;
 %type <node> identifier
 %type <node> vector_identifier
 %type <node> literal
+%type <node> local_var_init
+%type <node> local_var_list
+%type <node> local_decl
+%type <node> local_var_value
+%type <node> local_var_operator
 
 %type <node> assign_expression;
 %type <node> ternary_expression
@@ -101,7 +106,6 @@ extern void *arvore;
 %type <node> one_line_command
 %type <node> generic_command
 %type <node> multiline_command
-%type <node> local_decl
 %type <node> block_command
 %type <node> assign_command
 %type <node> control_commands
@@ -172,17 +176,19 @@ vector_length: TK_LIT_INT | '+' TK_LIT_INT;
 **** Local variables declaration ****
 *************************************/
 
-local_decl: storage_modifier var_qualifier type local_var_list {};
+local_decl: storage_modifier var_qualifier type local_var_list { $$ = $4; };
 
-local_var_list: local_var_init
-              | local_var_list ',' local_var_init
+local_var_list: local_var_init { $$ = $1; }
+              | local_var_init ',' local_var_list { $$ = $1; append_child($$, $3); }
               ;
 
-local_var_init: local_var_id
-              | local_var_id TK_OC_LE local_var_value 
+local_var_init: identifier { $$ = NULL; free_node($1); }
+              | identifier local_var_operator local_var_value { $$ = create_binary_exp($2, $1, $3); }
               ;
 
-local_var_id: TK_IDENTIFICADOR;
+local_var_operator: TK_OC_LE { $$ = create_node_with_lex($1); }
+
+//local_var_id: TK_IDENTIFICADOR;
 local_var_value: identifier | vector_identifier | literal ;
 
 
