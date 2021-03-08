@@ -1,3 +1,5 @@
+int abc;
+
 int testAssignmentCommand () {
   var1 = 323;
   var2 = var1;
