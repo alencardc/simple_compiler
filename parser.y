@@ -262,8 +262,6 @@ relational_operator: '<' { $$ = create_node_with_label("<"); }
                    | TK_OC_LE { $$ = create_node_with_lex($1); }
                    ;
 
-// Expressoes de shift???
-
 additive_expression: multiplicative_expression { $$ = $1; }
                   | additive_expression additive_operator multiplicative_expression { $$ = create_binary_exp($2, $1, $3); }
                   ;
@@ -344,7 +342,7 @@ assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", 
 
 input_command: TK_PR_INPUT identifier { $$ = create_io_node($2, "input"); };
 output_command: TK_PR_OUTPUT identifier { $$ = create_io_node($2, "output"); }
-               |  TK_PR_OUTPUT literal { $$ = create_io_node($2, "output"); }
+              | TK_PR_OUTPUT literal { $$ = create_io_node($2, "output"); }
               ;
               
 io_command: input_command | output_command { $$ = $1; };
