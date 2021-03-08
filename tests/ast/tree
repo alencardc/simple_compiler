@@ -1,0 +1,9 @@
+digraph G {
+n0 -> n1;
+n1 -> n2;
+n3n3;
+n0 [label="testIOCommand"];
+n1 [label="call bambam"];
+n2 [label="909090"];
+
+}

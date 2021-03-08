@@ -41,5 +41,6 @@ LexValue create_char(char* value, int line);
 LexValue create_bool(bool value, int line);
 LexValue create_identifier(char *value, int line);
 LexValue create_compound_op(char *value, int line);
+char* remove_quotes(char* string);
 
 #endif // __LEX_VALUE_H__
