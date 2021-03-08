@@ -4,14 +4,33 @@
 #include <stdbool.h>
 #include "lex_value.h"
 
+typedef enum sNodeType {
+  AST_IF,
+  AST_IF_ELSE,
+  AST_SHIFT,
+  AST_ASSIGN,
+  AST_IO,
+  AST_FOR,
+  AST_WHILE,
+  AST_FUNC_CALL,
+  AST_FUNC_DECL,
+  AST_CONTROL,
+  AST_RETURN,
+  AST_LITERAL,
+  AST_SPECIAL,
+  AST_COMPOUND_OP,
+  AST_TERNARY,
+} NodeType;
+
 typedef struct sNode {
   LexValue *data;
   char *label;
+  NodeType type;
   int children_amount;
   struct sNode **children;
 } Node;
 
-Node* create_node(LexValue *data, const char *label);
+Node* create_node(LexValue *data, const char *label, NodeType type);
 Node* append_child(Node *parent, Node *child);
 
 //bool is_root(Node *node);

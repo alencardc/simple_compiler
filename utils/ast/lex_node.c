@@ -182,3 +182,16 @@ Node* join_local_with_commands(Node *local, Node *commands) {
   append_child(local_init, commands);
   return local;
 }
+
+Node* join_command_lists(Node *parent_list, Node *child_list) {
+  if (parent_list == NULL) {
+    return child_list;
+  }
+
+  Node* node = parent_list;
+  while (node->children_amount == expected_children_amount()+1) {
+    node = node->children[node->children_amount-1];
+  }
+  append_child(parent_list, child_list);
+  return parent_list;
+}

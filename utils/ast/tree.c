@@ -3,7 +3,7 @@
 #include <string.h>
 #include "ast.h"
 
-Node* create_node(LexValue *data, const char *label) {
+Node* create_node(LexValue *data, const char *label, NodeType type) {
   Node *node;
   node = (Node*) malloc(sizeof(Node));
   if (node == NULL) {
@@ -11,6 +11,7 @@ Node* create_node(LexValue *data, const char *label) {
   }
 
   node->label = strdup(label);
+  node->label = type;
   node->data = data;
   node->children_amount = 0;
   node->children = NULL;
