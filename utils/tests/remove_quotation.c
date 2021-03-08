@@ -8,6 +8,8 @@ void test_string(char *string);
 
 int main(){
     printf("------Test starting-------");
+    char* teste = "uiuiui";
+    printf("%s", teste);
     char string1[] = "\"teste\"";
     char string2[] = "\'t\'";
     char string3[] = "\"linguica de feijao queimado e não muda nada e .com e .br\"";

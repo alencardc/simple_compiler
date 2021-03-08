@@ -121,12 +121,17 @@ Node* create_ternary_tree(const char* parentLabel, Node *leftChild, Node *middle
 Node* create_func_call_node(LexValue function_id, Node* expression){
   char* id = get_label(function_id);
   char* call = "call ";
-  char* callPlusId = (char*) malloc(sizeof(char) * (strlen(call) + strlen(id)));
+  char* callPlusId = (char*) malloc(sizeof(char) * (strlen(call) + strlen(id) + 1));
   strcpy(callPlusId, call);
   strcat(callPlusId, id);
   
   Node* function_call = create_node_with_label(callPlusId);
   append_child(function_call, expression);
+
+  free(callPlusId);
+  free(function_id.token_value.s_value);
+  free(id);
+
   return function_call;
 }
 
