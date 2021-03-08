@@ -5,6 +5,7 @@
 # Image output at tests/ast/tree.png
 
 import sys
+import re
 from graphviz import Source
 
 out_f = open(sys.argv[1], "r", encoding="utf8")
@@ -29,6 +30,7 @@ for line in out_f:
   else:
     node = line.split(" ")[0]
     new_line = line.replace(node, dict_nodes[str(node)])
+
     graph_description = graph_description + new_line
 
 graph_description = graph_description + "\n}"

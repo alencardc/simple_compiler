@@ -303,7 +303,7 @@ unary_operator: '+' { $$ = create_node_with_label("+"); }
 basic_expression: identifier { $$ = $1; }
                 | vector_identifier { $$ = $1; }
                 | constant { $$ = $1; }
-                | function_call
+                | function_call { $$ = $1; }
                 | '(' assign_expression ')' { $$ = $2 ; }
                 ;
 
@@ -331,7 +331,7 @@ command: local_decl
        | assign_command
        | io_command
        | shift_command
-       | function_call
+       | function_call { $$ = $1; }
        | control_commands
        {
          $$ = $1;

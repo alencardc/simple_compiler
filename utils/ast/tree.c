@@ -54,12 +54,63 @@ void free_node(Node *node) {
   free(node);
 }
 
+void print_debug_node(Node *root) {
+  LexValue *data = root->data;
+  printf("%p [label=\"%s", root, root->label);
+  if (data != NULL) {
+    char *token_type;
+    switch (data->token_type) {
+    case TOKEN_IDENTIFIER:
+      token_type = strdup("TOKEN_IDENTIFIER");
+      break;
+    case TOKEN_LITERAL:
+      token_type = strdup("TOKEN_LITERAL");
+      break;
+    case TOKEN_SPECIAL:
+      token_type = strdup("TOKEN_SPECIAL");
+      break;
+    case TOKEN_COMPOUND_OP:
+      token_type = strdup("TOKEN_COMPOUND_OP");
+      break;
+    default:
+      token_type = strdup(" ");
+      break;
+    }
+    switch (data->value_type) {
+      case INTEGER_VAL:
+        printf("\\n %s\\n INTEGER_VAL\\n Value:%d", token_type, data->token_value.i_val);
+        break;
+      case BOOL_VAL:
+        printf("\\n %s\\n BOOL_VAL\\n Value:%s", token_type, data->token_value.b_val == true ? "true" : "false");
+        break;
+      case FLOAT_VAL:
+        printf("\\n %s\\n FLOAT_VAL\\n Value:%g", token_type, data->token_value.f_val);
+        break;
+      case STRING_VAL:
+        printf("\\n %s\\n STRING_VAL \\n Value:%s", token_type, data->token_value.s_value);
+        break;
+      case CHAR_VAL:
+        printf("\\n %s\\n CHAR_VAL \\n Value:%s", token_type, data->token_value.s_value);
+      default:
+        printf("\\n %s\\n CHAR_VAL \\n Value:", token_type);
+        break;
+    }
+    free(token_type);
+  }
+  printf("\"];\n");
+}
+
 void export_labels(Node *root) {
   if (root == NULL) {
     return;
   }
-  // Quebrar ou nao a linha?
-  printf("%p [label=\"%s\"];\n", root, root->label);
+
+  #ifdef DEBUG
+    print_debug_node(root);
+  #else
+    printf("%p [label=\"%s\"];\n", root, root->label);
+  #endif
+
   for (int i = 0; i < root->children_amount; i += 1) {
     export_labels(root->children[i]);
   }
