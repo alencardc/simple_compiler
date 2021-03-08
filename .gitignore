@@ -10,6 +10,7 @@ submit
 **/**.tgz
 
 **/**.txt
+tests/*.txt
 **/**.png
 utils/tests/test
 tests/ast/tree
