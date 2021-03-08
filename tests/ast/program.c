@@ -1,5 +1,6 @@
 int main() {
-  // int a <= alen, b<= 123;
+  int a,a,a, a <= alen, c,c,c,c, b <= 2, d,d,d,d;
+  output 2;
   // int b <= 16;
   // a = 13 <= 2 && a || a >= a == b != a;
   // a >> 3;
@@ -27,13 +28,13 @@ int main() {
   // }
   // return a+a == b;
   //output "a";
-  a = a;
+  //a = a;
 }
 
-int foo(int a, int b) {
-  output b;
-  while (i <= 2) do {
-    printf();
-    output abasfas;
-  }
-}
+// int foo(int a, int b) {
+//   output b;
+//   while (i <= 2) do {
+//     printf();
+//     output abasfas;
+//   }
+// }

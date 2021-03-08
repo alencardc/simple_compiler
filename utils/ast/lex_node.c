@@ -161,3 +161,11 @@ Node* create_for_node(Node* init, Node* expressao, Node* atualizacao, Node* comm
   return forNode;
 }
 
+Node* create_local_node(Node *list, Node *local) {
+  if (list == NULL) {
+    return local;
+  }
+
+  append_child(list, local);
+  return list;
+}

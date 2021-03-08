@@ -182,7 +182,7 @@ vector_length: TK_LIT_INT | '+' TK_LIT_INT;
 local_decl: storage_modifier var_qualifier type local_var_list { $$ = $4; };
 
 local_var_list: local_var_init { $$ = $1; }
-              | local_var_init ',' local_var_list { $$ = $1; append_child($$, $3); }
+              | local_var_list ',' local_var_init { $$ = create_local_node($1, $3); }
               ;
 
 local_var_init: identifier { $$ = NULL; free_node($1); }
@@ -326,7 +326,7 @@ command_list: generic_command
 generic_command: one_line_command | multiline_command {$$ = $1;};
 
 one_line_command: command ';' {$$ = $1;};
-command: local_decl
+command: local_decl { ; }
        | block_command
        | assign_command
        | io_command
@@ -338,21 +338,7 @@ command: local_decl
        }
        ;
 
-control_block: '{' command_list '}'  
-{
-  Node* current_command = $2;
-  //exporta((void*)current_command);
-  $$ = $2;
-  // int i = 1;
-  // printf("Comando %i: %s\n", i, current_command->label);
-  // current_command = current_command->children->next;
-  // i++;
-  // while(current_command != NULL){
-  //   printf("Comando %i: %s\n", i,current_command->label);
-  //   current_command = current_command->next; 
-  //   i++;
-  // }
-};
+control_block: '{' command_list '}' { $$ = $2; };
 block_command: control_block {};
 
 assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }

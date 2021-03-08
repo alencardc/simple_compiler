@@ -17,8 +17,8 @@ Node* append_child(Node *parent, Node *child);
 //bool is_root(Node *node);
 
 void free_node(Node *node);
-static void free_node_rec(Node *node);
 
+void print_debug_node(Node *root);
 void export_labels(Node *root);
 void export_relations(Node *root);
 

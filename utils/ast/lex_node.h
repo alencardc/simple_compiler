@@ -21,6 +21,7 @@ Node* create_for_node(Node* init, Node* expressao, Node* atualizacao, Node* comm
 Node* create_binary_tree(const char* parentLabel, Node *leftChild, Node *rightChild);
 Node* create_binary_exp(Node *parent, Node *leftChild, Node *rightChild);
 Node* create_ternary_tree(const char* parentLabel, Node *leftChild, Node *middleChild, Node *rightChild);
+Node* create_local_node(Node *list, Node *local);
 
 char* integerToString(int a);
 
