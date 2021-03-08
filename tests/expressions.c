@@ -64,19 +64,16 @@ int testExpressions() {
   ternary = isMarried ? (sheIsHot ? youRock : youFuckedUp) : itsOK; 
   ternary = isMarried ? sheIsHot ? youRock : youFuckedUp : itsOK;
 
-<<<<<<< HEAD
   //int ternary <= isMarried ? sheIsHot ? youRock : youFuckedUp : haveSex ? isOK : youNerdola;
 
   
    //int vetorzaoBrabo <= abc[vetorzaoBrabo[2] ^ 2] - 24;
    //int vetorzaumBrabissimo <= a[2 ^2] - 26 + 32;
-=======
   ternary = isMarried ? sheIsHot ? youRock : youFuckedUp : haveSex ? isOK : youNerdola;
 
   
    vetorzaoBrabo = abc[vetorzaoBrabo[2] ^ 2] - 24;
   vetorzaumBrabissimo = a[2 ^2] - 26 + 32;
->>>>>>> 8f8aa84075a635b010a28e3bc06b41b30555385d
 
   testFunction = incVar(test) * 2;
 }
