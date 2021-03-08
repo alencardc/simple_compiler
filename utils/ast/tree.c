@@ -122,7 +122,6 @@ void export_relations(Node *root) {
   }
 
   for (int i = 0; i < root->children_amount; i += 1) {
-    // Quebrar ou nao a linha?
     printf("%p, %p\n", root, root->children[i]);
     export_relations(root->children[i]);
   }
@@ -130,7 +129,6 @@ void export_relations(Node *root) {
 
 void exporta(void *arvore) {
   export_relations((Node*) arvore);
-  printf("\n");
   export_labels((Node*) arvore);
 }
 

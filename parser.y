@@ -315,17 +315,19 @@ constant: TK_LIT_INT { $$ = create_node_with_lex($1); }
 ************* Commands ***************
 *************************************/
 
-command_list: generic_command { $$ = $1; printf("Unico %s\n", $$->label);}
-            | generic_command command_list { $$ = $1; append_child($$,$2); printf("Lista %s %s\n", $$->label , $2->label); };
+command_list: generic_command { $$ = $1; }
+            | generic_command command_list { $$ = $1; append_child($$,$2); }
+            | local_decl ';' { $$ = $1; }
+            | local_decl ';' command_list { $$ = join_local_with_commands($1, $3);}
+            ;
 
-generic_command: one_line_command {$$ = $1; printf("Generic %s\n", $$->label);}
+generic_command: one_line_command {$$ = $1; }
                | multiline_command {$$ = $1;}
                ;
 
-one_line_command: command ';' {$$ = $1; printf("Command %s\n", $$->label);};
+one_line_command: command ';' {$$ = $1; };
 
-command: local_decl { $$ = $1; }
-       | block_command { $$ = $1; }
+command: block_command { $$ = $1; }
        | assign_command { $$ = $1; }
        | io_command { $$ = $1; }
        | shift_command { $$ = $1; }

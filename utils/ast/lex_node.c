@@ -169,3 +169,16 @@ Node* create_local_node(Node *local, Node *list) {
   append_child(local, list);
   return local;
 }
+
+Node* join_local_with_commands(Node *local, Node *commands) {
+  if (local == NULL) {
+    return commands;
+  }
+
+  Node* local_init = local;
+  while (local_init->children_amount == 3) {
+    local_init = local_init->children[local_init->children_amount-1];
+  }
+  append_child(local_init, commands);
+  return local;
+}
