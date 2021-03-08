@@ -334,7 +334,7 @@ command: block_command { $$ = $1; }
        ;
 
 control_block: '{' command_list '}' { $$ = $2; };
-block_command: control_block {};
+block_command: control_block { };
 
 assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
               | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
