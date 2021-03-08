@@ -1,5 +1,5 @@
 int main() {
-  int a,a,a, a <= alen, c,c,c,c, b <= 2, d,d,d,d;
+  int a,a,a, a <= alen, c,c,c,c, b <= 2, d,d,d,d, d <= 3;
   output 2;
   // int b <= 16;
   // a = 13 <= 2 && a || a >= a == b != a;

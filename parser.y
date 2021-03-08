@@ -182,7 +182,7 @@ vector_length: TK_LIT_INT | '+' TK_LIT_INT;
 local_decl: storage_modifier var_qualifier type local_var_list { $$ = $4; };
 
 local_var_list: local_var_init { $$ = $1; }
-              | local_var_list ',' local_var_init { $$ = create_local_node($1, $3); }
+              | local_var_init ',' local_var_list { $$ = create_local_node($1, $3); }
               ;
 
 local_var_init: identifier { $$ = NULL; free_node($1); }
@@ -315,27 +315,20 @@ constant: TK_LIT_INT { $$ = create_node_with_lex($1); }
 ************* Commands ***************
 *************************************/
 
-command_list: generic_command
-              {$$ = $1;}
-            |  generic_command command_list
-                                          { 
-                                            append_child($1,$2);
-                                            $$ = $1; 
-                                          };
+command_list: generic_command { $$ = $1; }
+            | generic_command command_list { append_child($1,$2); $$ = $1; };
 
 generic_command: one_line_command | multiline_command {$$ = $1;};
 
 one_line_command: command ';' {$$ = $1;};
-command: local_decl { ; }
-       | block_command
-       | assign_command
-       | io_command
-       | shift_command
+
+command: local_decl { $$ = $1; }
+       | block_command { $$ = $1; }
+       | assign_command { $$ = $1; }
+       | io_command { $$ = $1; }
+       | shift_command { $$ = $1; }
        | function_call { $$ = $1; }
-       | control_commands
-       {
-         $$ = $1;
-       }
+       | control_commands { $$ = $1; }
        ;
 
 control_block: '{' command_list '}' { $$ = $2; };
