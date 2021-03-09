@@ -46,7 +46,7 @@ LexValue create_compound_op(char *value, int line) {
 char* remove_quotes(char* string){
   if(string[0] == SINGLE_QUOTES || 
     string[0] == DOUBLE_QUOTES){
-    memmove(string, string + 1, sizeof(char) * (strlen(string) + 1));
+    memmove(string, string + 1, sizeof(char) * (strlen(string)));
   }
 
   int sizeAfterRemoval = strlen(string);
