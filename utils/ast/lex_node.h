@@ -18,13 +18,15 @@ Node* create_local_node(Node *list, Node *local);
 Node* create_io_node(Node* child, const char *label);
 Node* create_shift_node(LexValue shift, Node *id, Node* literal);
 Node* create_func_call_node(LexValue function_id, Node* expression);
+Node* create_function_node(Node* identifier, Node* command_list);
 
 Node* create_binary_tree(const char* parent_label, NodeType type, Node *left_child, Node *right_child);
 Node* create_binary_exp(Node *parent, Node *left_child, Node *right_child);
 Node* create_ternary_node(Node *left_child, Node *middle_child, Node *right_child);
 
 Node* create_while_node(Node* expression, Node* command);
-Node* create_partial_if_node(Node* expression, Node* command);
+Node* create_if_node(Node* expression, Node* command);
+Node* create_if_else_node(Node* if_node, Node* else_commands);
 Node* create_for_node(Node* init, Node* expression, Node* update, Node* command);
 
 Node* join_local_with_commands(Node *local, Node *commands);

@@ -199,7 +199,7 @@ local_var_value: identifier | vector_identifier | literal ;
 ******* Functions declaration ********
 *************************************/
 
-func_decl: storage_modifier type identifier '(' params ')' control_block { $$ = $3; $3->type = AST_FUNC_DECL; append_child($$, $7); };
+func_decl: storage_modifier type identifier '(' params ')' control_block { $$ = create_function_node($3, $7); };
 
 params: param_list | %empty;
 
@@ -384,8 +384,8 @@ multiline_command: if_simples {$$ = $1;}
                  | while {$$ = $1;}
                  ;
 
-if_simples: TK_PR_IF '(' assign_expression ')' control_block {$$ = create_partial_if_node($3,$5);}; 
-if_else: if_simples TK_PR_ELSE control_block {append_child($1,$3); $1->type = AST_IF_ELSE; $$ = $1;};
+if_simples: TK_PR_IF '(' assign_expression ')' control_block {$$ = create_if_node($3,$5);}; 
+if_else: if_simples TK_PR_ELSE control_block { $$ = create_if_else_node($1, $3); };
 
 for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block 
   {

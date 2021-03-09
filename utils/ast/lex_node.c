@@ -111,6 +111,15 @@ Node* create_func_call_node(LexValue function_id, Node* expression){
   return function_call;
 }
 
+Node* create_function_node(Node* identifier, Node* command_list) {
+  if (identifier != NULL) {
+    identifier->type = AST_FUNC_DECL;
+  }
+  append_child(identifier, command_list);
+
+  return identifier;
+}
+
 
 Node* create_binary_tree(const char* parent_label, NodeType type, Node *left_child, Node *right_child) {
   Node *parent = create_node_with_label(parent_label, type);
@@ -145,12 +154,21 @@ Node* create_while_node(Node* expression, Node* command){
   return whileNode;
 }
 
-Node* create_partial_if_node(Node* expression, Node* command){
+Node* create_if_node(Node* expression, Node* command){
   Node* ifNode = create_node_with_label("if", AST_IF);
   append_child(ifNode, expression);
   append_child(ifNode, command);
 
   return ifNode;
+}
+
+Node* create_if_else_node(Node* if_node, Node* else_commands){
+  if (if_node != NULL) {
+    if_node->type = AST_IF_ELSE;
+  }
+  append_child(if_node, else_commands);
+
+  return if_node;
 }
 
 Node* create_for_node(Node* init, Node* expression, Node* update, Node* command){
