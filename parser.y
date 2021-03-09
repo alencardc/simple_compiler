@@ -144,18 +144,18 @@ storage_modifier: TK_PR_STATIC | %empty;
 
 var_qualifier: TK_PR_CONST | %empty;
 
-identifier: TK_IDENTIFICADOR { $$ = create_node_with_lex($1); };
+identifier: TK_IDENTIFICADOR { $$ = create_id_node($1); };
 
-vector_identifier: identifier '[' assign_expression ']' { $$ = create_id_vector_node($1,$3); };
+vector_identifier: identifier '[' assign_expression ']' { $$ = create_vector_node($1,$3); };
 
 type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
 
-literal: TK_LIT_INT { $$ = create_node_with_lex($1); }
-       | TK_LIT_FLOAT { $$ = create_node_with_lex($1); }
-       | TK_LIT_FALSE { $$ = create_node_with_lex($1); }
-       | TK_LIT_TRUE { $$ = create_node_with_lex($1); }
-       | TK_LIT_CHAR { $$ = create_node_with_lex($1); }
-       | TK_LIT_STRING { $$ = create_node_with_lex($1); }
+literal: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); }
+       | TK_LIT_FLOAT { $$ = create_node_with_lex($1, AST_LITERAL); }
+       | TK_LIT_FALSE { $$ = create_node_with_lex($1, AST_LITERAL); }
+       | TK_LIT_TRUE { $$ = create_node_with_lex($1, AST_LITERAL); }
+       | TK_LIT_CHAR { $$ = create_node_with_lex($1, AST_LITERAL); }
+       | TK_LIT_STRING { $$ = create_node_with_lex($1, AST_LITERAL); }
        ;
 
 
@@ -189,7 +189,7 @@ local_var_init: identifier { $$ = NULL; free_node($1); }
               | identifier local_var_operator local_var_value { $$ = create_binary_exp($2, $1, $3); }
               ;
 
-local_var_operator: TK_OC_LE { $$ = create_node_with_lex($1); }
+local_var_operator: TK_OC_LE { $$ = create_node_with_lex($1, AST_ASSIGN); }
 
 //local_var_id: TK_IDENTIFICADOR;
 local_var_value: identifier | vector_identifier | literal ;
@@ -199,7 +199,7 @@ local_var_value: identifier | vector_identifier | literal ;
 ******* Functions declaration ********
 *************************************/
 
-func_decl: storage_modifier type identifier '(' params ')' control_block { $$ = $3; append_child($$, $7); };
+func_decl: storage_modifier type identifier '(' params ')' control_block { $$ = $3; $3->type = AST_FUNC_DECL; append_child($$, $7); };
 
 params: param_list | %empty;
 
@@ -217,85 +217,85 @@ param: var_qualifier type identifier { free_node($3); };
 assign_expression: ternary_expression { $$ = $1; };
 
 ternary_expression: or_expression { $$ = $1; }
-                  | or_expression '?' assign_expression ':' ternary_expression { $$ = create_ternary_tree("?:", $1, $3, $5); }
+                  | or_expression '?' assign_expression ':' ternary_expression { $$ = create_ternary_node($1, $3, $5); }
                   ;
 
 or_expression: and_expression { $$ = $1; }
              | or_expression or_operator and_expression { $$ = create_binary_exp($2, $1, $3); }
              ;
 
-or_operator: TK_OC_OR { $$ = create_node_with_lex($1); };
+or_operator: TK_OC_OR { $$ = create_node_with_lex($1, AST_BINARY_EXP); };
 
 and_expression: bit_or_expression { $$ = $1; }
               | and_expression and_operator bit_or_expression { $$ = create_binary_exp($2, $1, $3); }
               ;
 
-and_operator: TK_OC_AND { $$ = create_node_with_lex($1); };
+and_operator: TK_OC_AND { $$ = create_node_with_lex($1, AST_BINARY_EXP); };
 
 bit_or_expression: bit_and_expression { $$ = $1; }
                  | bit_or_expression bit_or_operator bit_and_expression { $$ = create_binary_exp($2, $1, $3); }
                  ;
 
-bit_or_operator: '|' { $$ = create_node_with_label("|"); };
+bit_or_operator: '|' { $$ = create_node_with_label("|", AST_BINARY_EXP); };
 
 bit_and_expression: equality_expression { $$ = $1; }
                   | bit_and_expression bit_and_operator equality_expression { $$ = create_binary_exp($2, $1, $3); }
                   ;
 
-bit_and_operator: '&' { $$ = create_node_with_label("&"); };
+bit_and_operator: '&' { $$ = create_node_with_label("&", AST_BINARY_EXP); };
 
 equality_expression: relational_expression { $$ = $1; }
                    | equality_expression equality_operator relational_expression { $$ = create_binary_exp($2, $1, $3); }
                    ;
 
-equality_operator: TK_OC_EQ { $$ = create_node_with_lex($1); }
-                 | TK_OC_NE { $$ = create_node_with_lex($1); }
+equality_operator: TK_OC_EQ { $$ = create_node_with_lex($1, AST_BINARY_EXP); }
+                 | TK_OC_NE { $$ = create_node_with_lex($1, AST_BINARY_EXP); }
                  ;
 
 relational_expression: additive_expression { $$ = $1; }
                      | relational_expression relational_operator additive_expression { $$ = create_binary_exp($2, $1, $3); }
                      ;
 
-relational_operator: '<' { $$ = create_node_with_label("<"); }
-                   | '>' { $$ = create_node_with_label(">"); }
-                   | TK_OC_GE { $$ = create_node_with_lex($1); }
-                   | TK_OC_LE { $$ = create_node_with_lex($1); }
+relational_operator: '<' { $$ = create_node_with_label("<", AST_BINARY_EXP); }
+                   | '>' { $$ = create_node_with_label(">", AST_BINARY_EXP); }
+                   | TK_OC_GE { $$ = create_node_with_lex($1, AST_BINARY_EXP); }
+                   | TK_OC_LE { $$ = create_node_with_lex($1, AST_BINARY_EXP); }
                    ;
 
 additive_expression: multiplicative_expression { $$ = $1; }
                   | additive_expression additive_operator multiplicative_expression { $$ = create_binary_exp($2, $1, $3); }
                   ;
 
-additive_operator: '+' { $$ = create_node_with_label("+"); }
-                 | '-' { $$ = create_node_with_label("-"); }
+additive_operator: '+' { $$ = create_node_with_label("+", AST_BINARY_EXP); }
+                 | '-' { $$ = create_node_with_label("-", AST_BINARY_EXP); }
                  ;
 
 multiplicative_expression: exponential_expression { $$ = $1; }
                          | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3); }
                          ;
 
-multiplicative_operator: '*' { $$ = create_node_with_label("*"); }
-                       | '/' { $$ = create_node_with_label("/"); }
-                       | '%' { $$ = create_node_with_label("%"); }
+multiplicative_operator: '*' { $$ = create_node_with_label("*", AST_BINARY_EXP); }
+                       | '/' { $$ = create_node_with_label("/", AST_BINARY_EXP); }
+                       | '%' { $$ = create_node_with_label("%", AST_BINARY_EXP); }
                        ;
 
 exponential_expression: unary_expression { $$ = $1; }
                       | exponential_expression exponential_operator unary_expression { $$ = create_binary_exp($2, $1, $3); }
                       ;
 
-exponential_operator: '^' { $$ = create_node_with_label("^"); } ;
+exponential_operator: '^' { $$ = create_node_with_label("^", AST_BINARY_EXP); } ;
 
 unary_expression: basic_expression { $$ = $1; }
                 | unary_operator unary_expression { $$ = $1; append_child($$, $2); }
                 ;
 
-unary_operator: '+' { $$ = create_node_with_label("+"); }
-              | '-' { $$ = create_node_with_label("-"); }
-              | '!' { $$ = create_node_with_label("!"); }
-              | '&' { $$ = create_node_with_label("&"); }
-              | '*' { $$ = create_node_with_label("*"); }
-              | '?' { $$ = create_node_with_label("?"); }
-              | '#' { $$ = create_node_with_label("#"); }
+unary_operator: '+' { $$ = create_node_with_label("+", AST_UNARY_EXP); }
+              | '-' { $$ = create_node_with_label("-", AST_UNARY_EXP); }
+              | '!' { $$ = create_node_with_label("!", AST_UNARY_EXP); }
+              | '&' { $$ = create_node_with_label("&", AST_UNARY_EXP); }
+              | '*' { $$ = create_node_with_label("*", AST_UNARY_EXP); }
+              | '?' { $$ = create_node_with_label("?", AST_UNARY_EXP); }
+              | '#' { $$ = create_node_with_label("#", AST_UNARY_EXP); }
               ;
 
 basic_expression: identifier { $$ = $1; }
@@ -305,8 +305,8 @@ basic_expression: identifier { $$ = $1; }
                 | '(' assign_expression ')' { $$ = $2 ; }
                 ;
 
-constant: TK_LIT_INT { $$ = create_node_with_lex($1); }
-        | TK_LIT_FLOAT { $$ = create_node_with_lex($1); }
+constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); }
+        | TK_LIT_FLOAT { $$ = create_node_with_lex($1, AST_LITERAL); }
         ;
 
 /*************************************
@@ -317,6 +317,8 @@ command_list: generic_command { $$ = $1; }
             | generic_command command_list { $$ = $1; append_child($$,$2); }
             | local_decl ';' { $$ = $1; }
             | local_decl ';' command_list { $$ = join_local_with_commands($1, $3);}
+            | block_command ';' { $$ = $1; }
+            | block_command ';' command_list { $$ = join_command_lists($1, $3);}
             ;
 
 generic_command: one_line_command {$$ = $1; }
@@ -325,8 +327,7 @@ generic_command: one_line_command {$$ = $1; }
 
 one_line_command: command ';' {$$ = $1; };
 
-command: block_command { $$ = $1; }
-       | assign_command { $$ = $1; }
+command: assign_command { $$ = $1; }
        | io_command { $$ = $1; }
        | shift_command { $$ = $1; }
        | function_call { $$ = $1; }
@@ -336,8 +337,8 @@ command: block_command { $$ = $1; }
 control_block: '{' command_list '}' { $$ = $2; };
 block_command: control_block { };
 
-assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
-              | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", $1, $3); }
+assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", AST_ASSIGN,$1, $3); }
+              | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", AST_ASSIGN, $1, $3); }
               ;
 
 input_command: TK_PR_INPUT identifier { $$ = create_io_node($2, "input"); };
@@ -352,8 +353,8 @@ shift_operand: identifier { $$ = $1; }
               | vector_identifier { $$ = $1; };
 
 shift_command: shift_operand shift shift_number { $$ = create_shift_node($2, $1, $3); };
-shift_number: TK_LIT_INT { $$ = create_node_with_lex($1); };
-            | '+' TK_LIT_INT { $$ = create_node_with_lex($2); };
+shift_number: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); };
+            | '+' TK_LIT_INT { $$ = create_node_with_lex($2, AST_LITERAL); };
 
 function_call: TK_IDENTIFICADOR '(' arguments ')' { $$ = create_func_call_node($1, $3);};
 
@@ -365,11 +366,11 @@ argument: assign_expression {$$ = $1;};
 
 
 control_commands: return { $$ = $1; }
-                | TK_PR_BREAK {$$ = create_node_with_label("break");}
-                | TK_PR_CONTINUE {$$ = create_node_with_label("continue");}
+                | TK_PR_BREAK {$$ = create_node_with_label("break", AST_CONTROL);}
+                | TK_PR_CONTINUE {$$ = create_node_with_label("continue", AST_CONTROL);}
                 ;
 
-return: TK_PR_RETURN assign_expression { $$ = create_node_with_label("return"); append_child($$, $2);}; 
+return: TK_PR_RETURN assign_expression { $$ = create_node_with_label("return", AST_RETURN); append_child($$, $2);}; 
 
 
 /*************************************
@@ -382,7 +383,7 @@ multiline_command: if_simples {$$ = $1;}
                  ;
 
 if_simples: TK_PR_IF '(' assign_expression ')' control_block {$$ = create_partial_if_node($3,$5);}; 
-if_else: if_simples TK_PR_ELSE control_block {append_child($1,$3); $$ = $1;};
+if_else: if_simples TK_PR_ELSE control_block {append_child($1,$3); $1->type = AST_IF_ELSE; $$ = $1;};
 
 for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block 
   {

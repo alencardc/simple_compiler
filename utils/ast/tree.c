@@ -11,7 +11,7 @@ Node* create_node(LexValue *data, const char *label, NodeType type) {
   }
 
   node->label = strdup(label);
-  node->label = type;
+  node->type = type;
   node->data = data;
   node->children_amount = 0;
   node->children = NULL;
@@ -53,6 +53,36 @@ void free_node(Node *node) {
   free(node->label);
   free(node->children);
   free(node);
+}
+
+int expected_children_amount(TokenType type) {
+  switch (type)
+  {
+    case AST_IDENTIFIER:
+    case AST_LITERAL:
+    case AST_CONTROL:
+      return 0;
+    case AST_RETURN:
+    case AST_IO:
+    case AST_UNARY_EXP:
+    case AST_FUNC_CALL:
+    case AST_FUNC_DECL:
+      return 1;
+    case AST_IF:
+    case AST_ASSIGN:
+    case AST_SHIFT:
+    case AST_VECTOR:
+    case AST_WHILE:
+    case AST_BINARY_EXP:
+      return 2;
+    case AST_TERNARY:
+    case AST_IF_ELSE:
+      return 3;
+    case AST_FOR:
+      return 4;
+    default:
+      return 0;
+  }
 }
 
 void print_debug_node(Node *root) {

@@ -5,6 +5,8 @@
 #include "lex_value.h"
 
 typedef enum sNodeType {
+  AST_IDENTIFIER,
+  AST_VECTOR,
   AST_IF,
   AST_IF_ELSE,
   AST_SHIFT,
@@ -17,8 +19,8 @@ typedef enum sNodeType {
   AST_CONTROL,
   AST_RETURN,
   AST_LITERAL,
-  AST_SPECIAL,
-  AST_COMPOUND_OP,
+  AST_UNARY_EXP,
+  AST_BINARY_EXP,
   AST_TERNARY,
 } NodeType;
 
@@ -36,6 +38,8 @@ Node* append_child(Node *parent, Node *child);
 //bool is_root(Node *node);
 
 void free_node(Node *node);
+
+int expected_children_amount(TokenType type);
 
 void print_debug_node(Node *root);
 void export_labels(Node *root);
