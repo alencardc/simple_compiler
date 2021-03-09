@@ -168,8 +168,9 @@ global_var_list: global_var_id
                  | global_var_list ',' global_var_id
                  ;
 
-global_var_id: identifier {free_node ($1);};
-             | identifier '[' vector_length ']' {free_node ($1);};;
+global_var_id: identifier { free_node ($1); };
+             | identifier '[' vector_length ']' { free_node ($1); }
+             ;
 
 vector_length: TK_LIT_INT | '+' TK_LIT_INT;
 

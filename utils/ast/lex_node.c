@@ -80,6 +80,7 @@ Node* create_local_node(Node *local, Node *list) {
   return local;
 }
 
+
 Node* create_io_node(Node* child, const char *label) {
   Node* output_node = create_node(NULL, label, AST_IO);
   append_child(output_node,child);
@@ -87,47 +88,12 @@ Node* create_io_node(Node* child, const char *label) {
   return output_node;
 }
 
-
 Node* create_shift_node(LexValue shift, Node *id, Node* literal){
   Node* shift_node = create_node_with_lex(shift, AST_SHIFT);
   append_child(shift_node, id);
   append_child(shift_node, literal);
 }
 
-
-char* integerToString(int a){
-  //Minimum integer: -2147483646 = 12 digitos + 1 para o \n
-  int maxDigits = 12 + 1;
-  
-  char* integerInString = (char*) malloc(12 * sizeof(char));
-  sprintf(integerInString,"%d",a);
-  
-  return integerInString;
-}
-
-Node* create_binary_tree(const char* parentLabel, NodeType type, Node *leftChild, Node *rightChild) {
-  Node *parent = create_node_with_label(parentLabel, type);
-  append_child(parent, leftChild);
-  append_child(parent, rightChild);
-
-  return parent;
-}
-
-Node* create_binary_exp(Node *parent, Node *leftChild, Node *rightChild) {
-  append_child(parent, leftChild);
-  append_child(parent, rightChild);
-
-  return parent;
-}
-
-Node* create_ternary_node(Node *leftChild, Node *middleChild, Node *rightChild) {
-  Node *parent = create_node_with_label("?:", AST_TERNARY);
-  append_child(parent, leftChild);
-  append_child(parent, middleChild);
-  append_child(parent, rightChild);
-
-  return parent;
-}
 Node* create_func_call_node(LexValue function_id, Node* expression){
   char* id = get_label(function_id);
   char* call = "call ";
@@ -145,31 +111,58 @@ Node* create_func_call_node(LexValue function_id, Node* expression){
   return function_call;
 }
 
-Node* create_while_node(Node* expressao, Node* command){
+
+Node* create_binary_tree(const char* parent_label, NodeType type, Node *left_child, Node *right_child) {
+  Node *parent = create_node_with_label(parent_label, type);
+  append_child(parent, left_child);
+  append_child(parent, right_child);
+
+  return parent;
+}
+
+Node* create_binary_exp(Node *parent, Node *left_child, Node *right_child) {
+  append_child(parent, left_child);
+  append_child(parent, right_child);
+
+  return parent;
+}
+
+Node* create_ternary_node(Node *left_child, Node *middle_child, Node *right_child) {
+  Node *parent = create_node_with_label("?:", AST_TERNARY);
+  append_child(parent, left_child);
+  append_child(parent, middle_child);
+  append_child(parent, right_child);
+
+  return parent;
+}
+
+
+Node* create_while_node(Node* expression, Node* command){
   Node* whileNode = create_node_with_label("while", AST_WHILE);
-  append_child(whileNode, expressao);
+  append_child(whileNode, expression);
   append_child(whileNode, command);
 
   return whileNode;
 }
 
-Node* create_partial_if_node(Node* expressao, Node* command){
+Node* create_partial_if_node(Node* expression, Node* command){
   Node* ifNode = create_node_with_label("if", AST_IF);
-  append_child(ifNode, expressao);
+  append_child(ifNode, expression);
   append_child(ifNode, command);
 
   return ifNode;
 }
 
-Node* create_for_node(Node* init, Node* expressao, Node* atualizacao, Node* command){
+Node* create_for_node(Node* init, Node* expression, Node* update, Node* command){
   Node* forNode = create_node_with_label("for", AST_FOR);
   append_child(forNode, init);
-  append_child(forNode, expressao);
-  append_child(forNode, atualizacao);
+  append_child(forNode, expression);
+  append_child(forNode, update);
   append_child(forNode, command);
   
   return forNode;
 }
+
 
 Node* join_local_with_commands(Node *local, Node *commands) {
   if (local == NULL) {
