@@ -32,7 +32,7 @@ char* get_label(LexValue lex_value) {
         break;
       
       case FLOAT_VAL:
-        snprintf(tmp_str, max_length, "%g", lex_value.token_value.f_val);
+        snprintf(tmp_str, max_length, "%f", lex_value.token_value.f_val);
         label = strdup(tmp_str);
         break;
 
@@ -42,7 +42,8 @@ char* get_label(LexValue lex_value) {
         break;
 
       case BOOL_VAL:
-        label = strdup(lex_value.token_value.b_val == true ? "true" : "false");
+        snprintf(tmp_str, max_length, "%d", lex_value.token_value.b_val == true ? 1 : 0);
+        label = strdup(tmp_str);
         break;
 
       default: // NO_VAL

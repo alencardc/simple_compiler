@@ -306,6 +306,8 @@ basic_expression: identifier { $$ = $1; }
 
 constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); }
         | TK_LIT_FLOAT { $$ = create_node_with_lex($1, AST_LITERAL); }
+        | TK_LIT_TRUE { $$ = create_node_with_lex($1, AST_LITERAL); }
+        | TK_LIT_FALSE { $$ = create_node_with_lex($1, AST_LITERAL); }
         ;
 
 /*************************************
