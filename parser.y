@@ -135,7 +135,7 @@ extern void *arvore;
 
 root: programa { arvore = (void*)$1; }
 
-programa: global_decl_list programa {}
+programa: global_decl_list programa {$$ = $2;};
         | func_decl programa { $$ = $1; append_child($$, $2); }
         | %empty { $$ = NULL; }
         ;
@@ -168,9 +168,8 @@ global_var_list: global_var_id
                  | global_var_list ',' global_var_id
                  ;
 
-global_var_id: identifier
-             | identifier '[' vector_length ']'
-             ;
+global_var_id: identifier {free_node ($1);};
+             | identifier '[' vector_length ']' {free_node ($1);};;
 
 vector_length: TK_LIT_INT | '+' TK_LIT_INT;
 
