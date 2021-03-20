@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include "../ast/lex_value.h"
 
-#define TABLE_SIZE 500
+//If you change please put a PRIME NUMBER
+#define TABLE_SIZE 499
 
 typedef struct sArgumentList{
     char* id;
@@ -37,6 +38,13 @@ Symbol_Entry* create_symbol_entry(char* key,
     TokenValueType type,
     int lenght,
     TokenValue token_value);
+
+int hash(char *key);
+
+int insert_entry_at_table(Symbol_Entry* entry, Symbol_Entry** table);
+
+Symbol_Entry* get_entry_from_table(char* key,Symbol_Entry **table);
+
 
 
 
