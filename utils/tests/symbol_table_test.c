@@ -9,6 +9,8 @@ int main(){
     Symbol_Entry* new_entry = create_symbol_entry("nova key", 10, VAR, FLOAT_VAL, 1, newValue);
     Symbol_Entry* new_entry2 = create_symbol_entry("nova key2", 20, VAR, FLOAT_VAL, 1, newValue);
     Symbol_Entry* new_entry3 = create_symbol_entry("nova key3", 10, FUNCTION, FLOAT_VAL, 1, newValue);
+    Symbol_Entry* new_entry4 = create_symbol_entry("nova key4", 20, VAR, FLOAT_VAL, 1, newValue);
+    Symbol_Entry* new_entry5 = create_symbol_entry("nova key5", 20, VAR, FLOAT_VAL, 1, newValue);
     
     printf("key: %s\n", new_entry->key);
 
@@ -16,7 +18,8 @@ int main(){
     int index = insert_entry_at_table(new_entry, table);
     int index2 = insert_entry_at_table(new_entry2, table);
     int index3 = insert_entry_at_table(new_entry3, table);
-    
+    int index4 = insert_entry_at_table(new_entry4, table);
+    int index5 = insert_entry_at_table(new_entry5, table);    
     printf("New entry inserted at: %i\n", index);
 
     Symbol_Entry* queried_entry;
@@ -24,6 +27,12 @@ int main(){
     print_entry(queried_entry);
 
     queried_entry = get_entry_from_table("nova key3", table);
+    print_entry(queried_entry);
+
+    queried_entry = get_entry_from_table("nova key4", table);
+    print_entry(queried_entry);
+
+    queried_entry = get_entry_from_table("nova key5", table);
     print_entry(queried_entry);
 
     free_table(table);
