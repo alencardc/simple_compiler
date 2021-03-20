@@ -31,6 +31,7 @@ Symbol_Entry* create_symbol_entry(char* key,
     entry->line_number = line_number;
     entry->nature = nature;
     entry->next = NULL;
+    entry->type = type;
 
     return entry;
 }

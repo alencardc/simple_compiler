@@ -4,7 +4,7 @@
 #include "../ast/lex_value.h"
 
 //If you change please put a PRIME NUMBER
-#define TABLE_SIZE 499
+#define TABLE_SIZE 2
 
 typedef struct sArgumentList{
     char* id;
