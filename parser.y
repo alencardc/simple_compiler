@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include "utils/ast/ast.h"
+#include "errors.h"
 
 int yylex(void);
 void yyerror (char const *s);
