@@ -71,7 +71,6 @@ int insert_entry_at_table(Symbol_Entry* entry, Symbol_Entry** table){
             Symbol_Entry* currentEntry = table[index]->next;
             while(currentEntry->next != NULL){
                 currentEntry = currentEntry->next;
-                printf("%i\n", currentEntry);
             }
             currentEntry->next = entry;
         }
