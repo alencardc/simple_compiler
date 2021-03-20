@@ -3,6 +3,11 @@
 Symbol_Entry** init_symbol_table(){
     Symbol_Entry** table = malloc(sizeof(Symbol_Entry*) * TABLE_SIZE);
 
+    int i;
+    for(i = 0; i < TABLE_SIZE; i++){
+        table[i] = NULL;
+    }
+
     if(table == NULL){
         printf("ERRO na hora de alocar tabela de símbolos.");
     }
