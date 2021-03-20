@@ -45,6 +45,12 @@ int insert_entry_at_table(Symbol_Entry* entry, Symbol_Entry** table);
 
 Symbol_Entry* get_entry_from_table(char* key,Symbol_Entry **table);
 
+void free_arg_list(Argument_List* list);
+
+void free_entry(Symbol_Entry *entry);
+
+void free_table(Symbol_Entry **table);
+
 
 
 

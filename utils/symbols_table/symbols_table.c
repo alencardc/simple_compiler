@@ -47,6 +47,15 @@ int hash(char *key) {
 }
 
 int insert_entry_at_table(Symbol_Entry* entry, Symbol_Entry** table){
+    if(entry == NULL)
+        return -1;
+
+    if(table == NULL)
+        return -1;
+
+    if(entry->key == NULL)
+        return -1;
+
     int index = hash(entry->key);
 
     //Hash collision
@@ -93,4 +102,46 @@ Symbol_Entry* get_entry_from_table(char* key,Symbol_Entry **table){
     }
 
     return NULL;
+}
+
+void free_arg_list(Argument_List* list){
+    if(list == NULL)
+        return;
+
+    free(list->id);
+   
+    free_arg_list(list->next);
+   
+    free(list);
+    return;
+}
+
+
+
+void free_entry(Symbol_Entry *entry){
+    if(entry == NULL)
+        return;
+
+    free(entry->key);
+    
+    const TokenValueType value_type = entry->type;
+    if (value_type == CHAR_VAL || value_type == STRING_VAL) {
+      free(entry->value.s_value);
+    }
+    
+    free_arg_list(entry->arg_list);
+
+    free_entry(entry->next);
+    
+    free(entry);
+    return;
+}
+
+void free_table(Symbol_Entry **table){
+    int i;
+    for(i = 0; i < TABLE_SIZE; i++){
+        free_entry(table[i]);
+    }
+
+    free(table);
 }

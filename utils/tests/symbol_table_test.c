@@ -16,7 +16,7 @@ int main(){
     int index = insert_entry_at_table(new_entry, table);
     int index2 = insert_entry_at_table(new_entry2, table);
     int index3 = insert_entry_at_table(new_entry3, table);
-    // int index3 = insert_entry_at_table(new_entry, table);
+    
     printf("New entry inserted at: %i\n", index);
 
     Symbol_Entry* queried_entry;
@@ -26,10 +26,15 @@ int main(){
     queried_entry = get_entry_from_table("nova key3", table);
     print_entry(queried_entry);
 
+    free_table(table);
+
     return 0;
 }
 
 void print_entry(const Symbol_Entry* entry){
+    if(entry == NULL)
+        return;
+
     printf("-------\n");
     printf("Key: %s\n", entry->key);
     printf("Line number: %i\n", (entry->line_number));
