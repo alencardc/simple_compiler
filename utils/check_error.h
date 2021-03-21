@@ -3,6 +3,6 @@
 
 #include <stdbool.h>
 
-bool check_identfier();
+bool check_identifier();
 
 #endif // __CHECK_ERROR_H__
