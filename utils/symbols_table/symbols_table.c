@@ -172,4 +172,5 @@ void print_entry(const Symbol_Entry* entry){
     printf("Symbol nature: %i\n", (entry->nature));
     printf("Type: %i\n", (entry->type));
     printf("Value: %s\n", entry->value.s_value);
+    printf("Size: %i bytes\n", entry->length);
 }
