@@ -149,3 +149,27 @@ void free_table(Symbol_Entry **table){
 
     free(table);
 }
+
+void print_table(Symbol_Entry **table){
+    int i;
+    for(i = 0; i < TABLE_SIZE; i++){
+        if(table[i] != NULL){
+            print_entry(table[i]);
+            Symbol_Entry* current_entry = table[i]->next;
+            while(current_entry != NULL){
+                print_entry(current_entry);
+                current_entry = current_entry->next;
+            }
+        }
+            
+    }
+}
+
+void print_entry(const Symbol_Entry* entry){
+    printf("-------\n");
+    printf("Key: %s\n", entry->key);
+    printf("Line number: %i\n", (entry->line_number));
+    printf("Symbol nature: %i\n", (entry->nature));
+    printf("Type: %i\n", (entry->type));
+    printf("Value: %s\n", entry->value.s_value);
+}
