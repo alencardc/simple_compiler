@@ -1,11 +1,15 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include "utils/ast/ast.h"
+#include "utils/symbols_table/symbols_entry.h"
 #include "errors.h"
 
 int yylex(void);
 void yyerror (char const *s);
 extern int get_line_number(void);
+
+Table_Stack* scopes = NULL;
 
 extern void *arvore;
 
@@ -16,6 +20,8 @@ extern void *arvore;
 %union {
   LexValue lexical_value;
   Node* node;
+  Id_List* id_list;
+  TokenValueType type;
 }
 
 %token TK_PR_INT
@@ -130,6 +136,10 @@ extern void *arvore;
 
 %type <node> return
 
+%type <id_list> global_var_id
+%type <id_list> global_var_list
+%type <type> type
+
 %start root
 
 %%
@@ -149,7 +159,11 @@ identifier: TK_IDENTIFICADOR { $$ = create_id_node($1); };
 
 vector_identifier: identifier '[' assign_expression ']' { $$ = create_vector_node($1,$3); };
 
-type: TK_PR_INT | TK_PR_FLOAT | TK_PR_BOOL | TK_PR_CHAR | TK_PR_STRING;
+type: TK_PR_INT  { $$ = INTEGER_VAL; }
+    | TK_PR_FLOAT  { $$ = FLOAT_VAL; }
+    | TK_PR_BOOL  { $$ = BOOL_VAL; }
+    | TK_PR_CHAR { $$ = CHAR_VAL; }
+    | TK_PR_STRING { $$ = STRING_VAL; };
 
 literal: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); }
        | TK_LIT_FLOAT { $$ = create_node_with_lex($1, AST_LITERAL); }
@@ -163,15 +177,44 @@ literal: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); }
 /*************************************
 **** Global variables declaration ****
 *************************************/
-global_decl_list: storage_modifier type global_var_list ';';
+global_decl_list: storage_modifier type global_var_list ';'{
+    if(scopes == NULL){
+      scopes = push_new_scope(scopes, "global");
+    }
 
-global_var_list: global_var_id
-                 | global_var_list ',' global_var_id
+    Id_List* id_list = $3;
+    Symbol_Entry** global_scope = top_scope(scopes);
+
+    while(id_list != NULL){
+      Symbol_Entry* queryEntry = get_entry_from_table(id_list->id, global_scope);
+      if(queryEntry != NULL){
+        printf("Já declarado");
+        exit(ERR_DECLARED);
+      }
+
+      Symbol_Entry* new_entry = create_id_entry(id_list, $2);
+      
+      insert_entry_at_table(new_entry, global_scope);
+      id_list = id_list->next;
+    }
+
+};
+
+global_var_list: global_var_id { $$ = $1;}
+                 | global_var_list ',' global_var_id 
+                 {
+                   $$ = append_id_list($1,$3);
+                  }
                  ;
 
-global_var_id: identifier { free_node ($1); };
-             | identifier '[' vector_length ']' { free_node ($1); }
-             ;
+global_var_id: identifier {  
+    $$ = create_id_list($1->label, 1, $1->data->line_number);
+    free_node($1);
+  }
+  | identifier '[' vector_length ']' {   
+    $$ = create_id_list($1->label, 1, $1->data->line_number);
+    free_node($1); 
+  };
 
 vector_length: TK_LIT_INT | '+' TK_LIT_INT;
 

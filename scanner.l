@@ -2,6 +2,7 @@
 
 %{
   #include "utils/ast/ast.h"
+  #include "utils/symbols_table/symbols_entry.h"
   #include "parser.tab.h"
 
   int get_line_number(void);

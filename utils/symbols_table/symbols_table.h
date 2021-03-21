@@ -15,6 +15,7 @@ typedef struct sArgumentList{
 typedef enum eSymbol_Nature {
   LITERAL,
   VAR,
+  VECTOR,
   FUNCTION
 } Symbol_Nature;
 
