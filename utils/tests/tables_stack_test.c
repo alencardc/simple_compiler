@@ -28,6 +28,8 @@ int main(){
 
     printf("Procurando zezim: ");
     search_all_scopes(scopes, "zezim");
+
+    free_scopes(scopes);
 }
 
 void print_entry(const Symbol_Entry* entry){

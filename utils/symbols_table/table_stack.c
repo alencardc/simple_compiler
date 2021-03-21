@@ -34,3 +34,24 @@ Symbol_Entry* search_all_scopes(const Table_Stack* scopes,char *key){
 
     return NULL;
 }
+
+Table_Stack* pop_scope(Table_Stack *scopes){
+    free(scopes->id);
+    free_table(scopes->table);
+
+    Table_Stack* toReturn = scopes->next;
+    free(scopes);
+    
+    return toReturn;
+}
+
+void free_scopes(Table_Stack* scopes){
+    if(scopes == NULL)
+        return;
+    
+    Table_Stack* current_scope = pop_scope(scopes);
+
+    while(current_scope != NULL){
+        current_scope = pop_scope(current_scope);
+    }
+}
