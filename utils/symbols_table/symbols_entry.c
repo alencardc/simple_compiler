@@ -37,6 +37,18 @@ Id_List* create_id_list(char* newId, int vectorSize, int lineNumber){
     return new_id;
 }
 
+void free_id_list(Id_List* list){
+    if(list == NULL)
+        return;
+
+    if(list->next != NULL)
+        free_id_list(list->next);
+    
+    free(list->id);
+    free(list);
+    return;
+}
+
 void print_id_list(Id_List* list){
     while (list != NULL)
     {
@@ -53,7 +65,7 @@ Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
     Symbol_Entry* new_entry = create_symbol_entry(id_list->id, 
                                   id_list->line_number,
                                   VAR,
-                                  FLOAT_VAL,
+                                  type,
                                   size,
                                   (TokenValue) ""
                                   );

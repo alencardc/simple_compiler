@@ -52,6 +52,10 @@ void free_entry(Symbol_Entry *entry);
 
 void free_table(Symbol_Entry **table);
 
+void print_table(Symbol_Entry **table);
+
+void print_entry(const Symbol_Entry* entry);
+
 
 
 

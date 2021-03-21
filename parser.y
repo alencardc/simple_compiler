@@ -1,8 +1,8 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "utils/check_error.h"
 #include "utils/ast/ast.h"
-#include "utils/symbols_table/symbols_entry.h"
 #include "errors.h"
 
 int yylex(void);
@@ -139,6 +139,7 @@ extern void *arvore;
 %type <id_list> global_var_id
 %type <id_list> global_var_list
 %type <type> type
+%type <lexical_value> vector_length
 
 %start root
 
@@ -186,17 +187,15 @@ global_decl_list: storage_modifier type global_var_list ';'{
     Symbol_Entry** global_scope = top_scope(scopes);
 
     while(id_list != NULL){
-      Symbol_Entry* queryEntry = get_entry_from_table(id_list->id, global_scope);
-      if(queryEntry != NULL){
-        printf("Já declarado");
-        exit(ERR_DECLARED);
-      }
-
-      Symbol_Entry* new_entry = create_id_entry(id_list, $2);
+      if(!check_identifier_redeclared(scopes,id_list->id)){
+        Symbol_Entry* new_entry = create_id_entry(id_list, $2);
       
-      insert_entry_at_table(new_entry, global_scope);
-      id_list = id_list->next;
+        insert_entry_at_table(new_entry, global_scope);
+      }
+        id_list = id_list->next;
     }
+    free_id_list($3);
+    print_table(global_scope);
 
 };
 
@@ -212,11 +211,11 @@ global_var_id: identifier {
     free_node($1);
   }
   | identifier '[' vector_length ']' {   
-    $$ = create_id_list($1->label, 1, $1->data->line_number);
-    free_node($1); 
+    $$ = create_id_list($1->label, $3.token_value.i_val, $1->data->line_number);
+    free_node($1);
   };
 
-vector_length: TK_LIT_INT | '+' TK_LIT_INT;
+vector_length: TK_LIT_INT {$$ = $1;} | '+' TK_LIT_INT {$$ = $2;};
 
 
 /*************************************

@@ -15,6 +15,7 @@ typedef struct sProd_val{
 Id_List* append_id_list(Id_List* list, Id_List* toAppend);
 Id_List* create_id_list(char* newId, int vectorSize, int lineNumber);
 void print_id_list(Id_List* list);
+void free_id_list(Id_List* list);
 
 Symbol_Entry* create_id_entry();
 Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type);
