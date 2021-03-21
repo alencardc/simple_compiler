@@ -21,7 +21,7 @@ Symbol_Entry* create_symbol_entry(const char* key,
     TokenValueType type,
     int lenght,
     TokenValue token_value){
-    
+    printf("=====> Criado: %s\n", key);
     Symbol_Entry* entry = malloc(sizeof(Symbol_Entry));
 
     if(entry == NULL){

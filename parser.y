@@ -145,7 +145,7 @@ extern void *arvore;
 
 %%
 
-root: programa { arvore = (void*)$1; }
+root: programa { arvore = (void*)$1; /*print_table(top_scope(scopes));*/ }
 
 programa: global_decl_list programa {$$ = $2;};
         | func_decl programa { $$ = $1; append_child($$, $2); }
@@ -195,7 +195,6 @@ global_decl_list: storage_modifier type global_var_list ';'{
         id_list = id_list->next;
     }
     free_id_list($3);
-    print_table(global_scope);
 
 };
 
@@ -229,7 +228,8 @@ local_decl: storage_modifier var_qualifier type local_var_list {
   while (node != NULL) {
     if (node->type == AST_ASSIGN) {
       // Check if node and assigment is declared
-      Symbol_Entry* new_entry = create_local_entry(node->label, node->data->line_number, $3);
+      Node* node_var = node->children[0];
+      Symbol_Entry* new_entry = create_local_entry(node_var->label, node_var->data->line_number, $3);
       //Adicionar o literal caso for o caso ou checar se o identificador existe e é de tipo valido
       insert_entry_at_table(new_entry, scope);
     } else if (node->type == AST_IDENTIFIER) {
@@ -244,7 +244,7 @@ local_decl: storage_modifier var_qualifier type local_var_list {
       node = NULL;
     }
   }
-
+  
   node = $4;
   Node* parent = $4;
   while (node != NULL) {
@@ -259,6 +259,7 @@ local_decl: storage_modifier var_qualifier type local_var_list {
         } else {
           free_node(node);
           node = NULL;
+          $4 = NULL;
         }
       } else {
         free_last_child_and_merge(parent);
@@ -283,7 +284,7 @@ local_var_list: local_var_init { $$ = $1; }
               | local_var_init ',' local_var_list { $$ = create_local_node($1, $3); }
               ;
 
-local_var_init: identifier { $$ = NULL; free_node($1);  }
+local_var_init: identifier { $$ = $1;/*$$ = NULL; free_node($1);*/  }
               | identifier local_var_operator local_var_value { $$ = create_binary_exp($2, $1, $3); }
               ;
 
