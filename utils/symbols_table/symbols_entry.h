@@ -17,4 +17,5 @@ Id_List* create_id_list(char* newId, int vectorSize, int lineNumber);
 void print_id_list(Id_List* list);
 
 Symbol_Entry* create_id_entry();
+Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type);
 int get_type_lenght(TokenValueType type);

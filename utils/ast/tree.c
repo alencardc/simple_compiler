@@ -55,6 +55,26 @@ void free_node(Node *node) {
   free(node);
 }
 
+bool free_last_child_and_merge(Node* parent) {
+  if (parent->children_amount == expected_children_amount(parent->type) + 1) {
+    Node* child = parent->children[parent->children_amount-1];
+
+   if (child->children_amount == expected_children_amount(child->type) + 1) {
+      Node* grandchild = child->children[child->children_amount-1];
+      child->children[child->children_amount-1] = NULL;
+      parent->children[parent->children_amount-1] = grandchild;
+    } else {
+      parent->children_amount -= 1;
+      // Realloc necessario? 
+    }
+    
+    free_node(child);
+    return true;
+  }
+
+  return false;
+}
+
 int expected_children_amount(TokenType type) {
   switch (type)
   {

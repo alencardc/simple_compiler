@@ -60,6 +60,18 @@ Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
     return new_entry;
 }
 
+Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type) {
+    Symbol_Entry* new_entry = create_symbol_entry(
+        key, 
+        line,
+        VAR,
+        type,
+        get_type_lenght(type),
+        (TokenValue) ""
+    );
+    return new_entry;
+}
+
 int get_type_lenght(TokenValueType type){
     switch (type)
     {

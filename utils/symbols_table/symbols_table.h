@@ -33,7 +33,7 @@ typedef struct sSymbol_Entry {
 
 Symbol_Entry** init_symbol_table();
 
-Symbol_Entry* create_symbol_entry(char* key, 
+Symbol_Entry* create_symbol_entry(const char* key, 
     int line_number, 
     Symbol_Nature nature,
     TokenValueType type,

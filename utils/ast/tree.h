@@ -39,6 +39,7 @@ Node* append_child(Node *parent, Node *child);
 
 void free_node(Node *node);
 
+bool free_last_child_and_merge(Node* parent);
 int expected_children_amount(TokenType type);
 
 void print_debug_node(Node *root);
