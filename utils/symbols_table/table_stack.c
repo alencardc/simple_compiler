@@ -55,3 +55,12 @@ void free_scopes(Table_Stack* scopes){
         current_scope = pop_scope(current_scope);
     }
 }
+
+void print_table_stack(Table_Stack* scopes) {
+    Table_Stack* scope = scopes;
+    while (scope != NULL) {
+        printf("\n\nTable/scope: %s\n", scope->id);
+        print_table(scope->table);
+        scope = scope->next;
+    }
+}

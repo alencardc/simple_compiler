@@ -80,7 +80,7 @@ Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type)
         VAR,
         type,
         get_type_lenght(type),
-        (TokenValue) ""
+        (TokenValue) 0
     );
     return new_entry;
 }

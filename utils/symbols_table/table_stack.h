@@ -20,4 +20,6 @@ void free_scopes(Table_Stack* scopes);
 
 Symbol_Entry* search_all_scopes(const Table_Stack* scopes,char *key);
 
+void print_table_stack(Table_Stack* scopes);
+
 #endif // __SYMBOLS_STACK_H__

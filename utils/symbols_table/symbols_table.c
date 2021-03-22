@@ -21,7 +21,6 @@ Symbol_Entry* create_symbol_entry(const char* key,
     TokenValueType type,
     int lenght,
     TokenValue token_value){
-    printf("=====> Criado: %s\n", key);
     Symbol_Entry* entry = malloc(sizeof(Symbol_Entry));
 
     if(entry == NULL){
@@ -152,6 +151,7 @@ void free_table(Symbol_Entry **table){
 
 void print_table(Symbol_Entry **table){
     int i;
+    printf("Key\t\tLine\tNature\tType\tValue\t\tSize\n");
     for(i = 0; i < TABLE_SIZE; i++){
         if(table[i] != NULL){
             print_entry(table[i]);
@@ -166,11 +166,18 @@ void print_table(Symbol_Entry **table){
 }
 
 void print_entry(const Symbol_Entry* entry){
-    printf("-------\n");
-    printf("Key: %s\n", entry->key);
-    printf("Line number: %i\n", (entry->line_number));
-    printf("Symbol nature: %i\n", (entry->nature));
-    printf("Type: %i\n", (entry->type));
-    printf("Value: %s\n", entry->value.s_value);
-    printf("Size: %i bytes\n", entry->length);
+    printf("%s\t\t", entry->key);
+    printf("%i\t", entry->line_number);
+    printf("%i\t", entry->nature);
+    printf("%i\t", entry->type);
+    if (entry->type == CHAR_VAL || entry->type == STRING_VAL) {
+        printf("%s\t", entry->value.s_value);
+    } else if (entry->type == BOOL_VAL || entry->type == INTEGER_VAL) {
+        printf("%d\t", entry->value.i_val);
+    } else if (entry->type == FLOAT_VAL) {
+        printf("%f\t", entry->value.f_val);
+    } else {
+        printf("\t");
+    }
+    printf("\t%i\n", entry->length);
 }
