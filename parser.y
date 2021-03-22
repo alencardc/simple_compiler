@@ -230,7 +230,7 @@ local_var_list: local_var_init { $$ = $1; }
               | local_var_init ',' local_var_list { $$ = create_local_node($1, $3); }
               ;
 
-local_var_init: identifier { $$ = $1;/*$$ = NULL; free_node($1);*/  }
+local_var_init: identifier { $$ = $1;  }
               | identifier local_var_operator local_var_value { $$ = create_binary_exp($2, $1, $3); }
               ;
 
