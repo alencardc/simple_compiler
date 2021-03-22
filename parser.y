@@ -145,7 +145,7 @@ extern void *arvore;
 
 %%
 
-root: programa { arvore = (void*)$1; print_table_stack(scopes); }
+root: programa { arvore = (void*)$1; /*print_table_stack(scopes);*/ }
 
 programa: global_decl_list programa {$$ = $2;};
         | func_decl programa { $$ = $1; append_child($$, $2); }
@@ -248,7 +248,9 @@ local_var_value: identifier | vector_identifier | literal ;
 ******* Functions declaration ********
 *************************************/
 
-func_decl: storage_modifier type identifier '(' params ')' control_block { $$ = create_function_node($3, $7); };
+func_decl: storage_modifier type identifier '(' params ')' control_block { 
+  $$ = create_function_node($3, $7);
+};
 
 params: param_list | %empty;
 
@@ -391,8 +393,10 @@ command: assign_command { $$ = $1; }
        | control_commands { $$ = $1; }
        ;
 
-control_block: '{' command_list '}' { $$ = $2; };
-block_command: control_block { };
+control_block: control_block_start command_list control_block_end { $$ = $2; };
+block_command: control_block { $$ = $1; };
+control_block_start: '{' { scopes = push_new_scope(scopes, ""); };
+control_block_end: '}' { print_table_stack(scopes); scopes = pop_scope(scopes); };
 
 assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", AST_ASSIGN,$1, $3); }
               | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", AST_ASSIGN, $1, $3); }

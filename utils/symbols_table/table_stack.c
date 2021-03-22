@@ -56,6 +56,11 @@ void free_scopes(Table_Stack* scopes){
     }
 }
 
+void set_top_scope_name(const char* id, Table_Stack* scopes) {
+    free(scopes->id);
+    scopes->id = strdup(id);
+}
+
 void print_table_stack(Table_Stack* scopes) {
     Table_Stack* scope = scopes;
     while (scope != NULL) {
