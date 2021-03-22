@@ -158,7 +158,12 @@ var_qualifier: TK_PR_CONST | %empty;
 
 identifier: TK_IDENTIFICADOR { $$ = create_id_node($1); };
 
-vector_identifier: identifier '[' assign_expression ']' { $$ = create_vector_node($1,$3); };
+vector_identifier: identifier '[' assign_expression ']' { 
+  if(!check_identifier_undeclared(scopes, $1->label) 
+  && !check_wrong_vector(scopes, $1->label)){
+    $$ = create_vector_node($1,$3); 
+  }
+};
 
 type: TK_PR_INT  { $$ = INTEGER_VAL; }
     | TK_PR_FLOAT  { $$ = FLOAT_VAL; }
@@ -196,7 +201,6 @@ global_decl_list: storage_modifier type global_var_list ';'{
     }
     free_id_list($3);
     print_table(global_scope);
-
 };
 
 global_var_list: global_var_id { $$ = $1;}
@@ -341,7 +345,13 @@ unary_operator: '+' { $$ = create_node_with_label("+", AST_UNARY_EXP); }
               | '#' { $$ = create_node_with_label("#", AST_UNARY_EXP); }
               ;
 
-basic_expression: identifier { $$ = $1; }
+basic_expression: 
+  identifier {
+    if(!check_identifier_undeclared(scopes, $1->label)
+      && !check_wrong_var(scopes, $1->label)
+    ) 
+      $$ = $1; 
+  }
                 | vector_identifier { $$ = $1; }
                 | constant { $$ = $1; }
                 | function_call { $$ = $1; }
