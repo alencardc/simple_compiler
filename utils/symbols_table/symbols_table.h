@@ -1,3 +1,6 @@
+#ifndef __SYMBOLS_TABLE_H__
+#define __SYMBOLS_TABLE_H__
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -58,5 +61,4 @@ void print_entry(const Symbol_Entry* entry);
 
 
 
-
-
+#endif // __SYMBOLS_TABLE_H__

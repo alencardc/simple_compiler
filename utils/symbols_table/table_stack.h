@@ -1,3 +1,6 @@
+#ifndef __SYMBOLS_STACK_H__
+#define __SYMBOLS_STACK_H__
+
 #include "symbols_table.h"
 
 typedef struct sTableStack{
@@ -17,3 +20,4 @@ void free_scopes(Table_Stack* scopes);
 
 Symbol_Entry* search_all_scopes(const Table_Stack* scopes,char *key);
 
+#endif // __SYMBOLS_STACK_H__

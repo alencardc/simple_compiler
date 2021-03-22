@@ -32,4 +32,6 @@ Node* create_for_node(Node* init, Node* expression, Node* update, Node* command)
 Node* join_local_with_commands(Node *local, Node *commands);
 Node* join_command_lists(Node *parent_list, Node *child_list);
 
+Node* free_all_id_nodes(Node* root);
+
 #endif // __LEX_NODE_H__

@@ -221,63 +221,9 @@ vector_length: TK_LIT_INT {$$ = $1;} | '+' TK_LIT_INT {$$ = $2;};
 **** Local variables declaration ****
 *************************************/
 
-local_decl: storage_modifier var_qualifier type local_var_list { 
-  //$$ = $4;
-  Symbol_Entry** scope = top_scope(scopes);
-  Node* node = $4;
-  while (node != NULL) {
-    if (node->type == AST_ASSIGN) {
-      // Check if node and assigment is declared
-      Node* node_var = node->children[0];
-      Symbol_Entry* new_entry = create_local_entry(node_var->label, node_var->data->line_number, $3);
-      //Adicionar o literal caso for o caso ou checar se o identificador existe e é de tipo valido
-      insert_entry_at_table(new_entry, scope);
-    } else if (node->type == AST_IDENTIFIER) {
-      // Check if node alterdy is declared
-      Symbol_Entry* new_entry = create_local_entry(node->label, node->data->line_number, $3);
-      insert_entry_at_table(new_entry, scope);
-    }
-
-    if (node->children_amount > expected_children_amount(node->type)) {
-      node = node->children[node->children_amount-1];
-    } else {
-      node = NULL;
-    }
-  }
-  
-  node = $4;
-  Node* parent = $4;
-  while (node != NULL) {
-    if (node->type == AST_IDENTIFIER) {
-      if (node == $4) {
-        if (node->children_amount > expected_children_amount(node->type)) {
-          $4 = node->children[node->children_amount-1];
-          node->children[node->children_amount-1] = NULL;
-          free_node(node);
-          node = $4;
-          parent = node;
-        } else {
-          free_node(node);
-          node = NULL;
-          $4 = NULL;
-        }
-      } else {
-        free_last_child_and_merge(parent);
-        if (parent->children_amount > expected_children_amount(parent->type)) {
-          node = parent->children[parent->children_amount-1];
-        } else {
-          node = NULL;
-        }
-      }
-    } else if (node->children_amount > expected_children_amount(node->type)) {
-      parent = node;
-      node = node->children[node->children_amount-1];
-    } else {
-      node = NULL;
-    }
-  }
-
-  $$ = $4;
+local_decl: storage_modifier var_qualifier type local_var_list {
+  insert_local_entry_from_list($4, $3, scopes);
+  $$ = free_all_id_nodes($4);
 };
 
 local_var_list: local_var_init { $$ = $1; }

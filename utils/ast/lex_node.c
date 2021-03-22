@@ -207,3 +207,38 @@ Node* join_command_lists(Node *parent_list, Node *child_list) {
   append_child(node, child_list);
   return parent_list;
 }
+
+Node* free_all_id_nodes(Node* root) {
+  Node* node = root;
+  Node* parent = root;
+  while (node != NULL) {
+    if (node->type == AST_IDENTIFIER) {
+      if (node == root) {
+        if (node->children_amount > expected_children_amount(node->type)) {
+          root = node->children[node->children_amount-1];
+          node->children[node->children_amount-1] = NULL;
+          free_node(node);
+          node = root;
+          parent = node;
+        } else {
+          free_node(node);
+          node = NULL;
+          root = NULL;
+        }
+      } else {
+        free_last_child_and_merge(parent);
+        if (parent->children_amount > expected_children_amount(parent->type)) {
+          node = parent->children[parent->children_amount-1];
+        } else {
+          node = NULL;
+        }
+      }
+    } else if (node->children_amount > expected_children_amount(node->type)) {
+      parent = node;
+      node = node->children[node->children_amount-1];
+    } else {
+      node = NULL;
+    }
+  }
+  return root;
+}
