@@ -402,7 +402,11 @@ assign_command: identifier '=' assign_expression { $$ = create_binary_tree("=", 
               | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", AST_ASSIGN, $1, $3); }
               ;
 
-input_command: TK_PR_INPUT identifier { $$ = create_io_node($2, "input"); };
+input_command: TK_PR_INPUT identifier {
+  $$ = create_io_node($2, "input"); 
+  check_identifier_undeclared(scopes, $2->label);
+  check_wrong_par_input($2->data->line_number, $2->label, scopes);
+};
 output_command: TK_PR_OUTPUT identifier { $$ = create_io_node($2, "output"); }
               | TK_PR_OUTPUT literal { $$ = create_io_node($2, "output"); }
               ;

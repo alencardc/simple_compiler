@@ -18,7 +18,7 @@ Symbol_Entry** top_scope(const Table_Stack* scopes){
     return scopes->table;
 }
 
-Symbol_Entry* search_all_scopes(const Table_Stack* scopes,char *key){
+Symbol_Entry* search_all_scopes(Table_Stack* scopes, const char *key){
     Table_Stack* current_scope = scopes;
     while(current_scope != NULL){
         Symbol_Entry** current_symbol_table = current_scope->table;

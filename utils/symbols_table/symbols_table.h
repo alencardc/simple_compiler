@@ -43,11 +43,11 @@ Symbol_Entry* create_symbol_entry(const char* key,
     int lenght,
     TokenValue token_value);
 
-int hash(char *key);
+int hash(const char *key);
 
 int insert_entry_at_table(Symbol_Entry* entry, Symbol_Entry** table);
 
-Symbol_Entry* get_entry_from_table(char* key,Symbol_Entry **table);
+Symbol_Entry* get_entry_from_table(const char* key,Symbol_Entry **table);
 
 void free_arg_list(Argument_List* list);
 

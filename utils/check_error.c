@@ -76,3 +76,16 @@ void errors_as_var(Symbol_Entry* entry){
       break;
   }
 }
+
+bool check_wrong_par_input(int line, const char* key, Table_Stack* scopes) {
+  Symbol_Entry* entry = search_all_scopes(scopes, key);
+  if (entry->type == INTEGER_VAL || entry->type == FLOAT_VAL) {
+    return false;
+  }
+
+  const char* type_string = token_value_type_to_string(entry->type);
+  printf("[ERR_WRONG_PAR_INPUT] \"input\" command at line %d expected a "
+  "parameter of type INTEGER or FLOAT, but the value \"%s\" is of type %s\n",
+  line, key, type_string);
+  exit(ERR_WRONG_PAR_INPUT);
+}

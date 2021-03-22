@@ -18,7 +18,7 @@ Table_Stack* pop_scope(Table_Stack *scopes);
 
 void free_scopes(Table_Stack* scopes);
 
-Symbol_Entry* search_all_scopes(const Table_Stack* scopes,char *key);
+Symbol_Entry* search_all_scopes(Table_Stack* scopes, const char *key);
 
 void set_top_scope_name(const char* id, Table_Stack* scopes);
 

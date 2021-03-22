@@ -5,6 +5,25 @@
 #define SINGLE_QUOTES '\''
 #define DOUBLE_QUOTES '\"'
 
+const char* token_value_type_to_string(TokenValueType type) {
+  switch (type) {
+    case CHAR_VAL:
+      return "CHAR";
+    case STRING_VAL:
+      return "STRING";
+    case INTEGER_VAL:
+      return "INTEGER";
+    case FLOAT_VAL:
+      return "FLOAT";
+    case BOOL_VAL:
+      return "BOOL";
+    case NO_VAL:
+      return "NO_VAL";
+    default:
+      return "-";
+  }
+}
+
 LexValue create_lex_value(TokenType token_type, TokenValue value, TokenValueType val_type, int line) {
 
   return (LexValue){

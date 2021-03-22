@@ -40,7 +40,7 @@ Symbol_Entry* create_symbol_entry(const char* key,
     return entry;
 }
 
-int hash(char *key) {
+int hash(const char *key) {
   unsigned int value = 5381;
 
   int i;
@@ -80,7 +80,7 @@ int insert_entry_at_table(Symbol_Entry* entry, Symbol_Entry** table){
     return index;
 }
 
-Symbol_Entry* get_entry_from_table(char* key,Symbol_Entry **table){
+Symbol_Entry* get_entry_from_table(const char* key, Symbol_Entry **table){
     int index = hash(key);
 
     if(table[index] == NULL)
