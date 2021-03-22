@@ -64,7 +64,7 @@ Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
 
     Symbol_Entry* new_entry = create_symbol_entry(id_list->id, 
                                   id_list->line_number,
-                                  VAR,
+                                  nature,
                                   type,
                                   size,
                                   (TokenValue) ""
