@@ -160,7 +160,7 @@ identifier: TK_IDENTIFICADOR { $$ = create_id_node($1); };
 
 vector_identifier: identifier '[' assign_expression ']' { 
   if(!check_identifier_undeclared(scopes, $1->label) 
-  && !check_wrong_vector(scopes, $1->label)){
+  && !check_wrong_vector(scopes, $1->label, $1->data->line_number)){
     $$ = create_vector_node($1,$3); 
   }
 };
@@ -353,14 +353,15 @@ basic_expression:
   identifier {
     if(!check_identifier_undeclared(scopes, $1->label)
       && !check_wrong_var(scopes, $1->label)
-    ) 
+    ){
       $$ = $1; 
+    } 
   }
-                | vector_identifier { $$ = $1; }
-                | constant { $$ = $1; }
-                | function_call { $$ = $1; }
-                | '(' assign_expression ')' { $$ = $2 ; }
-                ;
+  | vector_identifier { $$ = $1; }
+  | constant { $$ = $1; }
+  | function_call { $$ = $1; }
+  | '(' assign_expression ')' { $$ = $2 ; }
+  ;
 
 constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); }
         | TK_LIT_FLOAT { $$ = create_node_with_lex($1, AST_LITERAL); }

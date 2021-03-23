@@ -35,21 +35,21 @@ bool check_identifier_undeclared(Table_Stack* scopes, char* key) {
   return false;
 }
 
-bool check_wrong_vector(Table_Stack* scopes, char* key){
+bool check_wrong_vector(Table_Stack* scopes, char* key, int line){
   Symbol_Entry* queryEntry = search_all_scopes(scopes, key);
   if(queryEntry != NULL && queryEntry->nature != VECTOR){
-    errors_as_vector(queryEntry);
+    errors_as_vector(queryEntry, line);
   }
 
   return false;
 }
 
-void errors_as_vector(Symbol_Entry* entry){
+void errors_as_vector(Symbol_Entry* entry, int line){
   switch (entry->nature){
-    case VAR: printf("Isso era uma varíavel e foi usado como vetor");
+    case VAR: printf("[ERR_VARIABLE] Variable \"%s\" was used as a Vector at line %i.\n", entry->key, line);
       exit(ERR_VARIABLE);
       break;
-    case FUNCTION: printf("Isso era uma função e foi usado como vetor");
+    case FUNCTION: printf("[ERR_FUNCTION] Function \"%s\" was used as a Vector at line %i.\n", entry->key, line);
       exit(ERR_FUNCTION);
     default:
       break;
