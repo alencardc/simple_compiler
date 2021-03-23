@@ -22,6 +22,7 @@ extern void *arvore;
   Node* node;
   Id_List* id_list;
   TokenValueType type;
+  Argument_List* arg_list;
 }
 
 %token TK_PR_INT
@@ -141,11 +142,15 @@ extern void *arvore;
 %type <type> type
 %type <lexical_value> vector_length
 
+%type <arg_list> param
+%type <arg_list> param_list
+%type <arg_list> params
+
 %start root
 
 %%
 
-root: programa { arvore = (void*)$1; /*print_table_stack(scopes);*/ }
+root: programa { arvore = (void*)$1; print_table_stack(scopes); }
 
 programa: global_decl_list programa {$$ = $2;};
         | func_decl programa { $$ = $1; append_child($$, $2); }
@@ -251,17 +256,30 @@ local_var_value: identifier {
 ******* Functions declaration ********
 *************************************/
 
-func_decl: storage_modifier type identifier '(' params ')' control_block { 
+func_decl: storage_modifier type identifier '(' params ')' control_block {
+  if(scopes == NULL){
+      scopes = push_new_scope(scopes, "global");
+  }
+
+  Symbol_Entry* function = create_function_entry($3->label, $5, $2, $3->data->line_number);
+  Symbol_Entry** current_scope = top_scope(scopes);
+  int i = insert_entry_at_table(function, current_scope);
+
   $$ = create_function_node($3, $7);
 };
 
-params: param_list | %empty;
+params: param_list { $$ = $1; }| %empty { $$ = NULL; };
 
-param_list: param
-          | param_list ',' param
+param_list: param { $$ = $1;}
+          | param_list ',' param {$$ = append_arg_list($1, $3);}
           ;
 
-param: var_qualifier type identifier { free_node($3); };
+param: var_qualifier type identifier 
+  { 
+    Argument_List* arg_list_element = create_arg_list_element($3->label, $2);
+    $$ = arg_list_element;
+    free_node($3); 
+  };
 
 
 /*************************************

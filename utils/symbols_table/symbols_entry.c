@@ -14,6 +14,32 @@
 //         );
 // }
 
+Argument_List* create_arg_list_element(char* id, TokenValueType type){
+    Argument_List* new_argument = malloc(sizeof(Argument_List));
+
+    if(new_argument == NULL)
+        return NULL;
+    
+    new_argument->id = strdup(id);
+    new_argument->next = NULL;
+    new_argument->type = type;
+
+    return  new_argument;
+}
+
+Argument_List* append_arg_list(Argument_List* list, Argument_List* toAppend){
+    if(list == NULL)
+        return toAppend;
+    
+    Argument_List* current_arg = list;
+    while(current_arg->next != NULL){
+        current_arg = current_arg->next;
+    }
+    current_arg->next = toAppend;
+    
+    return list;
+}
+
 Id_List* append_id_list(Id_List* list, Id_List* toAppend){
     if(list == NULL)
         return toAppend;
@@ -70,6 +96,21 @@ Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
                                   size,
                                   (TokenValue) ""
                                   );
+    return new_entry;
+}
+
+Symbol_Entry* create_function_entry(const char* key, Argument_List* arg_list, TokenValueType returnType, int line){
+    Symbol_Entry* new_entry = create_symbol_entry(
+        key,
+        line,
+        FUNCTION,
+        returnType,
+        get_type_lenght(returnType),
+        (TokenValue) 0
+    );
+
+    new_entry->arg_list = arg_list;
+
     return new_entry;
 }
 

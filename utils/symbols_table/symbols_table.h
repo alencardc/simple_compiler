@@ -59,6 +59,6 @@ void print_table(Symbol_Entry **table);
 
 void print_entry(const Symbol_Entry* entry);
 
-
+void print_arg_list(Argument_List* list);
 
 #endif // __SYMBOLS_TABLE_H__

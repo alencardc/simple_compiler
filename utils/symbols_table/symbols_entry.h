@@ -20,8 +20,13 @@ Id_List* create_id_list(char* newId, int vectorSize, int lineNumber);
 void print_id_list(Id_List* list);
 void free_id_list(Id_List* list);
 
+Argument_List* create_arg_list_element(char* id, TokenValueType type);
+Argument_List* append_arg_list(Argument_List* list, Argument_List* toAppend);
+
 Symbol_Entry* create_id_entry();
+Symbol_Entry* create_function_entry(const char* key, Argument_List* arg_list, TokenValueType returnType, int line);
 Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type);
+
 int get_type_lenght(TokenValueType type);
 
 // Local var

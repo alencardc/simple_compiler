@@ -151,7 +151,7 @@ void free_table(Symbol_Entry **table){
 
 void print_table(Symbol_Entry **table){
     int i;
-    printf("Key\t\tLine\tNature\tType\tValue\t\tSize\n");
+    printf("Key\t\tLine\tNature\tType\tValue\t\tSize\tArgument List\n");
     for(i = 0; i < TABLE_SIZE; i++){
         if(table[i] != NULL){
             print_entry(table[i]);
@@ -179,5 +179,16 @@ void print_entry(const Symbol_Entry* entry){
     } else {
         printf("\t");
     }
-    printf("\t%i\n", entry->length);
+    printf("\t%i\t", entry->length);
+
+    print_arg_list(entry->arg_list);
+}
+
+void print_arg_list(Argument_List* list){
+    while (list != NULL)
+    {
+        printf("%s(%i) ",list->id, list->type);
+        list = list->next;
+    }
+    printf("\n");
 }
