@@ -12,8 +12,8 @@ bool check_identifier_undeclared(Table_Stack* scopes, char* key);
 bool check_wrong_vector(Table_Stack* scopes, char* key, int line);
 void errors_as_vector(Symbol_Entry* entry, int line);
 
-bool check_wrong_var(Table_Stack* scopes, char* key);
-void errors_as_var(Symbol_Entry* entry);
+bool check_wrong_var(Table_Stack* scopes, char* key, int line);
+void errors_as_var(Symbol_Entry* entry, int line);
 
 bool check_wrong_par_input(int line, const char* key, Table_Stack* scopes);
 
