@@ -27,6 +27,9 @@ Symbol_Entry* create_id_entry();
 Symbol_Entry* create_function_entry(const char* key, Argument_List* arg_list, TokenValueType returnType, int line);
 Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type);
 
+int get_number_of_args_from_node(Node* first_arg);
+int get_number_of_args_from_list(Argument_List* list);
+
 int get_type_lenght(TokenValueType type);
 
 // Local var

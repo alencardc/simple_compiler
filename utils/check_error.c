@@ -89,3 +89,27 @@ bool check_wrong_par_input(int line, const char* key, Table_Stack* scopes) {
     line, key, type_string);
   exit(ERR_WRONG_PAR_INPUT);
 }
+
+bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int line){
+  Symbol_Entry* entry = search_all_scopes(scopes, key);
+ 
+  int declaration_arg_size = get_number_of_args_from_list(entry->arg_list);
+  int actual_arg_size = get_number_of_args_from_node(args);
+ 
+  if(actual_arg_size > declaration_arg_size){
+    printf("[ERR_EXCESS_ARGS] Function \"%s\" expecting %i arguments(s) but was called with %i at line %i.\n", 
+            key, 
+            declaration_arg_size, 
+            actual_arg_size, 
+            line);
+    exit(ERR_EXCESS_ARGS);
+  } else if(declaration_arg_size > actual_arg_size){
+    printf("[ERR_MISSING_ARGS] Function \"%s\" expecting %i arguments(s) but was called with %i at line %i.\n", 
+            key, 
+            declaration_arg_size, 
+            actual_arg_size, 
+            line);
+    exit(ERR_MISSING_ARGS);
+  }
+  return false;
+}

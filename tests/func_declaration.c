@@ -9,5 +9,6 @@ int get_ui( float u1, bool gelo, int tristeza){
 }
 
 bool vazio(){
+    get_ui(20 + 1 + 32, !20, 20);
     output b;
 }

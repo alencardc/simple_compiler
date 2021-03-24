@@ -14,6 +14,32 @@
 //         );
 // }
 
+int get_number_of_args_from_node(Node* first_arg){
+    if(first_arg == NULL)
+        return 0;
+
+    Node* current_arg = first_arg;
+    int number_of_args = 1;
+
+    while(current_arg->children_amount > expected_children_amount(current_arg->type)){
+        number_of_args++;
+        current_arg = current_arg->children[current_arg->children_amount - 1];
+    }
+
+    return number_of_args;
+}
+
+int get_number_of_args_from_list(Argument_List* list){
+    int number_of_args = 0;
+
+    while(list != NULL){
+        number_of_args++;
+        list = list->next;
+    }
+
+    return number_of_args;
+}
+
 Argument_List* create_arg_list_element(char* id, TokenValueType type){
     Argument_List* new_argument = malloc(sizeof(Argument_List));
 

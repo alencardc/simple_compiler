@@ -452,12 +452,15 @@ shift_command: shift_operand shift shift_number { $$ = create_shift_node($2, $1,
 shift_number: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); };
             | '+' TK_LIT_INT { $$ = create_node_with_lex($2, AST_LITERAL); };
 
-function_call: TK_IDENTIFICADOR '(' arguments ')' { $$ = create_func_call_node($1, $3);};
+function_call: TK_IDENTIFICADOR '(' arguments ')' {
+  check_wrong_arg_size($3, $1.token_value.s_value, scopes, $1.line_number);
+  $$ = create_func_call_node($1, $3);
+};
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
 arguments: arguments_list {$$ = $1;} | %empty {$$ = NULL;};
 arguments_list: argument {$$ = $1;} | argument ',' arguments_list {$$ = $1; append_child($$, $3);};
-argument: assign_expression {$$ = $1;};
+argument: assign_expression { $$ = $1; };
 
 
 
