@@ -75,7 +75,7 @@ bool free_last_child_and_merge(Node* parent) {
   return false;
 }
 
-int expected_children_amount(TokenType type) {
+int expected_children_amount(NodeType type) {
   switch (type)
   {
     case AST_IDENTIFIER:
