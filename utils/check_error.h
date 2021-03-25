@@ -16,6 +16,7 @@ bool check_wrong_var(Table_Stack* scopes, char* key, int line);
 void errors_as_var(Symbol_Entry* entry, int line);
 
 bool check_wrong_par_input(int line, const char* key, Table_Stack* scopes);
-bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int line);
+bool check_wrong_par_shift(LexValue value);
 
+bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int line);
 #endif // __CHECK_ERROR_H__

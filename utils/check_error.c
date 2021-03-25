@@ -113,3 +113,11 @@ bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int 
   }
   return false;
 }
+
+bool check_wrong_par_shift(LexValue value){
+  if(value.token_value.i_val > 16){
+    printf("[ERR_WRONG_PAR_SHIFT] Shift command used a value (%i) greater than 16 at line %i.\n", value.token_value.i_val, value.line_number);
+    exit(ERR_WRONG_PAR_SHIFT);
+  }
+  return false;
+}

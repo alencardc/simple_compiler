@@ -454,8 +454,14 @@ shift_operand: identifier {
               | vector_identifier { $$ = $1; };
 
 shift_command: shift_operand shift shift_number { $$ = create_shift_node($2, $1, $3); };
-shift_number: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); };
-            | '+' TK_LIT_INT { $$ = create_node_with_lex($2, AST_LITERAL); };
+shift_number: TK_LIT_INT {
+                            check_wrong_par_shift($1); 
+                            $$ = create_node_with_lex($1, AST_LITERAL); 
+                          };
+            | '+' TK_LIT_INT { 
+                                check_wrong_par_shift($2);
+                                $$ = create_node_with_lex($2, AST_LITERAL); 
+                              };
 
 function_call: TK_IDENTIFICADOR '(' arguments ')' {
   check_identifier_undeclared(scopes, $1.token_value.s_value, $1.line_number);
