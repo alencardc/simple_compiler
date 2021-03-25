@@ -164,7 +164,7 @@ var_qualifier: TK_PR_CONST | %empty;
 identifier: TK_IDENTIFICADOR { $$ = create_id_node($1); };
 
 vector_identifier: identifier '[' assign_expression ']' { 
-  if(!check_identifier_undeclared(scopes, $1->label) 
+  if(!check_identifier_undeclared(scopes, $1->label, $1->data->line_number) 
   && !check_wrong_vector(scopes, $1->label, $1->data->line_number)){
     $$ = create_vector_node($1,$3); 
   }
@@ -247,6 +247,7 @@ local_var_operator: TK_OC_LE { $$ = create_node_with_lex($1, AST_ASSIGN); }
 
 //local_var_id: TK_IDENTIFICADOR;
 local_var_value: identifier {
+  check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
   check_wrong_var(scopes, $1->label, $1->data->line_number);
   $$ = $1;
 } | vector_identifier | literal ;
@@ -372,7 +373,7 @@ unary_operator: '+' { $$ = create_node_with_label("+", AST_UNARY_EXP); }
 
 basic_expression: 
   identifier {
-    if(!check_identifier_undeclared(scopes, $1->label)
+    if(!check_identifier_undeclared(scopes, $1->label, $1->data->line_number)
       && !check_wrong_var(scopes, $1->label, $1->data->line_number)
     ){
       $$ = $1; 
@@ -420,7 +421,9 @@ block_command: control_block { $$ = $1; };
 control_block_start: '{' { scopes = push_new_scope(scopes, ""); };
 control_block_end: '}' { print_table_stack(scopes); scopes = pop_scope(scopes); };
 
-assign_command: identifier '=' assign_expression {  check_wrong_var(scopes, $1->label, $1->data->line_number);
+assign_command: identifier '=' assign_expression {  
+                                                    check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
+                                                    check_wrong_var(scopes, $1->label, $1->data->line_number);
                                                     $$ = create_binary_tree("=", AST_ASSIGN,$1, $3); 
                                                   }
               | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", AST_ASSIGN, $1, $3); }
@@ -428,11 +431,12 @@ assign_command: identifier '=' assign_expression {  check_wrong_var(scopes, $1->
 
 input_command: TK_PR_INPUT identifier {
   $$ = create_io_node($2, "input"); 
-  check_identifier_undeclared(scopes, $2->label);
+  check_identifier_undeclared(scopes, $2->label, $2->data->line_number);
   check_wrong_par_input($2->data->line_number, $2->label, scopes);
   check_wrong_var(scopes, $2->label, $2->data->line_number);
 };
 output_command: TK_PR_OUTPUT identifier { 
+                                          check_identifier_undeclared(scopes, $2->label, $2->data->line_number);
                                           check_wrong_var(scopes, $2->label, $2->data->line_number);
                                           $$ = create_io_node($2, "output"); 
                                         }
@@ -443,6 +447,7 @@ io_command: input_command | output_command { $$ = $1; };
 
 shift: TK_OC_SR | TK_OC_SL { $$ = $1;};
 shift_operand: identifier {
+                            check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
                             check_wrong_var(scopes, $1->label, $1->data->line_number); 
                             $$ = $1; 
                           } 
@@ -453,6 +458,7 @@ shift_number: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); };
             | '+' TK_LIT_INT { $$ = create_node_with_lex($2, AST_LITERAL); };
 
 function_call: TK_IDENTIFICADOR '(' arguments ')' {
+  check_identifier_undeclared(scopes, $1.token_value.s_value, $1.line_number);
   check_wrong_arg_size($3, $1.token_value.s_value, scopes, $1.line_number);
   $$ = create_func_call_node($1, $3);
 };

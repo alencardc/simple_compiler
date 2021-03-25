@@ -190,7 +190,7 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
 
             check_identifier_redeclared(scopes, node_var->label);
             if (node_value->type == AST_IDENTIFIER || node_value->type == AST_VECTOR) {
-                check_identifier_undeclared(scopes, node_value->label);
+                check_identifier_undeclared(scopes, node_value->label, 0); //TODO: Perguntar ao alencar por que disso
 
                 // check identifier type
             } else { // AST_LITERAL

@@ -25,10 +25,10 @@ bool check_type_cast(Node* node_cast, Node* node_test) {
   exit(ERR_WRONG_TYPE);
 }
 
-bool check_identifier_undeclared(Table_Stack* scopes, char* key) {
+bool check_identifier_undeclared(Table_Stack* scopes, char* key, int line) {
   Symbol_Entry* queryEntry = search_all_scopes(scopes, key);
   if(queryEntry == NULL) {
-    printf("Não declarado :/\n");
+    printf("[ERR_UNDECLARED] Identifier \"%s\" used without previous declaration at line %i.\n", key, line);
     exit(ERR_UNDECLARED);
   }
 
