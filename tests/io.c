@@ -1,4 +1,5 @@
+bool teste;
+
 int testIOCommand() {
-  bambam(909090);
-  output "bambamOMaiorDeTodos";
+  output teste;
 }

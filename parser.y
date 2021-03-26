@@ -438,9 +438,13 @@ input_command: TK_PR_INPUT identifier {
 output_command: TK_PR_OUTPUT identifier { 
                                           check_identifier_undeclared(scopes, $2->label, $2->data->line_number);
                                           check_wrong_var(scopes, $2->label, $2->data->line_number);
+                                          check_wrong_par_output($2->label, *($2->data), scopes, $2->data->line_number);
                                           $$ = create_io_node($2, "output"); 
                                         }
-              | TK_PR_OUTPUT literal { $$ = create_io_node($2, "output"); }
+              | TK_PR_OUTPUT literal { 
+                                        check_wrong_par_output(NULL, *($2->data), scopes, $2->data->line_number);
+                                        $$ = create_io_node($2, "output"); 
+                                      }
               ;
               
 io_command: input_command | output_command { $$ = $1; };

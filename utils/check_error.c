@@ -90,6 +90,48 @@ bool check_wrong_par_input(int line, const char* key, Table_Stack* scopes) {
   exit(ERR_WRONG_PAR_INPUT);
 }
 
+bool check_wrong_par_output(const char* key, LexValue literal, Table_Stack* scopes, int line){
+  TokenValueType type;
+  if (key == NULL){
+    type = literal.value_type;
+  }
+  else{
+    Symbol_Entry* entry = search_all_scopes(scopes,key);
+    if(entry == NULL)
+      return true;
+
+    type = entry->type;
+  }
+  
+  if(type != FLOAT_VAL && type != INTEGER_VAL){
+    char* type_name = get_type_name(type);
+    printf("[ERR_WRONG_PAR_OUTPUT] Output command expects (float/integer) value but type (%s) was supplied at line %i.\n", get_type_name(type), line);
+    free(type_name);
+    exit(ERR_WRONG_PAR_OUTPUT);
+  }
+}
+
+char* get_type_name(TokenValueType type){
+  char* type_name = (char*) malloc(sizeof(char) * 15);
+  switch (type)
+  {
+  case FLOAT_VAL: type_name = strdup("float");
+    break;
+  case INTEGER_VAL: type_name = strdup("int");
+    break;
+  case BOOL_VAL: type_name = strdup("bool");
+    break;
+  case STRING_VAL: type_name = strdup("string");
+    break;
+  case CHAR_VAL: type_name = strdup("char");
+    break;
+  default:
+    break;
+  }
+
+  return type_name;
+}
+
 bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int line){
   Symbol_Entry* entry = search_all_scopes(scopes, key);
  
