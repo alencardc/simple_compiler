@@ -15,6 +15,9 @@ typedef struct sProd_val{
   Node* node;
 } Prod_Val;
 
+void inject_value_type_from_scopes(Node* node, Table_Stack* scopes);
+void inject_value_type(Node* node, TokenValueType type);
+
 Id_List* append_id_list(Id_List* list, Id_List* toAppend);
 Id_List* create_id_list(char* newId, int vectorSize, int lineNumber);
 void print_id_list(Id_List* list);

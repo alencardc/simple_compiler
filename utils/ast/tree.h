@@ -30,6 +30,7 @@ typedef struct sNode {
   NodeType type;
   int children_amount;
   struct sNode **children;
+  TokenValueType value_type;
 } Node;
 
 Node* create_node(LexValue *data, const char *label, NodeType type);

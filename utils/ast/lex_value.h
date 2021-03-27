@@ -36,6 +36,8 @@ typedef struct sLexValue {
 const char* token_value_type_to_string(TokenValueType type);
 
 LexValue create_lex_value(TokenType token_type, TokenValue value, TokenValueType val_type, int line);
+LexValue* create_lex_value_from_type(TokenValueType type);
+TokenValueType result_type_from(TokenValueType type1, TokenValueType type2);
 LexValue create_integer(int value, int line);
 LexValue create_float(double value, int line);
 LexValue create_string(char* value, int line);

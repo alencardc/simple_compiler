@@ -14,6 +14,15 @@
 //         );
 // }
 
+void inject_value_type_from_scopes(Node* node, Table_Stack* scopes){
+  Symbol_Entry* entry = search_all_scopes(scopes, node->label);
+  node->value_type = entry->type;
+}
+
+void inject_value_type(Node* node, TokenValueType type){
+    node->value_type = type;
+}
+
 int get_number_of_args_from_node(Node* first_arg){
     if(first_arg == NULL)
         return 0;

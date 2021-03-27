@@ -1,6 +1,7 @@
 #include "lex_value.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #define SINGLE_QUOTES '\''
 #define DOUBLE_QUOTES '\"'
@@ -75,4 +76,22 @@ char* remove_quotes(char* string){
   }
 
   return string;
+}
+
+TokenValueType result_type_from(TokenValueType type1, TokenValueType type2){
+  if (type1 == type2)
+    return type1;
+
+  //Integer, float and bool are almost "equally" the same type, with an hierarchy of float > int > bool
+  if(type1 == FLOAT_VAL || type2 == FLOAT_VAL)
+    return FLOAT_VAL;
+
+  else if(type1 == INTEGER_VAL || type2 == INTEGER_VAL)
+    return INTEGER_VAL;
+
+  else if(type1 == BOOL_VAL || type2 == BOOL_VAL)
+    return BOOL_VAL;
+
+  // Char and string val, and not equal, as these types are not coerced we have an error
+  return NO_VAL;
 }

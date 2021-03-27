@@ -166,8 +166,10 @@ identifier: TK_IDENTIFICADOR { $$ = create_id_node($1); };
 vector_identifier: identifier '[' assign_expression ']' { 
   if(!check_identifier_undeclared(scopes, $1->label, $1->data->line_number) 
   && !check_wrong_vector(scopes, $1->label, $1->data->line_number)){
-    $$ = create_vector_node($1,$3); 
+    $$ = create_vector_node($1,$3);
   }
+  Symbol_Entry* entry = search_all_scopes(scopes, $1->label);
+  inject_value_type($$, entry->type);
 };
 
 type: TK_PR_INT  { $$ = INTEGER_VAL; }
@@ -344,7 +346,9 @@ additive_operator: '+' { $$ = create_node_with_label("+", AST_BINARY_EXP); }
                  ;
 
 multiplicative_expression: exponential_expression { $$ = $1; }
-                         | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3); }
+                         | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3);
+                                                                                                       
+                                                                                                    }
                          ;
 
 multiplicative_operator: '*' { $$ = create_node_with_label("*", AST_BINARY_EXP); }
@@ -359,7 +363,11 @@ exponential_expression: unary_expression { $$ = $1; }
 exponential_operator: '^' { $$ = create_node_with_label("^", AST_BINARY_EXP); } ;
 
 unary_expression: basic_expression { $$ = $1; }
-                | unary_operator unary_expression { $$ = $1; append_child($$, $2); }
+                | unary_operator unary_expression { $$ = $1;
+                                                    $$->value_type =  $2->value_type;
+                                                    append_child($$, $2);
+                                                    printf("type: %i", $$->value_type);
+                                                  }
                 ;
 
 unary_operator: '+' { $$ = create_node_with_label("+", AST_UNARY_EXP); }
@@ -376,19 +384,29 @@ basic_expression:
     if(!check_identifier_undeclared(scopes, $1->label, $1->data->line_number)
       && !check_wrong_var(scopes, $1->label, $1->data->line_number)
     ){
-      $$ = $1; 
+
+      $$ = $1;
+      inject_value_type_from_scopes($$, scopes);
     } 
   }
-  | vector_identifier { $$ = $1; }
+  | vector_identifier { $$ = $1;}
   | constant { $$ = $1; }
   | function_call { $$ = $1; }
   | '(' assign_expression ')' { $$ = $2 ; }
   ;
 
-constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); }
-        | TK_LIT_FLOAT { $$ = create_node_with_lex($1, AST_LITERAL); }
-        | TK_LIT_TRUE { $$ = create_node_with_lex($1, AST_LITERAL); }
-        | TK_LIT_FALSE { $$ = create_node_with_lex($1, AST_LITERAL); }
+constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL);
+                       $$->value_type = INTEGER_VAL;
+                     }
+        | TK_LIT_FLOAT { $$ = create_node_with_lex($1, AST_LITERAL);
+                         $$->value_type = FLOAT_VAL;
+                       }
+        | TK_LIT_TRUE { $$ = create_node_with_lex($1, AST_LITERAL); 
+                        $$->value_type = BOOL_VAL;
+                      }
+        | TK_LIT_FALSE { $$ = create_node_with_lex($1, AST_LITERAL); 
+                         $$->value_type = BOOL_VAL;
+                       }
         ;
 
 /*************************************
@@ -471,6 +489,8 @@ function_call: TK_IDENTIFICADOR '(' arguments ')' {
   check_identifier_undeclared(scopes, $1.token_value.s_value, $1.line_number);
   check_wrong_arg_size($3, $1.token_value.s_value, scopes, $1.line_number);
   $$ = create_func_call_node($1, $3);
+  Symbol_Entry* entry = search_all_scopes(scopes, ($$->label + 5));
+  $$->value_type = entry->type;
 };
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
