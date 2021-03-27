@@ -5,5 +5,5 @@ bool coco(){
 }
 
 int testIOCommand() {
-  teste = !true;
+  teste = !true * 3 + 3;
 }

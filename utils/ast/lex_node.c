@@ -133,6 +133,9 @@ Node* create_binary_exp(Node *parent, Node *left_child, Node *right_child) {
   append_child(parent, left_child);
   append_child(parent, right_child);
 
+  //Inject new type by inference
+  parent->value_type = result_type_from(left_child->value_type, right_child->value_type);
+
   return parent;
 }
 

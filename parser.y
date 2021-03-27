@@ -289,7 +289,9 @@ param: var_qualifier type identifier
 *********** Expressions **************
 *************************************/
 
-assign_expression: ternary_expression { $$ = $1; };
+assign_expression: ternary_expression { $$ = $1; 
+                                        printf("Type: %i", $$->value_type);
+                                      };
 
 ternary_expression: or_expression { $$ = $1; }
                   | or_expression '?' assign_expression ':' ternary_expression { $$ = create_ternary_node($1, $3, $5); }
@@ -346,10 +348,8 @@ additive_operator: '+' { $$ = create_node_with_label("+", AST_BINARY_EXP); }
                  ;
 
 multiplicative_expression: exponential_expression { $$ = $1; }
-                         | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3);
-                                                                                                       
-                                                                                                    }
-                         ;
+                         | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3);};
+                                                                                                            
 
 multiplicative_operator: '*' { $$ = create_node_with_label("*", AST_BINARY_EXP); }
                        | '/' { $$ = create_node_with_label("/", AST_BINARY_EXP); }
@@ -366,7 +366,6 @@ unary_expression: basic_expression { $$ = $1; }
                 | unary_operator unary_expression { $$ = $1;
                                                     $$->value_type =  $2->value_type;
                                                     append_child($$, $2);
-                                                    printf("type: %i", $$->value_type);
                                                   }
                 ;
 
