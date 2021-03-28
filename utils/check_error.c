@@ -157,7 +157,8 @@ bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int 
     free(supplied_type_str);
 
     i++;
-    args = args->children[args->children_amount - 1];
+    if(args->children_amount > 0)
+      args = args->children[args->children_amount - 1];
     arg_list = arg_list->next;
   }
   return false;

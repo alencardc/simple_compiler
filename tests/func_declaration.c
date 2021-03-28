@@ -5,10 +5,9 @@ int a(int b, int c, int d, int e){
 float teste;
 
 int get_ui( float u1, bool gelo, int tristeza){
-    output "aiPapai";
+    output 3;
 }
 
 bool vazio(){
-    get_ui(20 + 1 + 32, !20, 2);
-    teste << + 26;
+    get_ui(2.0 + 3 + 7, !true, 2+ 3);
 }
