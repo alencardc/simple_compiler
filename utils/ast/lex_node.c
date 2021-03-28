@@ -145,6 +145,8 @@ Node* create_ternary_node(Node *left_child, Node *middle_child, Node *right_chil
   append_child(parent, middle_child);
   append_child(parent, right_child);
 
+  parent->value_type = result_type_from(middle_child->value_type, right_child->value_type);
+  
   return parent;
 }
 
