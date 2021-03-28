@@ -132,6 +132,37 @@ char* get_type_name(TokenValueType type){
   return type_name;
 }
 
+bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int line){
+  Symbol_Entry* entry = search_all_scopes(scopes, key);
+  Argument_List* arg_list = entry->arg_list;
+  int i = 1;
+  while(arg_list != NULL){
+    TokenValueType agr_type = arg_list->type;
+    TokenValueType supplied_type = args->value_type;
+
+    char* arg_type_str = get_type_name(agr_type);
+    char* supplied_type_str = get_type_name(supplied_type);
+
+    if(agr_type != supplied_type){
+      printf("[ERR_WRONG_TYPE_ARGS] The %i° argument of function call [%s()] is wrong at line %i. Expected: %s | Actual: %s\n",
+      i,
+      entry->key,
+      line,
+      arg_type_str,
+      supplied_type_str
+      );
+      exit(ERR_WRONG_TYPE_ARGS);
+    }
+    free(arg_type_str);
+    free(supplied_type_str);
+
+    i++;
+    args = args->children[args->children_amount - 1];
+    arg_list = arg_list->next;
+  }
+  return false;
+}
+
 bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int line){
   Symbol_Entry* entry = search_all_scopes(scopes, key);
  

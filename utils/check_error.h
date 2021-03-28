@@ -22,4 +22,5 @@ bool check_wrong_par_shift(LexValue value);
 char* get_type_name(TokenValueType type);
 
 bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int line);
+bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int line);
 #endif // __CHECK_ERROR_H__
