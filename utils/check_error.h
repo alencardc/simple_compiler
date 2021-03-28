@@ -10,6 +10,7 @@ bool check_type_cast(Node* node_cast, Node* node_test);
 bool check_identifier_undeclared(Table_Stack* scopes, char* key, int line);
 
 bool check_wrong_vector(Table_Stack* scopes, char* key, int line);
+bool check_for_wrong_vector_string(Id_List* id, TokenValueType type, int line);
 void errors_as_vector(Symbol_Entry* entry, int line);
 
 bool check_wrong_var(Table_Stack* scopes, char* key, int line);

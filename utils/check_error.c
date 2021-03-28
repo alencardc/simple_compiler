@@ -211,7 +211,6 @@ bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueT
   return false;
 }
 
-
 bool isTypeCompatible(TokenValueType type1, TokenValueType type2){
   if(type1 == type2)
     return true;
@@ -220,5 +219,17 @@ bool isTypeCompatible(TokenValueType type1, TokenValueType type2){
   bool isTestTypeValid = type2 == INTEGER_VAL || type2 == FLOAT_VAL || type2 == BOOL_VAL;
   
   return (isCastTypeValid == true && isTestTypeValid == true);
+  return false;
+}
+
+bool check_for_wrong_vector_string(Id_List* id, TokenValueType type, int line){
+  if(id == NULL)
+    return false;
+
+  if(id->vector_size > 1 && type == STRING_VAL){
+    printf("[ERR_STRING_VECTOR] Tried to declare \"%s\" as a string vector at line %i.\n", id->id ,line);
+    exit(ERR_STRING_VECTOR);
+  }
+
   return false;
 }
