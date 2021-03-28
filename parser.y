@@ -452,9 +452,13 @@ control_block_end: '}' { print_table_stack(scopes); scopes = pop_scope(scopes); 
 assign_command: identifier '=' assign_expression {  
                                                     check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
                                                     check_wrong_var(scopes, $1->label, $1->data->line_number);
+                                                    check_for_assignment_type_error(scopes, $1->label, $3, $1->data->line_number);
                                                     $$ = create_binary_tree("=", AST_ASSIGN,$1, $3); 
                                                   }
-              | vector_identifier '=' assign_expression { $$ = create_binary_tree("=", AST_ASSIGN, $1, $3); }
+              | vector_identifier '=' assign_expression { 
+                                                          check_for_vector_assignment_type_error($1, scopes, $3, get_line_number());            
+                                                          $$ = create_binary_tree("=", AST_ASSIGN, $1, $3); 
+                                                        }
               ;
 
 input_command: TK_PR_INPUT identifier {

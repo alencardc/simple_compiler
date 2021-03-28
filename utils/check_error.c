@@ -215,10 +215,10 @@ bool isTypeCompatible(TokenValueType type1, TokenValueType type2){
   if(type1 == type2)
     return true;
 
-  bool isCastTypeValid = type1 == INTEGER_VAL || type1 == FLOAT_VAL ||  type1 == BOOL_VAL;
-  bool isTestTypeValid = type2 == INTEGER_VAL || type2 == FLOAT_VAL || type2 == BOOL_VAL;
+  // bool isCastTypeValid = type1 == INTEGER_VAL || type1 == FLOAT_VAL ||  type1 == BOOL_VAL;
+  // bool isTestTypeValid = type2 == INTEGER_VAL || type2 == FLOAT_VAL || type2 == BOOL_VAL;
   
-  return (isCastTypeValid == true && isTestTypeValid == true);
+  // return (isCastTypeValid == true && isTestTypeValid == true);
   return false;
 }
 
@@ -232,4 +232,32 @@ bool check_for_wrong_vector_string(Id_List* id, TokenValueType type, int line){
   }
 
   return false;
+}
+
+bool check_for_assignment_type_error(Table_Stack* scopes, char* key, Node* value, int line){
+  Symbol_Entry* entry = search_all_scopes(scopes, key);
+
+  if(!isTypeCompatible(entry->type, value->value_type)){
+    char* variable_type = get_type_name(entry->type);
+    char* value_type = get_type_name(value->value_type);
+    printf("[ERR_WRONG_TYPE] Tried to assign a [%s] type to a variable of type [%s] at line %i.\n", value_type, variable_type, line);
+    exit(ERR_WRONG_TYPE);
+  }
+
+  return false;
+}
+
+bool check_for_vector_assignment_type_error(Node* vector_node, Table_Stack* scopes, Node* value, int line){
+  Node* id_node = vector_node->children[0];
+
+  Symbol_Entry* vector_entry = search_all_scopes(scopes, id_node->label);
+
+   if(!isTypeCompatible(vector_entry->type, value->value_type)){
+    char* variable_type = get_type_name(vector_entry->type);
+    char* value_type = get_type_name(value->value_type);
+    printf("[ERR_WRONG_TYPE] Tried to assign a [%s] type to a vector of type [%s] at line %i.\n", value_type, variable_type, line);
+    exit(ERR_WRONG_TYPE);
+  }
+
+  return false;  
 }

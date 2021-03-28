@@ -26,4 +26,7 @@ bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int 
 bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int line);
 bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueType type, int line);
 bool isTypeCompatible(TokenValueType type1, TokenValueType type2);
+
+bool check_for_assignment_type_error(Table_Stack* scopes, char* key, Node* value, int line);
+bool check_for_vector_assignment_type_error(Node* vector_node, Table_Stack* scopes, Node* value, int line);
 #endif // __CHECK_ERROR_H__
