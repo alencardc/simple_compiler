@@ -202,7 +202,7 @@ bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueT
   if(!isTypeCompatible(function_entry->type, type)){
     char* function_type_str = get_type_name(function_entry->type);
     char* supplied_type_str = get_type_name(type);
-    printf("[ERR_WRONG_PAR_RETURN] Returned type (%s) when function returns type (%s) at line %i.\n", supplied_type_str, function_type_str, line);
+    printf("[ERR_WRONG_PAR_RETURN] Returned type (%s) when function(\"%s\") has return type (%s) at line %i.\n", supplied_type_str, function_id ,function_type_str, line);
     free(supplied_type_str);
     free(function_type_str);
     exit(ERR_WRONG_PAR_RETURN);
@@ -220,4 +220,5 @@ bool isTypeCompatible(TokenValueType type1, TokenValueType type2){
   bool isTestTypeValid = type2 == INTEGER_VAL || type2 == FLOAT_VAL || type2 == BOOL_VAL;
   
   return (isCastTypeValid == true && isTestTypeValid == true);
+  return false;
 }
