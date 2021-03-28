@@ -300,9 +300,7 @@ param: var_qualifier type identifier
 *********** Expressions **************
 *************************************/
 
-assign_expression: ternary_expression { $$ = $1; 
-                                        printf("Type: %i", $$->value_type);
-                                      };
+assign_expression: ternary_expression { $$ = $1; };
 
 ternary_expression: or_expression { $$ = $1; }
                   | or_expression '?' assign_expression ':' ternary_expression { $$ = create_ternary_node($1, $3, $5); }
@@ -447,7 +445,7 @@ command: assign_command { $$ = $1; }
 control_block: control_block_start command_list control_block_end { $$ = $2; };
 block_command: control_block { $$ = $1; };
 control_block_start: '{' { scopes = push_new_scope(scopes, ""); };
-control_block_end: '}' { print_table_stack(scopes); scopes = pop_scope(scopes); };
+control_block_end: '}' { scopes = pop_scope(scopes); };
 
 assign_command: identifier '=' assign_expression {  
                                                     check_identifier_undeclared(scopes, $1->label, $1->data->line_number);

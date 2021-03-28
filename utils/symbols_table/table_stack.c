@@ -25,7 +25,6 @@ Symbol_Entry* search_all_scopes(Table_Stack* scopes, const char *key){
         Symbol_Entry* entry_queried = get_entry_from_table(key, current_symbol_table);
         
         if(entry_queried != NULL){
-            printf("\nFound at: %s\n", current_scope->id);
             return entry_queried;
         }
             
