@@ -35,6 +35,22 @@ Symbol_Entry* search_all_scopes(Table_Stack* scopes, const char *key){
     return NULL;
 }
 
+Symbol_Entry* search_deep_scope(Table_Stack* scopes, const char *key){
+    if(scopes == NULL)
+        return NULL;
+    
+    Table_Stack* current_scope = scopes;
+
+    while(current_scope->next != NULL){
+        current_scope = current_scope->next;
+    }
+
+    Symbol_Entry** table = current_scope->table;
+    Symbol_Entry* queried = get_entry_from_table(key, table);
+
+    return queried;
+}
+
 Table_Stack* pop_scope(Table_Stack *scopes){
     free(scopes->id);
     free_table(scopes->table);

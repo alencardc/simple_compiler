@@ -9,6 +9,7 @@ int yylex(void);
 void yyerror (char const *s);
 extern int get_line_number(void);
 
+char* function_id = NULL;
 Table_Stack* scopes = NULL;
 
 extern void *arvore;
@@ -136,6 +137,7 @@ extern void *arvore;
 %type <node> for
 
 %type <node> return
+%type <node> func_header
 
 %type <id_list> global_var_id
 %type <id_list> global_var_list
@@ -259,8 +261,8 @@ local_var_value: identifier {
 ******* Functions declaration ********
 *************************************/
 
-func_decl: storage_modifier type identifier '(' params ')' control_block {
-  if(scopes == NULL){
+func_header: storage_modifier type identifier '(' params ')'{
+   if(scopes == NULL){
       scopes = push_new_scope(scopes, "global");
   }
 
@@ -268,7 +270,15 @@ func_decl: storage_modifier type identifier '(' params ')' control_block {
   Symbol_Entry** current_scope = top_scope(scopes);
   int i = insert_entry_at_table(function, current_scope);
 
-  $$ = create_function_node($3, $7);
+  function_id = strdup($3->label);
+  $$ = $3;
+}
+
+func_decl: func_header control_block {
+  $$ = create_function_node($1, $2);
+  if(function_id != NULL){
+    free(function_id);
+  }
 };
 
 params: param_list { $$ = $1; }| %empty { $$ = NULL; };
@@ -505,7 +515,12 @@ control_commands: return { $$ = $1; }
                 | TK_PR_CONTINUE {$$ = create_node_with_label("continue", AST_CONTROL);}
                 ;
 
-return: TK_PR_RETURN assign_expression { $$ = create_node_with_label("return", AST_RETURN); append_child($$, $2);}; 
+return: TK_PR_RETURN assign_expression { 
+                                          $$ = create_node_with_label("return", AST_RETURN); 
+                                          append_child($$, $2);
+                                          check_wrong_return_type(function_id, scopes, $2->value_type, get_line_number());
+
+                                        }; 
 
 
 /*************************************

@@ -23,4 +23,6 @@ char* get_type_name(TokenValueType type);
 
 bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int line);
 bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int line);
+bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueType type, int line);
+bool isTypeCompatible(TokenValueType type1, TokenValueType type2);
 #endif // __CHECK_ERROR_H__
