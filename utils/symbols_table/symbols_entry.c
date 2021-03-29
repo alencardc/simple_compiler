@@ -186,7 +186,7 @@ int get_type_lenght(TokenValueType type){
     }
 }
 
-void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* scopes) {
+void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* scopes, int line) {
     Symbol_Entry** scope = top_scope(scopes);
 
     Node* node = list;
@@ -198,12 +198,21 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             Symbol_Entry* new_entry = create_local_entry(node_var->label, node_var->data->line_number, type);
 
             check_identifier_redeclared(scopes, node_var->label);
-            if (node_value->type == AST_IDENTIFIER || node_value->type == AST_VECTOR) {
-                check_identifier_undeclared(scopes, node_value->label, 0); //TODO: Perguntar ao alencar por que disso
+            if (node_value->type == AST_IDENTIFIER) {
+                check_identifier_undeclared(scopes, node_value->label, 0);
+                check_wrong_var(scopes, node_value->label, line); 
+                node_value->value_type = search_all_scopes(scopes, node_value->label)->type;
+                check_for_local_init_type_error(new_entry, node_value, line);
 
                 // check identifier type
+            } else if(node_value->type == AST_VECTOR){
+                Node* id = node_value->children[0];
+                check_identifier_undeclared(scopes,id->label, 0);
+                check_wrong_vector(scopes, id->label, line); 
+                id->value_type = search_all_scopes(scopes, id->label)->type;
+                check_for_local_init_type_error(new_entry, id, line);
             } else { // AST_LITERAL
-                //check_type_cast(node_var, node_value);
+                check_for_local_init_type_error(new_entry, node_value, line);
                 Symbol_Entry* literal_entry = create_literal_entry(
                     node_value->label,
                     node_value->data->token_value,
@@ -211,7 +220,6 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
                     node_value->data->value_type);
                 insert_entry_at_table(literal_entry, scope);
             }
-
             insert_entry_at_table(new_entry, scope);
         } else if (node->type == AST_IDENTIFIER) {
             check_identifier_redeclared(scopes, node->label);

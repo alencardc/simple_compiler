@@ -29,4 +29,6 @@ bool isTypeCompatible(TokenValueType type1, TokenValueType type2);
 
 bool check_for_assignment_type_error(Table_Stack* scopes, char* key, Node* value, int line);
 bool check_for_vector_assignment_type_error(Node* vector_node, Table_Stack* scopes, Node* value, int line);
+
+bool check_for_local_init_type_error(Symbol_Entry* entry, Node* value, int line);
 #endif // __CHECK_ERROR_H__

@@ -21,6 +21,9 @@ bool check_type_cast(Node* node_cast, Node* node_test) {
     return false;
   }
 
+  printf("cast_type: %i", cast_type);
+  printf("test_type: %i", test_type);
+
   printf("Tipo errado");
   exit(ERR_WRONG_TYPE);
 }
@@ -260,4 +263,19 @@ bool check_for_vector_assignment_type_error(Node* vector_node, Table_Stack* scop
   }
 
   return false;  
+}
+
+bool check_for_local_init_type_error(Symbol_Entry* entry, Node* value, int line){
+  TokenValueType id_type = entry->type;
+  TokenValueType value_type = value->value_type;
+
+
+  if(!isTypeCompatible(id_type, value_type)){
+    char* id_type_str = get_type_name(id_type);
+    char* value_type_str = get_type_name(value_type);
+    printf("[ERR_WRONG_TYPE] Wrong initialization at line %i. Identifier \"%s\" expecting %s value, but %s was supplied.\n", line, entry->key, id_type_str, value_type_str);    
+    exit(ERR_WRONG_TYPE);
+  }
+
+  return false;
 }

@@ -180,12 +180,12 @@ type: TK_PR_INT  { $$ = INTEGER_VAL; }
     | TK_PR_CHAR { $$ = CHAR_VAL; }
     | TK_PR_STRING { $$ = STRING_VAL; };
 
-literal: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); }
-       | TK_LIT_FLOAT { $$ = create_node_with_lex($1, AST_LITERAL); }
-       | TK_LIT_FALSE { $$ = create_node_with_lex($1, AST_LITERAL); }
-       | TK_LIT_TRUE { $$ = create_node_with_lex($1, AST_LITERAL); }
-       | TK_LIT_CHAR { $$ = create_node_with_lex($1, AST_LITERAL); }
-       | TK_LIT_STRING { $$ = create_node_with_lex($1, AST_LITERAL); }
+literal: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); $$->value_type = INTEGER_VAL; }
+       | TK_LIT_FLOAT { $$ = create_node_with_lex($1, AST_LITERAL); $$->value_type = FLOAT_VAL;}
+       | TK_LIT_FALSE { $$ = create_node_with_lex($1, AST_LITERAL); $$->value_type = BOOL_VAL; }
+       | TK_LIT_TRUE { $$ = create_node_with_lex($1, AST_LITERAL); $$->value_type = BOOL_VAL; }
+       | TK_LIT_CHAR { $$ = create_node_with_lex($1, AST_LITERAL); $$->value_type = CHAR_VAL; }
+       | TK_LIT_STRING { $$ = create_node_with_lex($1, AST_LITERAL); $$->value_type = STRING_VAL;}
        ;
 
 
@@ -236,7 +236,7 @@ vector_length: TK_LIT_INT {$$ = $1;} | '+' TK_LIT_INT {$$ = $2;};
 *************************************/
 
 local_decl: storage_modifier var_qualifier type local_var_list {
-  insert_local_entry_from_list($4, $3, scopes);
+  insert_local_entry_from_list($4, $3, scopes, get_line_number());
   $$ = free_all_id_nodes($4);
 };
 
@@ -255,7 +255,7 @@ local_var_value: identifier {
   check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
   check_wrong_var(scopes, $1->label, $1->data->line_number);
   $$ = $1;
-} | vector_identifier | literal ;
+} | vector_identifier {$$ = $1;} | literal  { $$ = $1; };
 
 
 /*************************************

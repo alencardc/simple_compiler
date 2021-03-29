@@ -36,6 +36,6 @@ int get_number_of_args_from_list(Argument_List* list);
 int get_type_lenght(TokenValueType type);
 
 // Local var
-void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* scopes);
+void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* scopes, int line);
 
 #endif // __SYMBOLS_ENTRY_H__
