@@ -92,6 +92,27 @@ void errors_as_var(Symbol_Entry* entry, int line){
   }
 }
 
+bool check_wrong_function(Table_Stack* scopes, char* key, int line){
+  Symbol_Entry* queryEntry = search_all_scopes(scopes, key);
+  if(queryEntry != NULL && queryEntry->nature != FUNCTION){
+    errors_as_function(queryEntry, line);
+  }
+
+  return false;
+}
+
+void errors_as_function(Symbol_Entry* entry, int line){
+  switch (entry->nature){
+    case VECTOR:  printf("[ERR_VECTOR] Vector '%s' was used as a function at line %i.\n", entry->key, line);
+      exit(ERR_VECTOR);
+      break;
+    case VAR:  printf("[ERR_VARIABLE] Variable '%s' was used as a function at line %i.\n", entry->key, line);
+      exit(ERR_VARIABLE);
+    default:
+      break;
+  }
+}
+
 bool check_char_to_x(TokenValueType type1, TokenValueType type2, int line) {
   if (type1 == CHAR_VAL && type2 != CHAR_VAL
     || type2 == CHAR_VAL && type1 != CHAR_VAL) {
