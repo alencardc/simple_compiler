@@ -234,3 +234,23 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
         }
     }
 }
+
+void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
+    Symbol_Entry* func_entry = search_all_scopes(scopes, function_id);
+    Argument_List* arg_list = func_entry->arg_list;
+
+    Symbol_Entry** func_scope = top_scope(scopes);
+
+    while(arg_list != NULL){
+        Symbol_Entry* new_symbol_entry = create_symbol_entry(arg_list->id, 
+                                                            func_entry->line_number, 
+                                                            VAR,
+                                                            arg_list->type,
+                                                            get_type_lenght(arg_list->type),
+                                                            (TokenValue) 0
+                                                            );
+                            
+        insert_entry_at_table(new_symbol_entry, func_scope);
+        arg_list = arg_list->next;
+    }
+}

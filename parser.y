@@ -10,6 +10,7 @@ void yyerror (char const *s);
 extern int get_line_number(void);
 
 char* function_id = NULL;
+bool is_function_block = false;
 Table_Stack* scopes = NULL;
 
 extern void *arvore;
@@ -272,6 +273,7 @@ func_header: storage_modifier type identifier '(' params ')'{
   int i = insert_entry_at_table(function, current_scope);
 
   function_id = strdup($3->label);
+  is_function_block = true;
   $$ = $3;
 }
 
@@ -444,7 +446,14 @@ command: assign_command { $$ = $1; }
 
 control_block: control_block_start command_list control_block_end { $$ = $2; };
 block_command: control_block { $$ = $1; };
-control_block_start: '{' { scopes = push_new_scope(scopes, ""); };
+control_block_start: '{' { 
+                            scopes = push_new_scope(scopes, "");
+                            if(is_function_block){
+                              insert_arg_list_at_func_scope(function_id, scopes);
+                              //Switch bool value to only insert once
+                              is_function_block = false;
+                            } 
+                         };
 control_block_end: '}' { scopes = pop_scope(scopes); };
 
 assign_command: identifier '=' assign_expression {  
