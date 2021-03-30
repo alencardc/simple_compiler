@@ -71,10 +71,10 @@ bool check_wrong_var(Table_Stack* scopes, char* key, int line){
 
 void errors_as_var(Symbol_Entry* entry, int line){
   switch (entry->nature){
-    case VECTOR:  printf("[ERR_VECTOR] Vector \"%s\" was used as a Variable at line %i.\n", entry->key, line);
+    case VECTOR:  printf("[ERR_VECTOR] Vector '%s' was used as a variable at line %i.\n", entry->key, line);
       exit(ERR_VECTOR);
       break;
-    case FUNCTION:  printf("[ERR_FUNCTION] Function \"%s\" was used as a Variable at line %i.\n", entry->key, line);
+    case FUNCTION:  printf("[ERR_FUNCTION] Function '%s' was used as a variable at line %i.\n", entry->key, line);
       exit(ERR_FUNCTION);
     default:
       break;
@@ -85,9 +85,9 @@ bool check_char_to_x(TokenValueType type1, TokenValueType type2, int line) {
   if (type1 == CHAR_VAL && type2 != CHAR_VAL
     || type2 == CHAR_VAL && type1 != CHAR_VAL) {
       TokenValueType coercion_type = type1 == CHAR_VAL ? type2 : type1;
-      const char* type_string = token_value_type_to_string(coercion_type);
-      printf("[ERR_CHAR_TO_X] tried to do an implicit coercion of type CHAR to "
-        "type %s at line %d\n", type_string, line);
+      const char* type_string = get_type_name(coercion_type);
+      printf("[ERR_CHAR_TO_X] Tried to do an implicit coercion of type 'char' to "
+        "type %s at line %d.\n", type_string, line);
 
       exit(ERR_CHAR_TO_X);
   }
@@ -99,9 +99,9 @@ bool check_string_to_x(TokenValueType type1, TokenValueType type2, int line) {
   if (type1 == STRING_VAL && type2 != STRING_VAL
     || type2 == STRING_VAL && type1 != STRING_VAL) {
       TokenValueType coercion_type = type1 == STRING_VAL ? type2 : type1;
-      const char* type_string = token_value_type_to_string(coercion_type);
-      printf("[ERR_STRING_TO_X] tried to do an implicit coercion of type STRING "
-        "to type %s at line %d\n", type_string, line);
+      const char* type_string = get_type_name(coercion_type);
+      printf("[ERR_STRING_TO_X] Tried to do an implicit coercion of type 'string' "
+        "to type %s at line %d.\n", type_string, line);
 
       exit(ERR_STRING_TO_X);
   }
@@ -297,7 +297,7 @@ bool check_for_assignment_type_error(Table_Stack* scopes, char* key, Node* value
   if(!is_type_compatible(entry->type, value->value_type)){
     char* variable_type = get_type_name(entry->type);
     char* value_type = get_type_name(value->value_type);
-    printf("[ERR_WRONG_TYPE] Tried to assign a [%s] type to a variable of type [%s] at line %i.\n", value_type, variable_type, line);
+    printf("[ERR_WRONG_TYPE] Tried to assign a '%s' type to a variable of type '%s' at line %i.\n", value_type, variable_type, line);
     exit(ERR_WRONG_TYPE);
   }
 
@@ -312,7 +312,7 @@ bool check_for_vector_assignment_type_error(Node* vector_node, Table_Stack* scop
    if(!is_type_compatible(vector_entry->type, value->value_type)){
     char* variable_type = get_type_name(vector_entry->type);
     char* value_type = get_type_name(value->value_type);
-    printf("[ERR_WRONG_TYPE] Tried to assign a [%s] type to a vector of type [%s] at line %i.\n", value_type, variable_type, line);
+    printf("[ERR_WRONG_TYPE] Tried to assign a '%s' type to a vector of type '%s' at line %i.\n", value_type, variable_type, line);
     exit(ERR_WRONG_TYPE);
   }
 
@@ -327,7 +327,7 @@ bool check_for_local_init_type_error(Symbol_Entry* entry, Node* value, int line)
   if(!is_type_compatible(id_type, value_type)){
     char* id_type_str = get_type_name(id_type);
     char* value_type_str = get_type_name(value_type);
-    printf("[ERR_WRONG_TYPE] Wrong initialization at line %i. Identifier \"%s\" expecting %s value, but %s was supplied.\n", line, entry->key, id_type_str, value_type_str);    
+    printf("[ERR_WRONG_TYPE] Wrong initialization at line %i. Identifier '%s' expecting '%s' value, but '%s' was supplied.\n", line, entry->key, id_type_str, value_type_str);    
     exit(ERR_WRONG_TYPE);
   }
 
