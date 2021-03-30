@@ -1,12 +1,13 @@
 #include "../errors.h"
 #include "check_error.h"
 
-bool check_identifier_redeclared(Table_Stack* scopes, char* key){
+bool check_identifier_redeclared(Table_Stack* scopes, char* key, int line){
   Symbol_Entry** scope = top_scope(scopes);
 
   Symbol_Entry* queryEntry = get_entry_from_table(key, scope);
   if(queryEntry != NULL){
-    printf("Já declarado");
+    printf("[ERR_DECLARED] Identifier '%s' redeclared at line %d was previously "
+      "declared at line %d.\n", key, line, queryEntry->line_number);
     exit(ERR_DECLARED);
   }
   return false;
@@ -31,7 +32,7 @@ bool check_type_cast(Node* node_cast, Node* node_test) {
 bool check_identifier_undeclared(Table_Stack* scopes, char* key, int line) {
   Symbol_Entry* queryEntry = search_all_scopes(scopes, key);
   if(queryEntry == NULL) {
-    printf("[ERR_UNDECLARED] Identifier \"%s\" used without previous declaration at line %i.\n", key, line);
+    printf("[ERR_UNDECLARED] Identifier '%s' at line %i was used without a previous declaration.\n", key, line);
     exit(ERR_UNDECLARED);
   }
 
@@ -49,10 +50,10 @@ bool check_wrong_vector(Table_Stack* scopes, char* key, int line){
 
 void errors_as_vector(Symbol_Entry* entry, int line){
   switch (entry->nature){
-    case VAR: printf("[ERR_VARIABLE] Variable \"%s\" was used as a Vector at line %i.\n", entry->key, line);
+    case VAR: printf("[ERR_VARIABLE] Variable '%s' was used as a vector at line %i.\n", entry->key, line);
       exit(ERR_VARIABLE);
       break;
-    case FUNCTION: printf("[ERR_FUNCTION] Function \"%s\" was used as a Vector at line %i.\n", entry->key, line);
+    case FUNCTION: printf("[ERR_FUNCTION] Function '%s' was used as a vector at line %i.\n", entry->key, line);
       exit(ERR_FUNCTION);
     default:
       break;
@@ -218,14 +219,14 @@ bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int 
   int actual_arg_size = get_number_of_args_from_node(args);
  
   if(actual_arg_size > declaration_arg_size){
-    printf("[ERR_EXCESS_ARGS] Function \"%s\" expecting %i arguments(s) but was called with %i at line %i.\n", 
+    printf("[ERR_EXCESS_ARGS] Function '%s' expecting %i argument(s) but was called at line %i with %i argument(s).\n", 
             key, 
             declaration_arg_size, 
             actual_arg_size, 
             line);
     exit(ERR_EXCESS_ARGS);
   } else if(declaration_arg_size > actual_arg_size){
-    printf("[ERR_MISSING_ARGS] Function \"%s\" expecting %i arguments(s) but was called with %i at line %i.\n", 
+    printf("[ERR_MISSING_ARGS] Function '%s' expecting %i argument(s) but was called at line %i with only %i argument(s).\n", 
             key, 
             declaration_arg_size, 
             actual_arg_size, 

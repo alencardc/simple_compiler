@@ -4,7 +4,7 @@
 
 #include <stdbool.h>
 
-bool check_identifier_redeclared(Table_Stack* scopes, char* key);
+bool check_identifier_redeclared(Table_Stack* scopes, char* key, int line);
 
 bool check_type_cast(Node* node_cast, Node* node_test);
 bool check_identifier_undeclared(Table_Stack* scopes, char* key, int line);

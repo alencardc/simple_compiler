@@ -202,7 +202,7 @@ global_decl_list: storage_modifier type global_var_list ';'{
     Symbol_Entry** global_scope = top_scope(scopes);
 
     while(id_list != NULL){
-      if(!check_identifier_redeclared(scopes,id_list->id)){
+      if(!check_identifier_redeclared(scopes,id_list->id, get_line_number())){
         check_for_wrong_vector_string(id_list, $2, get_line_number());
         Symbol_Entry* new_entry = create_id_entry(id_list, $2);
       

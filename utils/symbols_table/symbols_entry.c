@@ -204,7 +204,7 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             Symbol_Entry* new_entry = create_local_entry(node_var->label, node_var->data->line_number, type);
 
             
-            check_identifier_redeclared(scopes, node_var->label);
+            check_identifier_redeclared(scopes, node_var->label, line);
             if (node_value->type == AST_IDENTIFIER) {
                 check_identifier_undeclared(scopes, node_value->label, 0);
                 check_wrong_var(scopes, node_value->label, line); 
@@ -237,7 +237,7 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             }
             insert_entry_at_table(new_entry, scope);
         } else if (node->type == AST_IDENTIFIER) {
-            check_identifier_redeclared(scopes, node->label);
+            check_identifier_redeclared(scopes, node->label, line);
             Symbol_Entry* new_entry = create_local_entry(node->label, node->data->line_number, type);
             if(new_entry->type == STRING_VAL){
                 new_entry->length = 0; //Strings não inicializadas tem tamanho 0.
