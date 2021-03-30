@@ -13,6 +13,17 @@ bool check_identifier_redeclared(Table_Stack* scopes, char* key, int line){
   return false;
 }
 
+bool check_arg_redeclared(Table_Stack* scopes, char* key, int arg_number_err, int line){
+  Symbol_Entry** scope = top_scope(scopes);
+
+  Symbol_Entry* queryEntry = get_entry_from_table(key, scope);
+  if(queryEntry != NULL){
+    printf("[ERR_DECLARED] %i° argument \'%s\' redeclared was previously declared as argument of the same function at line %d.\n", arg_number_err, key, queryEntry->line_number);
+    exit(ERR_DECLARED);
+  }
+  return false;
+}
+
 bool check_type_cast(Node* node_cast, Node* node_test) {
   TokenValueType cast_type = node_cast->data->value_type;
   TokenValueType test_type = node_test->data->value_type;
@@ -76,6 +87,27 @@ void errors_as_var(Symbol_Entry* entry, int line){
       break;
     case FUNCTION:  printf("[ERR_FUNCTION] Function '%s' was used as a variable at line %i.\n", entry->key, line);
       exit(ERR_FUNCTION);
+    default:
+      break;
+  }
+}
+
+bool check_wrong_function(Table_Stack* scopes, char* key, int line){
+  Symbol_Entry* queryEntry = search_all_scopes(scopes, key);
+  if(queryEntry != NULL && queryEntry->nature != FUNCTION){
+    errors_as_function(queryEntry, line);
+  }
+
+  return false;
+}
+
+void errors_as_function(Symbol_Entry* entry, int line){
+  switch (entry->nature){
+    case VECTOR:  printf("[ERR_VECTOR] Vector '%s' was used as a function at line %i.\n", entry->key, line);
+      exit(ERR_VECTOR);
+      break;
+    case VAR:  printf("[ERR_VARIABLE] Variable '%s' was used as a function at line %i.\n", entry->key, line);
+      exit(ERR_VARIABLE);
     default:
       break;
   }
@@ -348,14 +380,14 @@ bool check_error_string_max(Table_Stack* scopes, char* key, Node* value, int lin
   if(var_entry->type == STRING_VAL && value->type == AST_LITERAL && value->value_type == STRING_VAL){
     int value_length = strlen(value->data->token_value.s_value);
 
-    if(entry_length != value_length){
+    if(entry_length < value_length){
       printf("[ERR_STRING_MAX] Tried to assign a string of length %i to a string variable '%s' of length %i at line %i.\n", value_length, key, entry_length, line);
       exit(ERR_STRING_MAX);
     }
   } else if(var_entry->type == STRING_VAL && value->type == AST_IDENTIFIER){
     Symbol_Entry* var_value_entry = search_all_scopes(scopes, value->label);
 
-    if(var_value_entry->type == STRING_VAL && var_value_entry->length != entry_length){
+    if(var_value_entry->type == STRING_VAL &&  entry_length < var_value_entry->length){
        printf("[ERR_STRING_MAX] Tried to assign a string variable of length %i to a string variable(\"%s\") of length %i, at line %i.\n", var_value_entry->length, key, entry_length, line);
        exit(ERR_STRING_MAX);
     }

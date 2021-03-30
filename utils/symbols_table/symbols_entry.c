@@ -121,10 +121,15 @@ void print_id_list(Id_List* list){
     }
 }
 
+//TODO: Rename to create_global_id_entry to avoid problems 
 Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
     Symbol_Nature nature = id_list->vector_size > 1 ? VECTOR : VAR;
     int size = get_type_lenght(type);
     size = id_list->vector_size * size;
+
+    //When we create a string global, its value is always 0 because we never initialize it
+    if(type == STRING_VAL)
+        size = 0;
 
     Symbol_Entry* new_entry = create_symbol_entry(id_list->id, 
                                   id_list->line_number,
@@ -258,7 +263,7 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
     Argument_List* arg_list = func_entry->arg_list;
 
     Symbol_Entry** func_scope = top_scope(scopes);
-
+    int i = 1;
     while(arg_list != NULL){
         Symbol_Entry* new_symbol_entry = create_symbol_entry(arg_list->id, 
                                                             func_entry->line_number, 
@@ -267,8 +272,9 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
                                                             get_type_lenght(arg_list->type),
                                                             (TokenValue) 0
                                                             );
-                            
+        check_arg_redeclared(scopes, arg_list->id, i, get_line_number());
         insert_entry_at_table(new_symbol_entry, func_scope);
         arg_list = arg_list->next;
+        i++;
     }
 }

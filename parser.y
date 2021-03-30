@@ -524,6 +524,7 @@ shift_number: TK_LIT_INT {
 
 function_call: TK_IDENTIFICADOR '(' arguments ')' {
   check_identifier_undeclared(scopes, $1.token_value.s_value, $1.line_number);
+  check_wrong_function(scopes, $1.token_value.s_value,$1.line_number);
   check_wrong_arg_size($3, $1.token_value.s_value, scopes, $1.line_number);
   check_wrong_arg_type($3, $1.token_value.s_value, scopes, $1.line_number);
   $$ = create_func_call_node($1, $3);
