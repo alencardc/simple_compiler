@@ -375,14 +375,14 @@ bool check_error_string_max(Table_Stack* scopes, char* key, Node* value, int lin
   if(var_entry->type == STRING_VAL && value->type == AST_LITERAL && value->value_type == STRING_VAL){
     int value_length = strlen(value->data->token_value.s_value);
 
-    if(entry_length != value_length){
+    if(entry_length < value_length){
       printf("[ERR_STRING_MAX] Tried to assign a string of length %i to a string variable '%s' of length %i at line %i.\n", value_length, key, entry_length, line);
       exit(ERR_STRING_MAX);
     }
   } else if(var_entry->type == STRING_VAL && value->type == AST_IDENTIFIER){
     Symbol_Entry* var_value_entry = search_all_scopes(scopes, value->label);
 
-    if(var_value_entry->type == STRING_VAL && var_value_entry->length != entry_length){
+    if(var_value_entry->type == STRING_VAL &&  entry_length < var_value_entry->length){
        printf("[ERR_STRING_MAX] Tried to assign a string variable of length %i to a string variable(\"%s\") of length %i, at line %i.\n", var_value_entry->length, key, entry_length, line);
        exit(ERR_STRING_MAX);
     }
