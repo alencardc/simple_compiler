@@ -121,9 +121,9 @@ bool check_wrong_par_input(int line, const char* key, Table_Stack* scopes) {
     return false;
   }
 
-  const char* type_string = token_value_type_to_string(entry->type);
-  printf("[ERR_WRONG_PAR_INPUT] \"input\" command at line %d expected a "
-    "parameter of type INTEGER or FLOAT, but the value \"%s\" is of type %s\n",
+  const char* type_string = get_type_name(entry->type);
+  printf("[ERR_WRONG_PAR_INPUT] 'input' command at line %d expected a "
+    "parameter of type 'int' or 'float', but '%s' is of type '%s'.\n",
     line, key, type_string);
   exit(ERR_WRONG_PAR_INPUT);
 }
@@ -143,7 +143,8 @@ bool check_wrong_par_output(const char* key, LexValue literal, Table_Stack* scop
   
   if(type != FLOAT_VAL && type != INTEGER_VAL){
     char* type_name = get_type_name(type);
-    printf("[ERR_WRONG_PAR_OUTPUT] Output command expects (float/integer) value but type (%s) was supplied at line %i.\n", get_type_name(type), line);
+    printf("[ERR_WRONG_PAR_OUTPUT] Output command expects 'float' or 'integer' "
+      "value, but type '%s' was supplied at line %i.\n", get_type_name(type), line);
     free(type_name);
     exit(ERR_WRONG_PAR_OUTPUT);
   }
@@ -175,7 +176,8 @@ bool check_function_string_par(TokenValueType type, int line) {
     return false;
   }
 
-  printf("[ERR_FUNCTION_STRING] Parameter declared at line %d is of type 'string'. "
+  printf("[ERR_FUNCTION_STRING] Parameter declared at line %d on function "
+    "declaration is of type 'string'. "
     "Function's parameters can not be 'string'.\n", line);
   exit(ERR_FUNCTION_STRING);
 }
@@ -239,7 +241,9 @@ bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int 
 
 bool check_wrong_par_shift(LexValue value){
   if(value.token_value.i_val > 16){
-    printf("[ERR_WRONG_PAR_SHIFT] Shift command used a value (%i) greater than 16 at line %i.\n", value.token_value.i_val, value.line_number);
+    printf("[ERR_WRONG_PAR_SHIFT] Shift command used with value '%i' that is "
+      "greater than 16 at line %i. The parameter of a shift command must be less than 16.\n",
+      value.token_value.i_val, value.line_number);
     exit(ERR_WRONG_PAR_SHIFT);
   }
   return false;
@@ -262,7 +266,8 @@ bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueT
 
 bool check_string_return_type(TokenValueType type, int line){
   if(type == STRING_VAL){
-    printf("[ERR_FUNCTION_STRING] Returned type 'string' on line %i. Functions can't return 'string's.\n", line);
+    printf("[ERR_FUNCTION_STRING] Return type 'string' on function declaration "
+      "at line %i is not possible. Functions can't return 'string's.\n", line);
     exit(ERR_FUNCTION_STRING);
   }
 
