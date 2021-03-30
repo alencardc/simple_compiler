@@ -162,6 +162,10 @@ Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type)
 }
 
 Symbol_Entry* create_literal_entry(const char* key, TokenValue value, int line, TokenValueType type) {
+    if(type == STRING_VAL || type == CHAR_VAL){
+        value.s_value = strdup(value.s_value);
+    }
+
     Symbol_Entry* new_entry = create_symbol_entry(
         key, 
         line,
@@ -202,9 +206,11 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             if (node_value->type == AST_IDENTIFIER) {
                 check_identifier_undeclared(scopes, node_value->label, 0);
                 check_wrong_var(scopes, node_value->label, line); 
-                node_value->value_type = search_all_scopes(scopes, node_value->label)->type;
-                check_for_local_init_type_error(new_entry, node_value, line);
 
+                Symbol_Entry* value_entry =  search_all_scopes(scopes, node_value->label);
+                node_value->value_type = value_entry->type;
+                new_entry->length = value_entry->length;
+                check_for_local_init_type_error(new_entry, node_value, line);
                 // check identifier type
             } else if(node_value->type == AST_VECTOR){
                 Node* id = node_value->children[0];
@@ -220,11 +226,20 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
                     node_value->data->line_number,
                     node_value->data->value_type);
                 insert_entry_at_table(literal_entry, scope);
+
+                if(literal_entry->type == STRING_VAL){
+                    int length_multiplier = strlen(literal_entry->value.s_value);
+                    new_entry->length = new_entry->length * length_multiplier;
+                    literal_entry->length = literal_entry->length * length_multiplier;
+                }
             }
             insert_entry_at_table(new_entry, scope);
         } else if (node->type == AST_IDENTIFIER) {
             check_identifier_redeclared(scopes, node->label);
             Symbol_Entry* new_entry = create_local_entry(node->label, node->data->line_number, type);
+            if(new_entry->type == STRING_VAL){
+                new_entry->length = 0; //Strings não inicializadas tem tamanho 0.
+            }
             insert_entry_at_table(new_entry, scope);
         }
 
