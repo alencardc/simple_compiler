@@ -223,7 +223,7 @@ bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int 
     char* arg_type_str = get_type_name(agr_type);
     char* supplied_type_str = get_type_name(supplied_type);
 
-    if(agr_type != supplied_type){
+    if(!is_type_compatible(agr_type, supplied_type)){
       printf("[ERR_WRONG_TYPE_ARGS] The %i° argument of function call '%s()' is "
       "of wrong type at line %i. Expected type '%s', but value of type '%s' was given.\n",
       i,
@@ -309,7 +309,6 @@ bool is_type_compatible(TokenValueType type1, TokenValueType type2){
   bool is_test_type_valid = type2 == INTEGER_VAL || type2 == FLOAT_VAL || type2 == BOOL_VAL;
   
   return (is_cast_type_valid == true && is_test_type_valid == true);
-  return false;
 }
 
 bool check_for_wrong_vector_string(Id_List* id, TokenValueType type, int line){
