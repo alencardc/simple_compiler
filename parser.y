@@ -153,7 +153,7 @@ extern void *arvore;
 
 %%
 
-root: programa { arvore = (void*)$1; print_table_stack(scopes); }
+root: programa { arvore = (void*)$1; print_table_stack(scopes); pop_scope(scopes); }
 
 programa: global_decl_list programa {$$ = $2;};
         | func_decl programa { $$ = $1; append_child($$, $2); }
@@ -250,7 +250,7 @@ local_var_list: local_var_init { $$ = $1; }
               ;*/
 
 local_var_init: identifier { $$ = $1; }
-              | identifier TK_OC_LE local_var_value { $$ = create_binary_tree("<=", AST_ASSIGN, $1, $3); }
+              | identifier TK_OC_LE local_var_value { $$ = create_binary_tree("<=", AST_ASSIGN, $1, $3); free($2.token_value.s_value); }
               ;
 
 //local_var_operator: TK_OC_LE { $$ = create_node_with_lex($1, AST_ASSIGN); }
