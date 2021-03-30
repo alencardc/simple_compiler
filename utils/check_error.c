@@ -248,6 +248,15 @@ bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueT
   return false;
 }
 
+bool check_string_return_type(TokenValueType type, int line){
+  if(type == STRING_VAL){
+    printf("[ERR_FUNCTION_STRING] Returned type string on line %i. Functions can never return strings.\n", line);
+    exit(ERR_FUNCTION_STRING);
+  }
+
+  return false;
+}
+
 bool is_type_compatible(TokenValueType type1, TokenValueType type2){
   if(type1 == type2)
     return true;
@@ -309,6 +318,30 @@ bool check_for_local_init_type_error(Symbol_Entry* entry, Node* value, int line)
     char* value_type_str = get_type_name(value_type);
     printf("[ERR_WRONG_TYPE] Wrong initialization at line %i. Identifier \"%s\" expecting %s value, but %s was supplied.\n", line, entry->key, id_type_str, value_type_str);    
     exit(ERR_WRONG_TYPE);
+  }
+
+  return false;
+}
+
+bool check_error_string_max(Table_Stack* scopes, char* key, Node* value, int line){
+  Symbol_Entry* var_entry = search_all_scopes(scopes, key);
+  int entry_length = var_entry->length;
+
+
+  if(var_entry->type == STRING_VAL && value->type == AST_LITERAL && value->value_type == STRING_VAL){
+    int value_length = strlen(value->data->token_value.s_value);
+
+    if(entry_length != value_length){
+      printf("[ERR_STRING_MAX] Tried to assign a string of length %i to a string variable(\"%s\") of length %i, at line %i.\n", value_length, key, entry_length, line);
+      exit(ERR_STRING_MAX);
+    }
+  } else if(var_entry->type == STRING_VAL && value->type == AST_IDENTIFIER){
+    Symbol_Entry* var_value_entry = search_all_scopes(scopes, value->label);
+
+    if(var_value_entry->type == STRING_VAL && var_value_entry->length != entry_length){
+       printf("[ERR_STRING_MAX] Tried to assign a string variable of length %i to a string variable(\"%s\") of length %i, at line %i.\n", var_value_entry->length, key, entry_length, line);
+       exit(ERR_STRING_MAX);
+    }
   }
 
   return false;

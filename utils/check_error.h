@@ -16,6 +16,7 @@ void errors_as_vector(Symbol_Entry* entry, int line);
 bool check_wrong_var(Table_Stack* scopes, char* key, int line);
 void errors_as_var(Symbol_Entry* entry, int line);
 
+bool check_error_string_max(Table_Stack* scopes, char* key, Node* value, int line);
 bool check_char_to_x(TokenValueType type1, TokenValueType type2, int line);
 bool check_string_to_x(TokenValueType type1, TokenValueType type2, int line);
 bool check_invalid_coercion(TokenValueType type1, TokenValueType type2, int line);
