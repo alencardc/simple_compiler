@@ -460,6 +460,7 @@ assign_command: identifier '=' assign_expression {
                                                     check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
                                                     check_wrong_var(scopes, $1->label, $1->data->line_number);
                                                     check_for_assignment_type_error(scopes, $1->label, $3, $1->data->line_number);
+                                                    check_error_string_max(scopes, $1->label, $3, get_line_number());
                                                     $$ = create_binary_tree("=", AST_ASSIGN,$1, $3); 
                                                   }
               | vector_identifier '=' assign_expression { 
@@ -531,7 +532,6 @@ return: TK_PR_RETURN assign_expression {
                                           $$ = create_node_with_label("return", AST_RETURN); 
                                           append_child($$, $2);
                                           check_wrong_return_type(function_id, scopes, $2->value_type, get_line_number());
-
                                         }; 
 
 

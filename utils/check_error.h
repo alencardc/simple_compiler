@@ -16,6 +16,8 @@ void errors_as_vector(Symbol_Entry* entry, int line);
 bool check_wrong_var(Table_Stack* scopes, char* key, int line);
 void errors_as_var(Symbol_Entry* entry, int line);
 
+bool check_error_string_max(Table_Stack* scopes, char* key, Node* value, int line);
+
 bool check_wrong_par_input(int line, const char* key, Table_Stack* scopes);
 bool check_wrong_par_output(const char* key, LexValue literal, Table_Stack* scopes, int line);
 bool check_wrong_par_shift(LexValue value);
