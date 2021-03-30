@@ -81,7 +81,7 @@ extern void *arvore;
 %type <node> local_var_list
 %type <node> local_decl
 %type <node> local_var_value
-%type <node> local_var_operator
+//%type <node> local_var_operator
 
 %type <node> assign_expression;
 %type <node> ternary_expression
@@ -245,11 +245,15 @@ local_var_list: local_var_init { $$ = $1; }
               | local_var_init ',' local_var_list { $$ = create_local_node($1, $3); }
               ;
 
-local_var_init: identifier { $$ = $1;  }
+/*local_var_init: identifier { $$ = $1;  }
               | identifier local_var_operator local_var_value { $$ = create_binary_exp($2, $1, $3); }
+              ;*/
+
+local_var_init: identifier { $$ = $1; }
+              | identifier TK_OC_LE local_var_value { $$ = create_binary_tree("<=", AST_ASSIGN, $1, $3); }
               ;
 
-local_var_operator: TK_OC_LE { $$ = create_node_with_lex($1, AST_ASSIGN); }
+//local_var_operator: TK_OC_LE { $$ = create_node_with_lex($1, AST_ASSIGN); }
 
 //local_var_id: TK_IDENTIFICADOR;
 local_var_value: identifier {
@@ -416,6 +420,12 @@ constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL);
                       }
         | TK_LIT_FALSE { $$ = create_node_with_lex($1, AST_LITERAL); 
                          $$->value_type = BOOL_VAL;
+                       }
+        | TK_LIT_CHAR { $$ = create_node_with_lex($1, AST_LITERAL); 
+                         $$->value_type = CHAR_VAL;
+                       }
+        | TK_LIT_STRING { $$ = create_node_with_lex($1, AST_LITERAL); 
+                         $$->value_type = STRING_VAL;
                        }
         ;
 

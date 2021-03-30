@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lex_node.h"
+#include "../check_error.h"
 
 Node* create_node_with_label(const char *label, NodeType type) {
   // Possibly do some validation on label
@@ -133,6 +134,7 @@ Node* create_binary_exp(Node *parent, Node *left_child, Node *right_child) {
   append_child(parent, left_child);
   append_child(parent, right_child);
 
+  check_invalid_coercion(left_child->value_type, right_child->value_type, get_line_number());
   //Inject new type by inference
   parent->value_type = result_type_from(left_child->value_type, right_child->value_type);
 
@@ -145,6 +147,7 @@ Node* create_ternary_node(Node *left_child, Node *middle_child, Node *right_chil
   append_child(parent, middle_child);
   append_child(parent, right_child);
 
+  check_invalid_coercion(middle_child->value_type, right_child->value_type, get_line_number());
   parent->value_type = result_type_from(middle_child->value_type, right_child->value_type);
   
   return parent;

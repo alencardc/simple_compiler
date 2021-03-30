@@ -197,6 +197,7 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             
             Symbol_Entry* new_entry = create_local_entry(node_var->label, node_var->data->line_number, type);
 
+            
             check_identifier_redeclared(scopes, node_var->label);
             if (node_value->type == AST_IDENTIFIER) {
                 check_identifier_undeclared(scopes, node_value->label, 0);
