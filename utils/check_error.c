@@ -192,7 +192,8 @@ bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int 
     char* supplied_type_str = get_type_name(supplied_type);
 
     if(agr_type != supplied_type){
-      printf("[ERR_WRONG_TYPE_ARGS] The %i° argument of function call [%s()] is wrong at line %i. Expected: %s | Actual: %s\n",
+      printf("[ERR_WRONG_TYPE_ARGS] The %i° argument of function call '%s()' is "
+      "of wrong type at line %i. Expected type '%s', but value of type '%s' was given.\n",
       i,
       entry->key,
       line,
