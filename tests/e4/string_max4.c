@@ -1,6 +1,6 @@
 // Nao deveria dar erro, ne?
-string s;
 int main() {
-  s = "";
+  string s <= "12345";
+  s = "12";
   return 0; 
 }
