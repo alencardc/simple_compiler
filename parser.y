@@ -268,11 +268,14 @@ local_var_value: identifier {
 *************************************/
 
 func_header: storage_modifier type identifier '(' params ')'{
+  
   check_string_return_type($2, get_line_number());
 
    if(scopes == NULL){
       scopes = push_new_scope(scopes, "global");
   }
+
+  check_identifier_redeclared(scopes, $3->label, get_line_number());
 
   Symbol_Entry* function = create_function_entry($3->label, $5, $2, $3->data->line_number);
   Symbol_Entry** current_scope = top_scope(scopes);

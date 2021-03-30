@@ -4,5 +4,7 @@ char a;
 int main() {
   char cu <= 'a';
   int my_var <= 2;
+  string ab <= "abcbc";
+  ab = "abcbca";
 
 }
