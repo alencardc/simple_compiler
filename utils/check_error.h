@@ -17,6 +17,9 @@ bool check_wrong_var(Table_Stack* scopes, char* key, int line);
 void errors_as_var(Symbol_Entry* entry, int line);
 
 bool check_error_string_max(Table_Stack* scopes, char* key, Node* value, int line);
+bool check_char_to_x(TokenValueType type1, TokenValueType type2, int line);
+bool check_string_to_x(TokenValueType type1, TokenValueType type2, int line);
+bool check_invalid_coercion(TokenValueType type1, TokenValueType type2, int line);
 
 bool check_wrong_par_input(int line, const char* key, Table_Stack* scopes);
 bool check_wrong_par_output(const char* key, LexValue literal, Table_Stack* scopes, int line);
@@ -27,7 +30,7 @@ char* get_type_name(TokenValueType type);
 bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int line);
 bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int line);
 bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueType type, int line);
-bool isTypeCompatible(TokenValueType type1, TokenValueType type2);
+bool is_type_compatible(TokenValueType type1, TokenValueType type2);
 
 bool check_for_assignment_type_error(Table_Stack* scopes, char* key, Node* value, int line);
 bool check_for_vector_assignment_type_error(Node* vector_node, Table_Stack* scopes, Node* value, int line);

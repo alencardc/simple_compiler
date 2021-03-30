@@ -1,5 +1,5 @@
-#ifndef __SYMBOLS_STACK_H__
-#define __SYMBOLS_STACK_H__
+#ifndef __TABLE_STACK_H__
+#define __TABLE_STACK_H__
 
 #include "symbols_table.h"
 
@@ -25,4 +25,4 @@ void set_top_scope_name(const char* id, Table_Stack* scopes);
 
 void print_table_stack(Table_Stack* scopes);
 
-#endif // __SYMBOLS_STACK_H__
+#endif // __TABLE_STACK_H__

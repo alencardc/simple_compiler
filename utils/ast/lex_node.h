@@ -3,6 +3,8 @@
 
 #include "tree.h"
 
+extern int get_line_number();
+
 Node* create_node_with_label(const char *label, NodeType type);
 
 Node* create_node_with_lex(LexValue lex_value, NodeType type);

@@ -80,6 +80,40 @@ void errors_as_var(Symbol_Entry* entry, int line){
   }
 }
 
+bool check_char_to_x(TokenValueType type1, TokenValueType type2, int line) {
+  if (type1 == CHAR_VAL && type2 != CHAR_VAL
+    || type2 == CHAR_VAL && type1 != CHAR_VAL) {
+      TokenValueType coercion_type = type1 == CHAR_VAL ? type2 : type1;
+      const char* type_string = token_value_type_to_string(coercion_type);
+      printf("[ERR_CHAR_TO_X] tried to do an implicit coercion of type CHAR to "
+        "type %s at line %d\n", type_string, line);
+
+      exit(ERR_CHAR_TO_X);
+  }
+
+  return false;
+}
+
+bool check_string_to_x(TokenValueType type1, TokenValueType type2, int line) {
+  if (type1 == STRING_VAL && type2 != STRING_VAL
+    || type2 == STRING_VAL && type1 != STRING_VAL) {
+      TokenValueType coercion_type = type1 == STRING_VAL ? type2 : type1;
+      const char* type_string = token_value_type_to_string(coercion_type);
+      printf("[ERR_STRING_TO_X] tried to do an implicit coercion of type STRING "
+        "to type %s at line %d\n", type_string, line);
+
+      exit(ERR_STRING_TO_X);
+  }
+
+  return false;
+}
+
+bool check_invalid_coercion(TokenValueType type1, TokenValueType type2, int line) {
+  check_char_to_x(type1, type2, line);
+  check_string_to_x(type1, type2, line);
+  return false;
+}
+
 bool check_wrong_par_input(int line, const char* key, Table_Stack* scopes) {
   Symbol_Entry* entry = search_all_scopes(scopes, key);
   if (entry->type == INTEGER_VAL || entry->type == FLOAT_VAL) {
@@ -202,7 +236,7 @@ bool check_wrong_par_shift(LexValue value){
 bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueType type, int line){
   Symbol_Entry* function_entry = search_deep_scope(scopes,function_id);
 
-  if(!isTypeCompatible(function_entry->type, type)){
+  if(!is_type_compatible(function_entry->type, type)){
     char* function_type_str = get_type_name(function_entry->type);
     char* supplied_type_str = get_type_name(type);
     printf("[ERR_WRONG_PAR_RETURN] Returned type (%s) when function(\"%s\") has return type (%s) at line %i.\n", supplied_type_str, function_id ,function_type_str, line);
@@ -223,14 +257,14 @@ bool check_string_return_type(TokenValueType type, int line){
   return false;
 }
 
-bool isTypeCompatible(TokenValueType type1, TokenValueType type2){
+bool is_type_compatible(TokenValueType type1, TokenValueType type2){
   if(type1 == type2)
     return true;
 
-  // bool isCastTypeValid = type1 == INTEGER_VAL || type1 == FLOAT_VAL ||  type1 == BOOL_VAL;
-  // bool isTestTypeValid = type2 == INTEGER_VAL || type2 == FLOAT_VAL || type2 == BOOL_VAL;
+  bool is_cast_type_valid = type1 == INTEGER_VAL || type1 == FLOAT_VAL ||  type1 == BOOL_VAL;
+  bool is_test_type_valid = type2 == INTEGER_VAL || type2 == FLOAT_VAL || type2 == BOOL_VAL;
   
-  // return (isCastTypeValid == true && isTestTypeValid == true);
+  return (is_cast_type_valid == true && is_test_type_valid == true);
   return false;
 }
 
@@ -249,7 +283,7 @@ bool check_for_wrong_vector_string(Id_List* id, TokenValueType type, int line){
 bool check_for_assignment_type_error(Table_Stack* scopes, char* key, Node* value, int line){
   Symbol_Entry* entry = search_all_scopes(scopes, key);
 
-  if(!isTypeCompatible(entry->type, value->value_type)){
+  if(!is_type_compatible(entry->type, value->value_type)){
     char* variable_type = get_type_name(entry->type);
     char* value_type = get_type_name(value->value_type);
     printf("[ERR_WRONG_TYPE] Tried to assign a [%s] type to a variable of type [%s] at line %i.\n", value_type, variable_type, line);
@@ -264,7 +298,7 @@ bool check_for_vector_assignment_type_error(Node* vector_node, Table_Stack* scop
 
   Symbol_Entry* vector_entry = search_all_scopes(scopes, id_node->label);
 
-   if(!isTypeCompatible(vector_entry->type, value->value_type)){
+   if(!is_type_compatible(vector_entry->type, value->value_type)){
     char* variable_type = get_type_name(vector_entry->type);
     char* value_type = get_type_name(value->value_type);
     printf("[ERR_WRONG_TYPE] Tried to assign a [%s] type to a vector of type [%s] at line %i.\n", value_type, variable_type, line);
@@ -279,7 +313,7 @@ bool check_for_local_init_type_error(Symbol_Entry* entry, Node* value, int line)
   TokenValueType value_type = value->value_type;
 
 
-  if(!isTypeCompatible(id_type, value_type)){
+  if(!is_type_compatible(id_type, value_type)){
     char* id_type_str = get_type_name(id_type);
     char* value_type_str = get_type_name(value_type);
     printf("[ERR_WRONG_TYPE] Wrong initialization at line %i. Identifier \"%s\" expecting %s value, but %s was supplied.\n", line, entry->key, id_type_str, value_type_str);    
