@@ -13,6 +13,17 @@ bool check_identifier_redeclared(Table_Stack* scopes, char* key, int line){
   return false;
 }
 
+bool check_arg_redeclared(Table_Stack* scopes, char* key, int arg_number_err, int line){
+  Symbol_Entry** scope = top_scope(scopes);
+
+  Symbol_Entry* queryEntry = get_entry_from_table(key, scope);
+  if(queryEntry != NULL){
+    printf("[ERR_DECLARED] %i° argument \'%s\' redeclared was previously declared as argument of the same function at line %d.\n", arg_number_err, key, queryEntry->line_number);
+    exit(ERR_DECLARED);
+  }
+  return false;
+}
+
 bool check_type_cast(Node* node_cast, Node* node_test) {
   TokenValueType cast_type = node_cast->data->value_type;
   TokenValueType test_type = node_test->data->value_type;

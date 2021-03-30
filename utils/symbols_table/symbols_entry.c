@@ -258,7 +258,7 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
     Argument_List* arg_list = func_entry->arg_list;
 
     Symbol_Entry** func_scope = top_scope(scopes);
-
+    int i = 1;
     while(arg_list != NULL){
         Symbol_Entry* new_symbol_entry = create_symbol_entry(arg_list->id, 
                                                             func_entry->line_number, 
@@ -267,8 +267,9 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
                                                             get_type_lenght(arg_list->type),
                                                             (TokenValue) 0
                                                             );
-                            
+        check_arg_redeclared(scopes, arg_list->id, i, get_line_number());
         insert_entry_at_table(new_symbol_entry, func_scope);
         arg_list = arg_list->next;
+        i++;
     }
 }
