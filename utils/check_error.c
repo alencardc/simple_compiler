@@ -284,10 +284,19 @@ bool check_wrong_par_shift(LexValue value){
 bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueType type, int line){
   Symbol_Entry* function_entry = search_deep_scope(scopes,function_id);
 
+  if (type == STRING_VAL) {
+    printf("[ERR_FUNCTION_STRING] Returned type 'string' when function '%s' has "
+      "return type '%s' at line %i. Functions can not return values of type 'string'.\n",
+      function_id , get_type_name(function_entry->type), line);
+    exit(ERR_FUNCTION_STRING);
+  }
+
   if(!is_type_compatible(function_entry->type, type)){
     char* function_type_str = get_type_name(function_entry->type);
     char* supplied_type_str = get_type_name(type);
-    printf("[ERR_WRONG_PAR_RETURN] Returned type '%s' when function '%s' has return type '%s' at line %i.\n", supplied_type_str, function_id ,function_type_str, line);
+    printf("[ERR_WRONG_PAR_RETURN] Returned type '%s' when function '%s' has "
+      "return type '%s' at line %i.\n",
+      supplied_type_str, function_id ,function_type_str, line);
     free(supplied_type_str);
     free(function_type_str);
     exit(ERR_WRONG_PAR_RETURN);
