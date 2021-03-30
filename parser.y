@@ -268,6 +268,8 @@ local_var_value: identifier {
 *************************************/
 
 func_header: storage_modifier type identifier '(' params ')'{
+  check_string_return_type($2, get_line_number());
+
    if(scopes == NULL){
       scopes = push_new_scope(scopes, "global");
   }
@@ -291,7 +293,7 @@ func_decl: func_header control_block {
 params: param_list { $$ = $1; }| %empty { $$ = NULL; };
 
 param_list: param { $$ = $1;}
-          | param_list ',' param {$$ = append_arg_list($1, $3);}
+          | param_list ',' param {$$ = append_arg_list($1, $3, get_line_number());}
           ;
 
 param: var_qualifier type identifier 

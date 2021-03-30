@@ -27,9 +27,11 @@ bool check_wrong_par_shift(LexValue value);
 
 char* get_type_name(TokenValueType type);
 
+bool check_function_string_par(TokenValueType type, int line);
 bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int line);
 bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int line);
 bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueType type, int line);
+bool check_string_return_type(TokenValueType type, int line);
 bool is_type_compatible(TokenValueType type1, TokenValueType type2);
 
 bool check_for_assignment_type_error(Table_Stack* scopes, char* key, Node* value, int line);

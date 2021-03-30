@@ -62,7 +62,9 @@ Argument_List* create_arg_list_element(char* id, TokenValueType type){
     return  new_argument;
 }
 
-Argument_List* append_arg_list(Argument_List* list, Argument_List* toAppend){
+Argument_List* append_arg_list(Argument_List* list, Argument_List* toAppend, int line){
+    check_function_string_par(toAppend->type, line);
+
     if(list == NULL)
         return toAppend;
     

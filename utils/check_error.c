@@ -169,6 +169,16 @@ char* get_type_name(TokenValueType type){
   return type_name;
 }
 
+bool check_function_string_par(TokenValueType type, int line) {
+  if (type != STRING_VAL) {
+    return false;
+  }
+
+  printf("[ERR_FUNCTION_STRING] Parameter declared at line %d is of type 'string'. "
+    "Function's parameters can not be 'string'.\n", line);
+  exit(ERR_FUNCTION_STRING);
+}
+
 bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int line){
   Symbol_Entry* entry = search_all_scopes(scopes, key);
   Argument_List* arg_list = entry->arg_list;
@@ -239,7 +249,7 @@ bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueT
   if(!is_type_compatible(function_entry->type, type)){
     char* function_type_str = get_type_name(function_entry->type);
     char* supplied_type_str = get_type_name(type);
-    printf("[ERR_WRONG_PAR_RETURN] Returned type (%s) when function(\"%s\") has return type (%s) at line %i.\n", supplied_type_str, function_id ,function_type_str, line);
+    printf("[ERR_WRONG_PAR_RETURN] Returned type '%s' when function '\"%s\"' has return type '%s' at line %i.\n", supplied_type_str, function_id ,function_type_str, line);
     free(supplied_type_str);
     free(function_type_str);
     exit(ERR_WRONG_PAR_RETURN);
@@ -250,7 +260,7 @@ bool check_wrong_return_type(char* function_id, Table_Stack* scopes, TokenValueT
 
 bool check_string_return_type(TokenValueType type, int line){
   if(type == STRING_VAL){
-    printf("[ERR_FUNCTION_STRING] Returned type string on line %i. Functions can never return strings.\n", line);
+    printf("[ERR_FUNCTION_STRING] Returned type 'string' on line %i. Functions can't return 'string's.\n", line);
     exit(ERR_FUNCTION_STRING);
   }
 

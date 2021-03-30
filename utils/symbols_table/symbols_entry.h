@@ -24,7 +24,7 @@ void print_id_list(Id_List* list);
 void free_id_list(Id_List* list);
 
 Argument_List* create_arg_list_element(char* id, TokenValueType type);
-Argument_List* append_arg_list(Argument_List* list, Argument_List* toAppend);
+Argument_List* append_arg_list(Argument_List* list, Argument_List* toAppend, int line);
 
 Symbol_Entry* create_id_entry();
 Symbol_Entry* create_function_entry(const char* key, Argument_List* arg_list, TokenValueType returnType, int line);
