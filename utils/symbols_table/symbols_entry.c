@@ -121,10 +121,15 @@ void print_id_list(Id_List* list){
     }
 }
 
+//TODO: Rename to create_global_id_entry to avoid problems 
 Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
     Symbol_Nature nature = id_list->vector_size > 1 ? VECTOR : VAR;
     int size = get_type_lenght(type);
     size = id_list->vector_size * size;
+
+    //When we create a string global, its value is always 0 because we never initialize it
+    if(type == STRING_VAL)
+        size = 0;
 
     Symbol_Entry* new_entry = create_symbol_entry(id_list->id, 
                                   id_list->line_number,
