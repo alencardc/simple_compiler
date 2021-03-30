@@ -221,16 +221,16 @@ bool check_wrong_arg_size(Node* args, const char* key, Table_Stack* scopes, int 
   if(actual_arg_size > declaration_arg_size){
     printf("[ERR_EXCESS_ARGS] Function '%s' expecting %i argument(s) but was called at line %i with %i argument(s).\n", 
             key, 
-            declaration_arg_size, 
-            actual_arg_size, 
-            line);
+            declaration_arg_size,
+            line,
+            actual_arg_size);
     exit(ERR_EXCESS_ARGS);
   } else if(declaration_arg_size > actual_arg_size){
     printf("[ERR_MISSING_ARGS] Function '%s' expecting %i argument(s) but was called at line %i with only %i argument(s).\n", 
             key, 
             declaration_arg_size, 
-            actual_arg_size, 
-            line);
+            line,
+            actual_arg_size);
     exit(ERR_MISSING_ARGS);
   }
   return false;
@@ -284,7 +284,7 @@ bool check_for_wrong_vector_string(Id_List* id, TokenValueType type, int line){
     return false;
 
   if(id->vector_size > 1 && type == STRING_VAL){
-    printf("[ERR_STRING_VECTOR] Tried to declare \"%s\" as a string vector at line %i.\n", id->id ,line);
+    printf("[ERR_STRING_VECTOR] Tried to declare '%s' as a 'string' vector at line %i. Vectors can not be of type 'string'.\n", id->id ,line);
     exit(ERR_STRING_VECTOR);
   }
 
