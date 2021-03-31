@@ -1,5 +1,4 @@
 int main() {
-  bool a;
-  a = 'a' + 'b';
+  char a <= 'a';
   return 0;
 }

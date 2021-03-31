@@ -153,7 +153,7 @@ extern void *arvore;
 
 %%
 
-root: programa { arvore = (void*)$1; print_table_stack(scopes); pop_scope(scopes); }
+root: programa { arvore = (void*)$1; pop_scope(scopes); }
 
 programa: global_decl_list programa {$$ = $2;};
         | func_decl programa { $$ = $1; append_child($$, $2); }
