@@ -225,6 +225,14 @@ bool check_wrong_arg_type(Node *args, const char* key, Table_Stack* scopes, int 
     char* arg_type_str = get_type_name(agr_type);
     char* supplied_type_str = get_type_name(supplied_type);
 
+    if (supplied_type == STRING_VAL) {
+      printf("[ERR_FUNCTION_STRING] The %i° argument of function call '%s()' is "
+        "of type 'string' at line %i. Strings can not be passed as arguments to funtions.\n",
+        i, entry->key, line
+      );
+      exit(ERR_FUNCTION_STRING);
+    }
+
     if(!is_type_compatible(agr_type, supplied_type)){
       printf("[ERR_WRONG_TYPE_ARGS] The %i° argument of function call '%s()' is "
       "of wrong type at line %i. Expected type '%s', but value of type '%s' was given.\n",
