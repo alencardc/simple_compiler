@@ -1,7 +1,7 @@
 // Dando seg fault
 string s;
 int main() {
-  s = "a";
+  s = "";
   return 0; 
 }
 
@@ -19,6 +19,10 @@ int main() {
   return 0; 
 }
 
-
+string s;
+int main() {
+  s = "a";
+  return 0; 
+}
 
 */
