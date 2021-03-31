@@ -128,7 +128,7 @@ void free_entry(Symbol_Entry *entry){
     free(entry->key);
     
     const TokenValueType value_type = entry->type;
-    if (value_type == CHAR_VAL || value_type == STRING_VAL) {
+    if (value_type == STRING_VAL) {
         free(entry->value.s_value);
     }
     
