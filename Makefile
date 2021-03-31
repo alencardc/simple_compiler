@@ -21,7 +21,7 @@ bison: parser.y
 
 submit: clean
 	mkdir -p submit
-	tar cvzf submit/etapa$(SUBMITION_NUMBER).tgz --exclude=.gitignore --exclude=.git --exclude=tests --exclude=submit .
+	tar cvzf submit/etapa$(SUBMITION_NUMBER).tgz --exclude=.gitignore --exclude=.git --exclude=tests --exclude=.vscode --exclude=submit .
 
 clean:
 	rm -rf etapa* lex.yy.c parser.tab.* parser.output *.o submit *.tgz ./tests/ast/*.png ./tests/ast/*.txt
