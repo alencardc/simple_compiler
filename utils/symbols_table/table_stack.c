@@ -51,6 +51,9 @@ Symbol_Entry* search_deep_scope(Table_Stack* scopes, const char *key){
 }
 
 Table_Stack* pop_scope(Table_Stack *scopes){
+    if(scopes == NULL)
+        return NULL;
+        
     free(scopes->id);
     free_table(scopes->table);
 

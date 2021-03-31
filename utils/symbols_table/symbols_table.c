@@ -128,8 +128,10 @@ void free_entry(Symbol_Entry *entry){
     free(entry->key);
     
     const TokenValueType value_type = entry->type;
-    if (value_type == CHAR_VAL || value_type == STRING_VAL) {
-        free(entry->value.s_value);
+    if (value_type == STRING_VAL || value_type == CHAR_VAL) {
+        if(entry->nature == LITERAL){
+            free(entry->value.s_value);
+        }
     }
     
     free_arg_list(entry->arg_list);
