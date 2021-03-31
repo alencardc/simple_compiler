@@ -459,7 +459,10 @@ command: assign_command { $$ = $1; }
        | control_commands { $$ = $1; }
        ;
 
-control_block: control_block_start command_list control_block_end { $$ = $2; };
+control_block: control_block_start command_list control_block_end { $$ = $2; }
+             | control_block_start control_block_end { $$ = NULL; }
+             ;
+
 block_command: control_block { $$ = $1; };
 control_block_start: '{' { 
                             scopes = push_new_scope(scopes, "");
