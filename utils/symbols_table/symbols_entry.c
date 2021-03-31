@@ -169,7 +169,7 @@ Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type)
 }
 
 Symbol_Entry* create_literal_entry(const char* key, TokenValue value, int line, TokenValueType type) {
-    if(type == STRING_VAL){
+    if(type == STRING_VAL || type == CHAR_VAL){
         value.s_value = strdup(value.s_value);
     }
 
