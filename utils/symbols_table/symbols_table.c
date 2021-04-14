@@ -36,6 +36,8 @@ Symbol_Entry* create_symbol_entry(const char* key,
     entry->nature = nature;
     entry->next = NULL;
     entry->type = type;
+    entry->offset = 0; // TODO
+    entry->global = false; // TODO
 
     return entry;
 }

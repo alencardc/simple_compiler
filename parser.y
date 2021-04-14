@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include "utils/prod_node.h"
 #include "utils/check_error.h"
 #include "utils/ast/ast.h"
 #include "errors.h"
@@ -22,6 +23,7 @@ extern void *arvore;
 %union {
   LexValue lexical_value;
   Node* node;
+  ProdNode prod_node;
   Id_List* id_list;
   TokenValueType type;
   Argument_List* arg_list;
@@ -105,7 +107,7 @@ extern void *arvore;
 %type <node> exponential_operator
 %type <node> unary_operator
 %type <node> unary_expression
-%type <node> basic_expression
+%type <prod_node> basic_expression
 %type <node> constant 
 
 %type <node> output_command
@@ -382,7 +384,7 @@ exponential_expression: unary_expression { $$ = $1; }
 
 exponential_operator: '^' { $$ = create_node_with_label("^", AST_BINARY_EXP); } ;
 
-unary_expression: basic_expression { $$ = $1; }
+unary_expression: basic_expression { $$ = $1.ast; print_instruction($1.instr); }
                 | unary_operator unary_expression { $$ = $1;
                                                     $$->value_type =  $2->value_type;
                                                     append_child($$, $2);
@@ -400,18 +402,20 @@ unary_operator: '+' { $$ = create_node_with_label("+", AST_UNARY_EXP); }
 
 basic_expression: 
   identifier {
-    if(!check_identifier_undeclared(scopes, $1->label, $1->data->line_number)
-      && !check_wrong_var(scopes, $1->label, $1->data->line_number)
-    ){
-
-      $$ = $1;
-      inject_value_type_from_scopes($$, scopes);
-    } 
+    $$.ast = $1;
+    check_identifier_exp(scopes, $$.ast);
+    inject_value_type_from_scopes($$.ast, scopes);
+    $$.instr = create_instr_identifier(search_all_scopes(scopes, $$.ast->label));
   }
-  | vector_identifier { $$ = $1;}
-  | constant { $$ = $1; }
-  | function_call { $$ = $1; }
-  | '(' assign_expression ')' { $$ = $2 ; }
+  | vector_identifier { $$.ast = $1; }
+  | constant {
+    Symbol_Entry* entry = create_literal_entry($1->label, $1->data->token_value, $1->data->line_number, $1->value_type);
+    insert_entry_at_table(entry, top_scope(scopes));
+    $$.ast = $1; 
+    $$.instr = create_instr_literal(search_all_scopes(scopes, $$.ast->label)); 
+  }
+  | function_call { $$.ast = $1; }
+  | '(' assign_expression ')' { $$.ast = $2 ; }
   ;
 
 constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL);
@@ -472,7 +476,7 @@ control_block_start: '{' {
                               is_function_block = false;
                             } 
                          };
-control_block_end: '}' { scopes = pop_scope(scopes); };
+control_block_end: '}' { print_table_stack(scopes); scopes = pop_scope(scopes); };
 
 assign_command: identifier '=' assign_expression {  
                                                     check_identifier_undeclared(scopes, $1->label, $1->data->line_number);

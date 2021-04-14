@@ -2,6 +2,7 @@
 #define __INSTRUCTION_H__
 
 #include <stdbool.h>
+#include "../symbols_table/symbols_table.h"
 
 typedef struct sInstruction {
   char* opcode;
@@ -19,8 +20,12 @@ Instruction* create_instruction(
   Instruction* prev
 );
 
-static const char* get_new_register();
-static const char* get_new_label(); 
+static char* get_new_register();
+static char* get_new_label(); 
 
+Instruction* create_instr_identifier(Symbol_Entry* entry);
+Instruction* create_instr_literal(Symbol_Entry* entry);
+
+void print_instruction(Instruction* i);
 
 #endif //  __INSTRUCTION_H__

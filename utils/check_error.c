@@ -411,3 +411,11 @@ bool check_error_string_max(Table_Stack* scopes, char* key, Node* value, int lin
 
   return false;
 }
+
+bool check_identifier_exp(Table_Stack* scopes, Node* node) {
+  if(!check_identifier_undeclared(scopes, node->label, node->data->line_number)
+    && !check_wrong_var(scopes, node->label, node->data->line_number)
+  ) {
+    return false;
+  }
+}
