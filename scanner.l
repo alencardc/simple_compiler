@@ -1,7 +1,7 @@
 %option yylineno noyywrap
 
 %{
-  #include "utils/prod_node.h"
+  #include "utils/iloc/instruction.h"
   #include "utils/ast/ast.h"
   #include "utils/check_error.h"
   #include "parser.tab.h"

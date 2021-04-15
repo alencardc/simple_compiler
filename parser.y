@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "utils/prod_node.h"
+#include "utils/iloc/instruction.h"
 #include "utils/check_error.h"
 #include "utils/ast/ast.h"
 #include "errors.h"
@@ -99,14 +99,14 @@ extern void *arvore;
 %type <node> equality_operator
 %type <node> relational_expression
 %type <node> relational_operator
-%type <node> additive_expression
+%type <prod_node> additive_expression
 %type <node> additive_operator
-%type <node> multiplicative_expression
+%type <prod_node> multiplicative_expression
 %type <node> multiplicative_operator
-%type <node> exponential_expression
+%type <prod_node> exponential_expression
 %type <node> exponential_operator
 %type <node> unary_operator
-%type <node> unary_expression
+%type <prod_node> unary_expression
 %type <prod_node> basic_expression
 %type <node> constant 
 
@@ -351,8 +351,8 @@ equality_operator: TK_OC_EQ { $$ = create_node_with_lex($1, AST_BINARY_EXP); }
                  | TK_OC_NE { $$ = create_node_with_lex($1, AST_BINARY_EXP); }
                  ;
 
-relational_expression: additive_expression { $$ = $1; }
-                     | relational_expression relational_operator additive_expression { $$ = create_binary_exp($2, $1, $3); }
+relational_expression: additive_expression { $$ = $1.ast; print_iloc_code($1.instr); }
+                     | relational_expression relational_operator additive_expression { $$ = create_binary_exp($2, $1, $3.ast); }
                      ;
 
 relational_operator: '<' { $$ = create_node_with_label("<", AST_BINARY_EXP); }
@@ -362,7 +362,10 @@ relational_operator: '<' { $$ = create_node_with_label("<", AST_BINARY_EXP); }
                    ;
 
 additive_expression: multiplicative_expression { $$ = $1; }
-                  | additive_expression additive_operator multiplicative_expression { $$ = create_binary_exp($2, $1, $3); }
+                  | additive_expression additive_operator multiplicative_expression {
+                    $$.ast = create_binary_exp($2, $1.ast, $3.ast);
+                    $$.instr = create_instr_binary(&$$.temp, $2->label, $1, $3);
+                  }
                   ;
 
 additive_operator: '+' { $$ = create_node_with_label("+", AST_BINARY_EXP); }
@@ -370,7 +373,11 @@ additive_operator: '+' { $$ = create_node_with_label("+", AST_BINARY_EXP); }
                  ;
 
 multiplicative_expression: exponential_expression { $$ = $1; }
-                         | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3);};
+                         | multiplicative_expression multiplicative_operator exponential_expression { 
+                            $$.ast = create_binary_exp($2, $1.ast, $3.ast);
+                            $$.instr = create_instr_binary(&$$.temp, $2->label, $1, $3);
+                          }
+                         ;
                                                                                                             
 
 multiplicative_operator: '*' { $$ = create_node_with_label("*", AST_BINARY_EXP); }
@@ -379,16 +386,18 @@ multiplicative_operator: '*' { $$ = create_node_with_label("*", AST_BINARY_EXP);
                        ;
 
 exponential_expression: unary_expression { $$ = $1; }
-                      | exponential_expression exponential_operator unary_expression { $$ = create_binary_exp($2, $1, $3); }
+                      | exponential_expression exponential_operator unary_expression { $$.ast = create_binary_exp($2, $1.ast, $3.ast); }
                       ;
 
 exponential_operator: '^' { $$ = create_node_with_label("^", AST_BINARY_EXP); } ;
 
-unary_expression: basic_expression { $$ = $1.ast; print_instruction($1.instr); }
-                | unary_operator unary_expression { $$ = $1;
-                                                    $$->value_type =  $2->value_type;
-                                                    append_child($$, $2);
-                                                  }
+unary_expression: basic_expression { $$ = $1; }
+                | unary_operator unary_expression {
+                  $$.ast = $1;
+                  $$.ast->value_type = $2.ast->value_type;
+                  append_child($$.ast, $2.ast);
+                  $$.instr = create_instr_unary(&$$.temp, $1->label, $2);
+                }
                 ;
 
 unary_operator: '+' { $$ = create_node_with_label("+", AST_UNARY_EXP); }
@@ -405,14 +414,14 @@ basic_expression:
     $$.ast = $1;
     check_identifier_exp(scopes, $$.ast);
     inject_value_type_from_scopes($$.ast, scopes);
-    $$.instr = create_instr_identifier(search_all_scopes(scopes, $$.ast->label));
+    create_instr_identifier(&$$, scopes);
   }
   | vector_identifier { $$.ast = $1; }
   | constant {
     Symbol_Entry* entry = create_literal_entry($1->label, $1->data->token_value, $1->data->line_number, $1->value_type);
     insert_entry_at_table(entry, top_scope(scopes));
     $$.ast = $1; 
-    $$.instr = create_instr_literal(search_all_scopes(scopes, $$.ast->label)); 
+    create_instr_literal(&$$, scopes);
   }
   | function_call { $$.ast = $1; }
   | '(' assign_expression ')' { $$.ast = $2 ; }
