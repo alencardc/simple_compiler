@@ -16,6 +16,12 @@ Node* create_node(LexValue *data, const char *label, NodeType type) {
   node->children_amount = 0;
   node->children = NULL;
 
+  // This fields are filled by ILOC instruction factory functions
+  node->instr = NULL;
+  node->temp = NULL;
+  node->tl = NULL;
+  node->fl = NULL;
+
   return node;
 }
 
@@ -52,7 +58,13 @@ void free_node(Node *node) {
 
   free(node->label);
   free(node->children);
+
+  free(node->temp);
+  //free_instruction(node->instr); // Instructions should be freed at libera() to avoid double free
+  free_placeholder(node->tl);
+  free_placeholder(node->fl);
   free(node);
+  node = NULL;
 }
 
 bool free_last_child_and_merge(Node* parent) {

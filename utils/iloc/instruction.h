@@ -2,9 +2,23 @@
 #define __INSTRUCTION_H__
 
 #include <stdbool.h>
-#include "../symbols_table/table_stack.h"
-#include "../ast/ast.h"
-//#include "../prod_node.h"
+
+typedef struct sPlaceholder {
+  char** label_ref;
+  struct sPlaceholder* next;
+} Placeholder;
+
+Placeholder* create_placeholder(char** label);
+void free_placeholder(Placeholder* placeholder);
+Placeholder* insert_placeholder(Placeholder* new_item, Placeholder* list);
+
+// typedef struct sProdNode {
+//   Node* ast;
+//   Instruction* instr;
+//   char* temp;
+//   Placeholder* tl; // true list
+//   Placeholder* fl; // false list
+// } ProdNode;
 
 typedef struct sInstruction {
   char* opcode;
@@ -14,12 +28,6 @@ typedef struct sInstruction {
   struct sInstruction* previous;
 } Instruction;
 
-typedef struct sProdNode {
-  Node* ast;
-  Instruction* instr;
-  char* temp;
-} ProdNode;
-
 Instruction* create_instruction(
   const char* opcode, 
   const char* arg1, 
@@ -28,15 +36,10 @@ Instruction* create_instruction(
   Instruction* prev
 );
 
-static char* get_new_register();
-static char* get_new_label(); 
+void free_instruction(Instruction* instr);
 
-Instruction* append_instruction(Instruction* head, Instruction* new_instr);
-
-void create_instr_identifier(ProdNode* prod, Table_Stack* scopes);
-void create_instr_literal(ProdNode* prod, Table_Stack* scopes);
-Instruction* create_instr_unary(char** result_temp, const char* op, ProdNode operand);
-Instruction* create_instr_binary(char** result_temp, const char* op, ProdNode left, ProdNode right);
+Instruction* insert_instr_begin(Instruction* head, Instruction* new_instr);
+Instruction* concat_instructions(Instruction* head, Instruction* new_instr);
 
 void print_instruction(Instruction* i);
 void print_iloc_code(Instruction* head);
