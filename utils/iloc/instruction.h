@@ -11,16 +11,13 @@ typedef struct sPlaceholder {
 Placeholder* create_placeholder(char** label);
 void free_placeholder(Placeholder* placeholder);
 Placeholder* insert_placeholder(Placeholder* new_item, Placeholder* list);
+Placeholder* concat_placeholders(Placeholder* list1, Placeholder* list2);
+Placeholder* create_and_concat_placeholder(char** label, Placeholder* list1, Placeholder* list2);
 
-// typedef struct sProdNode {
-//   Node* ast;
-//   Instruction* instr;
-//   char* temp;
-//   Placeholder* tl; // true list
-//   Placeholder* fl; // false list
-// } ProdNode;
+void backpatch(Placeholder* list, char* label);
 
 typedef struct sInstruction {
+  char* label;
   char* opcode;
   char* operand1;
   char* operand2;
@@ -35,6 +32,8 @@ Instruction* create_instruction(
   const char* arg3,
   Instruction* prev
 );
+
+Instruction* create_label(const char* label, Instruction* prev);
 
 void free_instruction(Instruction* instr);
 
