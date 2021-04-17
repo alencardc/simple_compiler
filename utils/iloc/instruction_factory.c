@@ -51,7 +51,7 @@ void create_instr_identifier(Node* node, Table_Stack* scopes) {
 void create_instr_literal(Node* node, Table_Stack* scopes) {
   if (node == NULL || scopes == NULL)
     return;
-  
+
   Symbol_Entry* entry = search_all_scopes(scopes, node->label);
   if (entry == NULL) {
     node->temp = NULL;
@@ -66,6 +66,17 @@ void create_instr_literal(Node* node, Table_Stack* scopes) {
     case INTEGER_VAL:
       node->instr = create_instruction("loadI", entry->key, NULL, r, NULL);
       break;
+    case BOOL_VAL:
+      node->instr = create_instruction("loadI", entry->key, NULL, r, NULL);
+      Instruction* jump = create_instruction("jumpI", NULL, NULL, NULL, node->instr);
+      node->instr = jump;
+      if (node->data->token_value.b_val == true) {
+        node->tl = create_placeholder(&jump->operand1);
+        node->fl = NULL;
+      } else {
+        node->tl = NULL;
+        node->fl = create_placeholder(&jump->operand1);
+      }
   }
 }
 
@@ -103,7 +114,7 @@ void create_instr_binary(Node* op_node, Node* left, Node* right) {
   create_instr_rel_op(op_node, left, right);
   create_instr_log_op(op_node, left, right);
 
-  // Not sure if it is needed yet
+  // Not sure if it is needed yet int the create_instr_... above
   // if (instr == NULL) {
   //   free(op_node->temp);
   //   op_node->temp = NULL;
@@ -157,7 +168,7 @@ bool create_instr_rel_op(Node* op_node, Node* left, Node* right) {
 }
 
 bool create_instr_log_op(Node* op_node, Node* left, Node* right) {
-  if (op_node == NULL || left->temp == NULL || right->temp == NULL)
+  if (op_node == NULL || left == NULL || right == NULL)
     return false;
 
   bool is_log_op = false;
@@ -238,10 +249,9 @@ void create_instr_if(Node* if_node, Node* exp, Node* block) {
 
   char* true_label = get_new_label();
   char* false_label = get_new_label();
-
   backpatch(exp->tl, true_label);
   backpatch(exp->fl, false_label);
-
+  
   Instruction* true_label_instr = create_label(true_label, NULL);
   Instruction* false_label_instr = create_label(false_label, NULL);
   //if_node->instr = concat_instructions(false_label_instr, true_label_instr);

@@ -52,7 +52,7 @@ Placeholder* create_and_concat_placeholder(char** label, Placeholder* list1, Pla
 void backpatch(Placeholder* list, char* label) {
   if (list == NULL || label == NULL)
     return;
-
+    
   Placeholder* temp = list;
   while (temp != NULL) {
     *(temp->label_ref) = strdup(label);
@@ -69,7 +69,7 @@ Instruction* create_instruction(
 ) {
   Instruction* instruction = (Instruction*) malloc(sizeof(Instruction));
 
-  if (instruction == NULL || arg1 == NULL) {
+  if (instruction == NULL) {
     return NULL;
   }
 
@@ -106,7 +106,7 @@ void free_instruction(Instruction* instr) {
   if (instr == NULL)
     return;
   
-  print_instruction(instr);
+  //print_instruction(instr);
   while (instr->previous != NULL) {
     free_instruction(instr->previous);}
 
@@ -175,6 +175,9 @@ void print_instruction(Instruction* i) {
   }
   else if (strcmp("cbr", i->opcode) == 0) {
     printf("cbr %s -> %s, %s\n", i->operand1, i->operand2, i->operand3);
+  }
+  else if (strcmp("jumpI", i->opcode) == 0) {
+    printf("jumpI %s\n", i->operand1);
   }
   else if (strcmp("cmp_LT", i->opcode) == 0) {
     printf("cmp_LT %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);
