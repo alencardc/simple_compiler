@@ -262,3 +262,34 @@ void create_instr_if(Node* if_node, Node* exp, Node* block) {
   free(true_label);
   free(false_label);
 }
+
+void create_instr_if_else(Node* if_else_node, Node* if_node, Node* block) {
+  // Find false label
+  Instruction* false_label_instr = if_node->instr;
+  if (false_label_instr->label == NULL)
+    return;
+  
+  // Find true label
+  Instruction* true_label_instr = if_node->instr->previous;
+  while (true_label_instr != NULL && true_label_instr->label == NULL)
+    true_label_instr = true_label_instr->previous;
+  
+  if (true_label_instr == NULL || true_label_instr->label == NULL)
+    return;
+
+  // Label to end of if_else
+  char* end_label = get_new_label();
+
+  // Insert true jump before false label to jump the else code
+  Instruction* true_jump = create_instruction("jumpI", end_label, NULL, NULL, NULL);
+  true_jump->previous = false_label_instr->previous;
+  false_label_instr->previous = true_jump;
+
+  // Concatenate code from else block
+  if_else_node->instr = concat_instructions(block->instr, false_label_instr);
+  // Create else jump to end of if else and concatenate with end label instruction
+  if_else_node->instr = create_instruction("jumpI", end_label, NULL, NULL, if_else_node->instr);
+  if_else_node->instr = create_label(end_label, if_else_node->instr);
+
+  free(end_label);
+}

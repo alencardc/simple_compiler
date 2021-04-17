@@ -19,6 +19,7 @@ bool create_instr_rel_op(Node* op_node, Node* left, Node* right);
 bool create_instr_log_op(Node* op_node, Node* left, Node* right);
 
 void create_instr_if(Node* if_node, Node* exp, Node* block);
+void create_instr_if_else(Node* if_else_node, Node* if_node, Node* block);
 
 char* get_arithop_instr(const char* op);
 char* get_relop_instr(const char* op);

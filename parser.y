@@ -607,7 +607,10 @@ if_simples: TK_PR_IF '(' assign_expression ')' control_block {
   create_instr_if($$, $3, $5);
   }
   ; 
-if_else: if_simples TK_PR_ELSE control_block { $$ = create_if_else_node($1, $3); };
+if_else: if_simples TK_PR_ELSE control_block {
+  $$ = create_if_else_node($1, $3);
+  create_instr_if_else($$, $1, $3);
+};
 
 for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block 
   {
