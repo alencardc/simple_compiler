@@ -606,17 +606,22 @@ if_simples: TK_PR_IF '(' assign_expression ')' control_block {
   $$ = create_if_node($3,$5);
   create_instr_if($$, $3, $5);
   }
-  ; 
+; 
 if_else: if_simples TK_PR_ELSE control_block {
-  $$ = create_if_else_node($1, $3);
-  create_instr_if_else($$, $1, $3);
-};
+    $$ = create_if_else_node($1, $3);
+    create_instr_if_else($$, $1, $3);
+  }
+;
 
-for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block 
-  {
+for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block {
     $$ = create_for_node($3,$5,$7,$9);
-  };  
-while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {$$ = create_while_node($3,$6);}; 
+  }
+;  
+while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {
+    $$ = create_while_node($3,$6);
+    create_instr_while($$, $3, $6);
+  }
+; 
 
 %%
 

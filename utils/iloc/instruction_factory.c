@@ -264,6 +264,8 @@ void create_instr_if(Node* if_node, Node* exp, Node* block) {
 }
 
 void create_instr_if_else(Node* if_else_node, Node* if_node, Node* block) {
+  if (if_else_node == NULL && if_node == NULL && block == NULL)
+    return;
   // Find false label
   Instruction* false_label_instr = if_node->instr;
   if (false_label_instr->label == NULL)
@@ -292,4 +294,25 @@ void create_instr_if_else(Node* if_else_node, Node* if_node, Node* block) {
   if_else_node->instr = create_label(end_label, if_else_node->instr);
 
   free(end_label);
+}
+
+void create_instr_while(Node* while_node, Node* exp, Node* block) {
+  if (while_node == NULL && exp == NULL && block == NULL)
+    return;
+  char* true_label = get_new_label();
+  char* false_label = get_new_label();
+  char* loop_label = get_new_label();
+
+  backpatch(exp->tl, true_label);
+  backpatch(exp->fl, false_label);
+
+  Instruction* temp = NULL;
+  Instruction* loop_label_instr = create_label(loop_label, NULL);
+  temp = concat_instructions(exp->instr, loop_label_instr);
+  Instruction* true_label_instr = create_label(true_label, temp);
+  temp = concat_instructions(block->instr, true_label_instr);
+  Instruction* jump = create_instruction("jumpI", loop_label, NULL, NULL, temp);
+  Instruction* false_label_instr = create_label(false_label, jump);
+
+  while_node->instr = false_label_instr;
 }
