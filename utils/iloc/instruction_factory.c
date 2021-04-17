@@ -98,61 +98,10 @@ void create_instr_unary(Node* op_node, Node* operand) {
 }
 
 void create_instr_binary(Node* op_node, Node* left, Node* right) {
-  if (op_node == NULL || left->temp == NULL || right->temp == NULL) {
-    return;
-  }
-
-  Instruction* instr = NULL;
-  char* r = get_new_register();
-  op_node->temp = r;
-  if (op_node->label[0] == '+') {
-    instr = create_instruction("add", left->temp, right->temp, op_node->temp, NULL);
-  } 
-  else if (op_node->label[0] == '-') {
-    instr = create_instruction("sub", left->temp, right->temp, op_node->temp, NULL);
-  } 
-  else if (op_node->label[0] == '*') {
-    instr = create_instruction("mult", left->temp, right->temp, op_node->temp, NULL);
-  } 
-  else if (op_node->label[0] == '/') {
-    instr = create_instruction("div", left->temp, right->temp, op_node->temp, NULL);
-  } 
-  else if (op_node->label[0] == '>') {
-    instr = create_instruction("cmp_GT", left->temp, right->temp, op_node->temp, NULL);
-    instr = create_instruction("cbr", op_node->temp, NULL, NULL, instr);
-    op_node->tl = create_and_concat_placeholder(&instr->operand2, left->tl, right->tl);
-    op_node->fl = create_and_concat_placeholder(&instr->operand3, left->fl, right->fl);
-  } 
-  else if (op_node->label[0] == '<') {
-    instr = create_instruction("cmp_LT", left->temp, right->temp, op_node->temp, NULL);
-    instr = create_instruction("cbr", op_node->temp, NULL, NULL, instr);
-    op_node->tl = create_and_concat_placeholder(&instr->operand2, left->tl, right->tl);
-    op_node->fl = create_and_concat_placeholder(&instr->operand3, left->fl, right->fl);
-  } 
-  else if (strcmp(op_node->label, ">=") == 0) {
-    instr = create_instruction("cmp_GE", left->temp, right->temp, op_node->temp, NULL);
-    instr = create_instruction("cbr", op_node->temp, NULL, NULL, instr);
-    op_node->tl = create_and_concat_placeholder(&instr->operand2, left->tl, right->tl);
-    op_node->fl = create_and_concat_placeholder(&instr->operand3, left->fl, right->fl);
-  } 
-  else if (strcmp(op_node->label, "<=") == 0) {
-    instr = create_instruction("cmp_LE", left->temp, right->temp, op_node->temp, NULL);
-    instr = create_instruction("cbr", op_node->temp, NULL, NULL, instr);
-    op_node->tl = create_and_concat_placeholder(&instr->operand2, left->tl, right->tl);
-    op_node->fl = create_and_concat_placeholder(&instr->operand3, left->fl, right->fl);
-  }
-  else if (strcmp(op_node->label, "==") == 0) {
-    instr = create_instruction("cmp_EQ", left->temp, right->temp, op_node->temp, NULL);
-    instr = create_instruction("cbr", op_node->temp, NULL, NULL, instr);
-    op_node->tl = create_and_concat_placeholder(&instr->operand2, left->tl, right->tl);
-    op_node->fl = create_and_concat_placeholder(&instr->operand3, left->fl, right->fl);
-  }
-  else if (strcmp(op_node->label, "!=") == 0) {
-    instr = create_instruction("cmp_EQ", left->temp, right->temp, op_node->temp, NULL);
-    instr = create_instruction("cbr", op_node->temp, NULL, NULL, instr);
-    op_node->tl = create_and_concat_placeholder(&instr->operand2, left->tl, right->tl);
-    op_node->fl = create_and_concat_placeholder(&instr->operand3, left->fl, right->fl);
-  }
+  
+  create_instr_arith_op(op_node, left, right);
+  create_instr_rel_op(op_node, left, right);
+  create_instr_log_op(op_node, left, right);
 
   // Not sure if it is needed yet
   // if (instr == NULL) {
@@ -165,9 +114,122 @@ void create_instr_binary(Node* op_node, Node* left, Node* right) {
   //   free(left->temp); free(right->temp); 
   //   left->temp = NULL; right->temp = NULL;
   // }
-  Instruction* list = concat_instructions(instr, right->instr);
+}
 
+bool create_instr_arith_op(Node* op_node, Node* left, Node* right) {
+  if (op_node == NULL || left->temp == NULL || right->temp == NULL)
+    return false;
+
+  char* opcode = get_arithop_instr(op_node->label);
+  if (opcode == NULL)
+    return false;
+
+  char* r = get_new_register();
+  op_node->temp = r;
+  Instruction* instr = create_instruction(opcode, left->temp, right->temp, op_node->temp, NULL);
+  Instruction* list = concat_instructions(instr, right->instr);
   op_node->instr = concat_instructions(list, left->instr);
+
+  free(opcode);
+  return true;
+}
+
+bool create_instr_rel_op(Node* op_node, Node* left, Node* right) {
+  if (op_node == NULL || left->temp == NULL || right->temp == NULL)
+    return false;
+
+  char* opcode = get_relop_instr(op_node->label);
+  if (opcode == NULL)
+    return false;
+
+  char* r = get_new_register();
+  op_node->temp = r;
+  Instruction* instr = create_instruction(opcode, left->temp, right->temp, op_node->temp, NULL);
+  instr = create_instruction("cbr", op_node->temp, NULL, NULL, instr);
+  op_node->tl = create_and_concat_placeholder(&instr->operand2, left->tl, right->tl);
+  op_node->fl = create_and_concat_placeholder(&instr->operand3, left->fl, right->fl);
+  
+  Instruction* list = concat_instructions(instr, right->instr);
+  op_node->instr = concat_instructions(list, left->instr);
+
+  free(opcode);
+  return true;
+}
+
+bool create_instr_log_op(Node* op_node, Node* left, Node* right) {
+  if (op_node == NULL || left->temp == NULL || right->temp == NULL)
+    return false;
+
+  bool is_log_op = false;
+  char* new_label = NULL;
+  if (strcmp(op_node->label, "&&") == 0) {
+    new_label = get_new_label();
+    backpatch(left->tl, new_label);
+    op_node->tl = right->tl;
+    op_node->fl = concat_placeholders(left->fl, right->fl);
+    is_log_op = true;
+  }
+  else if (strcmp(op_node->label, "||") == 0) {
+    new_label = get_new_label();
+    backpatch(left->fl, new_label);
+    op_node->fl = right->fl;
+    op_node->tl = concat_placeholders(left->tl, right->tl);
+    is_log_op = true;
+  }
+
+  if (is_log_op == true) {
+    Instruction* label_instr = create_label(new_label, left->instr);
+    op_node->instr = concat_instructions(right->instr, label_instr);
+  }
+
+  free(new_label);
+  return is_log_op;
+}
+
+char* get_arithop_instr(const char* op) {
+  if (op == NULL)
+    return NULL;
+  
+  if (strcmp(op, "+") == 0) {
+    return strdup("add");
+  } 
+  else if (strcmp(op, "-") == 0) {
+    return strdup("sub");
+  } 
+  else if (strcmp(op, "*") == 0) {
+    return strdup("mult");
+  } 
+  else if (strcmp(op, "/") == 0) {
+    return strdup("div");
+  }
+
+  return NULL;
+}
+
+char* get_relop_instr(const char* op) {
+  if (op == NULL)
+    return NULL;
+
+  if (strcmp(op, ">") == 0) {
+    return strdup("cmp_GT");
+  } 
+  else if (strcmp(op, "<") == 0) {
+    return strdup("cmp_LT");
+  } 
+  else if (strcmp(op, ">=") == 0) {
+    return strdup("cmp_GE");
+  } 
+  else if (strcmp(op, "<=") == 0) {
+    return strdup("cmp_LE");
+  }
+  else if (strcmp(op, "==") == 0) {
+    return strdup("cmp_EQ");
+  }
+  else if (strcmp(op, "!=") == 0) {
+    return strdup("cmp_NE");
+  }
+
+  return NULL;
 }
 
 void create_instr_if(Node* if_node, Node* exp, Node* block) {

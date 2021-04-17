@@ -14,10 +14,8 @@ void libera (void *arvore);
 int main (int argc, char **argv)
 {
   int ret = yyparse(); 
-  exporta (arvore);
-  printf("Liberar\n");
+  //exporta (arvore);
   libera(arvore);
-  printf("Liberou\n");
   arvore = NULL;
   yylex_destroy();
   return ret;
