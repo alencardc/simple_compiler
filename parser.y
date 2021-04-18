@@ -615,6 +615,7 @@ if_else: if_simples TK_PR_ELSE control_block {
 
 for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block {
     $$ = create_for_node($3,$5,$7,$9);
+    create_instr_for($$, $3, $5, $7, $9);
   }
 ;  
 while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {

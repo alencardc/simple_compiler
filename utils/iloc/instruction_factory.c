@@ -315,4 +315,33 @@ void create_instr_while(Node* while_node, Node* exp, Node* block) {
   Instruction* false_label_instr = create_label(false_label, jump);
 
   while_node->instr = false_label_instr;
+  free(true_label);
+  free(false_label);
+  free(loop_label);
+}
+
+void create_instr_for(Node* for_node, Node* assign, Node* exp, Node* inc, Node* block) {
+  if (for_node == NULL && assign == NULL && inc == NULL && exp == NULL && block == NULL)
+    return;
+
+  char* true_label = get_new_label();
+  char* false_label = get_new_label();
+  char* loop_label = get_new_label();
+
+  backpatch(exp->tl, true_label);
+  backpatch(exp->fl, false_label);
+
+  Instruction* temp = NULL;
+  Instruction* loop_label_instr = create_label(loop_label, assign->instr);
+  temp = concat_instructions(exp->instr, loop_label_instr);
+  Instruction* true_label_instr = create_label(true_label, temp);
+  temp = concat_instructions(block->instr, true_label_instr);
+  temp = concat_instructions(inc->instr, temp);
+  Instruction* jump = create_instruction("jumpI", loop_label, NULL, NULL, temp);
+  Instruction* false_label_instr = create_label(false_label, jump);
+
+  for_node->instr = false_label_instr;
+  free(true_label);
+  free(false_label);
+  free(loop_label);
 }

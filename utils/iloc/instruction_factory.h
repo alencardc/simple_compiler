@@ -21,6 +21,7 @@ bool create_instr_log_op(Node* op_node, Node* left, Node* right);
 void create_instr_if(Node* if_node, Node* exp, Node* block);
 void create_instr_if_else(Node* if_else_node, Node* if_node, Node* block);
 void create_instr_while(Node* while_node, Node* exp, Node* block);
+void create_instr_for(Node* for_node, Node* assign, Node* exp, Node* inc, Node* block);
 
 char* get_arithop_instr(const char* op);
 char* get_relop_instr(const char* op);
