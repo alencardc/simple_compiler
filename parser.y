@@ -207,6 +207,8 @@ global_decl_list: storage_modifier type global_var_list ';'{
         check_for_wrong_vector_string(id_list, $2, get_line_number());
         Symbol_Entry* new_entry = create_id_entry(id_list, $2);
         new_entry->global = true;
+        new_entry->offset = scopes->offset;
+        scopes->offset += new_entry->length;
       
         insert_entry_at_table(new_entry, global_scope);
       }
