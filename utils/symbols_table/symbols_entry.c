@@ -169,6 +169,7 @@ Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type,
     //Offset calculation from rfp or rbss
     new_entry->offset = scopes->offset;
     scopes->offset += new_entry->length;
+    new_entry->global = false;
     
     return new_entry;
 }

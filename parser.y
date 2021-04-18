@@ -206,6 +206,7 @@ global_decl_list: storage_modifier type global_var_list ';'{
       if(!check_identifier_redeclared(scopes,id_list->id, get_line_number())){
         check_for_wrong_vector_string(id_list, $2, get_line_number());
         Symbol_Entry* new_entry = create_id_entry(id_list, $2);
+        new_entry->global = true;
       
         insert_entry_at_table(new_entry, global_scope);
       }
@@ -515,7 +516,11 @@ control_block_start: '{' {
                             printf("Offset: %i\n", scopes->offset); 
                          };
 control_block_end: '}' {  
-                          inject_offset(scopes);
+                          //On end of anonymous blocks we must inject the offset
+                          //so  next declarations have the correct offset
+                          if(!is_function_block){
+                            inject_offset(scopes);
+                          }
                           scopes = pop_scope(scopes);
                        };
 
