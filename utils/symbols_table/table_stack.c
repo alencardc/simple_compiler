@@ -1,10 +1,11 @@
 #include "table_stack.h"
 
-Table_Stack* push_new_scope(Table_Stack* scopes, char* id){
+Table_Stack* push_new_scope(Table_Stack* scopes, char* id, int offset){
     Table_Stack* newScope = (Table_Stack*) malloc(sizeof(Table_Stack));
 
     newScope->id = strdup(id);
     newScope->table = init_symbol_table();
+    newScope->offset = offset;
     
     newScope->next = scopes;
     
@@ -86,4 +87,11 @@ void print_table_stack(Table_Stack* scopes) {
         print_table(scope->table);
         scope = scope->next;
     }
+}
+
+void inject_offset(Table_Stack* scopes){
+    Table_Stack* to_inject_scope = scopes->next;
+
+    to_inject_scope->offset = scopes->offset;
+    printf("Escopo que vai ser injetado: %i", scopes->offset);
 }
