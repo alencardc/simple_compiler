@@ -11,6 +11,7 @@ static char* get_new_label();
 void create_instr_identifier(Node* node, Table_Stack* scopes);
 void create_instr_literal(Node* node, Table_Stack* scopes);
 
+void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* exp);
 void create_instr_unary(Node* op_node, Node* operand);
 
 void create_instr_binary(Node* op_node, Node* left, Node* right);

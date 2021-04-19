@@ -515,7 +515,6 @@ control_block_start: '{' {
                             else{ //Anonymous block scope
                               scopes = push_new_scope(scopes, "", scopes->offset);
                             }
-                            printf("Offset: %i\n", scopes->offset); 
                          };
 control_block_end: '}' {  
                           //On end of anonymous blocks we must inject the offset
@@ -532,7 +531,7 @@ assign_command: identifier '=' assign_expression {
                 check_for_assignment_type_error(scopes, $1->label, $3, $1->data->line_number);
                 check_error_string_max(scopes, $1->label, $3, get_line_number());
                 $$ = create_binary_tree("=", AST_ASSIGN,$1, $3);
-                create_instr_unary($$, $3); // TODO, It will be other function
+                create_instr_assignment($$, $1, scopes, $3);
               }
               | vector_identifier '=' assign_expression { 
                 check_for_vector_assignment_type_error($1, scopes, $3, get_line_number());            

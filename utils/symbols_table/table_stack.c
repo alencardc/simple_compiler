@@ -93,5 +93,4 @@ void inject_offset(Table_Stack* scopes){
     Table_Stack* to_inject_scope = scopes->next;
 
     to_inject_scope->offset = scopes->offset;
-    printf("Escopo que vai ser injetado: %i", scopes->offset);
 }

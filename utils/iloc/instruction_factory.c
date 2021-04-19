@@ -345,3 +345,24 @@ void create_instr_for(Node* for_node, Node* assign, Node* exp, Node* inc, Node* 
   free(false_label);
   free(loop_label);
 }
+
+void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* exp){
+  if(head == NULL || id == NULL || scopes == NULL || exp == NULL){
+    return;
+  }
+
+  Symbol_Entry* var_entry = search_all_scopes(scopes, id->label);
+  char* base_register;
+  if(var_entry->global){
+    base_register = strdup("rbss");
+  } else{
+    base_register = strdup("rfp");
+  }
+  
+  char offset[12];
+  sprintf(offset, "%d", var_entry->offset);
+  
+  //storeAI temp => rbss|rfp,offset
+  Instruction* assignment_instr = create_instruction("storeAI", exp->temp, base_register, offset, exp->instr);
+  head->instr = assignment_instr;
+}
