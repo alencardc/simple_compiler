@@ -241,29 +241,31 @@ vector_length: TK_LIT_INT {$$ = $1;} | '+' TK_LIT_INT {$$ = $2;};
 
 local_decl: storage_modifier var_qualifier type local_var_list {
   insert_local_entry_from_list($4, $3, scopes, get_line_number());
+  create_instr_from_local_list($4, scopes);
+  Instruction* temp = $4->instr;
   $$ = free_all_id_nodes($4);
+  $$->instr = temp;
 };
 
 local_var_list: local_var_init { $$ = $1; }
               | local_var_init ',' local_var_list { $$ = create_local_node($1, $3); }
               ;
 
-/*local_var_init: identifier { $$ = $1;  }
-              | identifier local_var_operator local_var_value { $$ = create_binary_exp($2, $1, $3); }
-              ;*/
-
 local_var_init: identifier { $$ = $1; }
-              | identifier TK_OC_LE local_var_value { $$ = create_binary_tree("<=", AST_ASSIGN, $1, $3); free($2.token_value.s_value); }
+              | identifier TK_OC_LE local_var_value { 
+                $$ = create_binary_tree("<=", AST_ASSIGN, $1, $3); 
+                free($2.token_value.s_value);
+              }
               ;
 
-//local_var_operator: TK_OC_LE { $$ = create_node_with_lex($1, AST_ASSIGN); }
-
-//local_var_id: TK_IDENTIFICADOR;
 local_var_value: identifier {
-  check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
-  check_wrong_var(scopes, $1->label, $1->data->line_number);
-  $$ = $1;
-} | vector_identifier {$$ = $1;} | literal  { $$ = $1; };
+                  check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
+                  check_wrong_var(scopes, $1->label, $1->data->line_number);
+                  $$ = $1;
+                } 
+                | vector_identifier {$$ = $1;} 
+                | literal  { $$ = $1; }
+                ;
 
 
 /*************************************
@@ -480,9 +482,9 @@ constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL);
 command_list: generic_command { $$ = $1; }
             | generic_command command_list { $$ = $1; append_child($$,$2); $$->instr = concat_instructions($2->instr,$$->instr); /* TODO, Will probably change */ }
             | local_decl ';' { $$ = $1; }
-            | local_decl ';' command_list { $$ = join_local_with_commands($1, $3);}
+            | local_decl ';' command_list { $$ = join_local_with_commands($1, $3); $$->instr = concat_instructions($3->instr,$$->instr);}
             | block_command ';' { $$ = $1; }
-            | block_command ';' command_list { $$ = join_command_lists($1, $3);}
+            | block_command ';' command_list { $$ = join_command_lists($1, $3); $$->instr = concat_instructions($3->instr,$$->instr); }
             ;
 
 generic_command: one_line_command { $$ = $1; }

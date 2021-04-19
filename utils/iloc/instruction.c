@@ -167,6 +167,9 @@ void print_instruction(Instruction* i) {
   else if (strcmp("add", i->opcode) == 0) {
     printf("add %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
   }
+  else if (strcmp("addI", i->opcode) == 0) {
+    printf("addI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+  }
   else if (strcmp("sub", i->opcode) == 0) {
     printf("sub %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
   }

@@ -58,11 +58,11 @@ void free_node(Node *node) {
 
   free(node->label);
   free(node->children);
-
-  free(node->temp);
-  //free_instruction(node->instr); // Instructions should be freed at libera() to avoid double free
-  free_placeholder(node->tl);
-  free_placeholder(node->fl);
+  // It should be made in free_code() function before calling this function
+  // free(node->temp);
+  // //free_instruction(node->instr); // Instructions should be freed at libera() to avoid double free
+  // free_placeholder(node->tl);
+  // free_placeholder(node->fl);
   free(node);
   node = NULL;
 }

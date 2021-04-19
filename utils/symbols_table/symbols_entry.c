@@ -118,14 +118,15 @@ Symbol_Entry* create_global_entry(Id_List* id_list, TokenValueType type){
     if(type == STRING_VAL)
         size = 0;
 
-    Symbol_Entry* new_entry = create_symbol_entry(id_list->id, 
-                                  id_list->line_number,
-                                  nature,
-                                  type,
-                                  size,
-                                  (TokenValue) "",
-                                  true
-                                  );
+    Symbol_Entry* new_entry = create_symbol_entry(
+        id_list->id, 
+        id_list->line_number,
+        nature,
+        type,
+        size,
+        (TokenValue) "",
+        true
+    );
     return new_entry;
 }
 
@@ -159,7 +160,6 @@ Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type,
     //Offset calculation from rfp or rbss
     new_entry->offset = scopes->offset;
     scopes->offset += new_entry->length;
-    new_entry->global = false;
     
     return new_entry;
 }
@@ -203,7 +203,9 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             Node* node_var = node->children[0];
             Node* node_value = node->children[1];
             
-            Symbol_Entry* new_entry = create_local_entry(node_var->label, node_var->data->line_number, type, scopes);
+            Symbol_Entry* new_entry = create_local_entry(
+                node_var->label, node_var->data->line_number,
+                type, scopes);
             
             
             check_identifier_redeclared(scopes, node_var->label, line);
