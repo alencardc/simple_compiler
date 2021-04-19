@@ -25,7 +25,7 @@ Argument_List* append_arg_list(Argument_List* list, Argument_List* toAppend, int
 Symbol_Entry* create_global_entry(Id_List* id_list, TokenValueType type);
 Symbol_Entry* create_literal_entry(const char* key, TokenValue value, int line, TokenValueType type);
 Symbol_Entry* create_function_entry(const char* key, Argument_List* arg_list, TokenValueType returnType, int line);
-Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type);
+Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type, Table_Stack* scopes);
 
 int get_number_of_args_from_node(Node* first_arg);
 int get_number_of_args_from_list(Argument_List* list);

@@ -154,7 +154,10 @@ void print_instruction(Instruction* i) {
   }
   else if (strcmp("loadAI", i->opcode) == 0) {
     printf("loadAI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
-  } 
+  }
+  else if (strcmp("storeAI", i->opcode) == 0) {
+    printf("storeAI %s => %s, %s\n", i->operand1, i->operand2, i->operand3);
+  }  
   else if (strcmp("loadI", i->opcode) == 0) {
     printf("loadI %s => %s\n", i->operand1, i->operand3);
   }

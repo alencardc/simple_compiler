@@ -145,7 +145,7 @@ Symbol_Entry* create_function_entry(const char* key, Argument_List* arg_list, To
     return new_entry;
 }
 
-Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type) {
+Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type, Table_Stack* scopes) {
     Symbol_Entry* new_entry = create_symbol_entry(
         key, 
         line,
@@ -155,6 +155,12 @@ Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type)
         (TokenValue) 0,
         false
     );
+    
+    //Offset calculation from rfp or rbss
+    new_entry->offset = scopes->offset;
+    scopes->offset += new_entry->length;
+    new_entry->global = false;
+    
     return new_entry;
 }
 
@@ -197,8 +203,8 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             Node* node_var = node->children[0];
             Node* node_value = node->children[1];
             
-            Symbol_Entry* new_entry = create_local_entry(node_var->label, node_var->data->line_number, type);
-
+            Symbol_Entry* new_entry = create_local_entry(node_var->label, node_var->data->line_number, type, scopes);
+            
             
             check_identifier_redeclared(scopes, node_var->label, line);
             if (node_value->type == AST_IDENTIFIER) {
@@ -234,7 +240,7 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             insert_entry_at_table(new_entry, scope);
         } else if (node->type == AST_IDENTIFIER) {
             check_identifier_redeclared(scopes, node->label, line);
-            Symbol_Entry* new_entry = create_local_entry(node->label, node->data->line_number, type);
+            Symbol_Entry* new_entry = create_local_entry(node->label, node->data->line_number, type, scopes);
             if(new_entry->type == STRING_VAL){
                 new_entry->length = 0; //Strings não inicializadas tem tamanho 0.
             }

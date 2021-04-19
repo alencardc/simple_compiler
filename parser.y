@@ -196,7 +196,7 @@ literal: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); $$->value_type
 *************************************/
 global_decl_list: storage_modifier type global_var_list ';'{
     if(scopes == NULL){
-      scopes = push_new_scope(scopes, "global");
+      scopes = push_new_scope(scopes, "global", 0);
     }
 
     Id_List* id_list = $3;
@@ -206,6 +206,8 @@ global_decl_list: storage_modifier type global_var_list ';'{
       if(!check_identifier_redeclared(scopes,id_list->id, get_line_number())){
         check_for_wrong_vector_string(id_list, $2, get_line_number());
         Symbol_Entry* new_entry = create_global_entry(id_list, $2);
+        new_entry->offset = scopes->offset;
+        scopes->offset += new_entry->length;
       
         insert_entry_at_table(new_entry, global_scope);
       }
@@ -273,7 +275,7 @@ func_header: storage_modifier type identifier '(' params ')'{
   check_string_return_type($2, get_line_number());
 
    if(scopes == NULL){
-      scopes = push_new_scope(scopes, "global");
+      scopes = push_new_scope(scopes, "global", 0);
   }
 
   check_identifier_redeclared(scopes, $3->label, get_line_number());
@@ -502,14 +504,25 @@ control_block: control_block_start command_list control_block_end { $$ = $2; }
 
 block_command: control_block { $$ = $1; };
 control_block_start: '{' { 
-                            scopes = push_new_scope(scopes, "");
+                            
                             if(is_function_block){
+                              scopes = push_new_scope(scopes, "", 0);
                               insert_arg_list_at_func_scope(function_id, scopes);
                               //Switch bool value to only insert once
                               is_function_block = false;
-                            } 
+                            }
+                            else{ //Anonymous block scope
+                              scopes = push_new_scope(scopes, "", scopes->offset);
+                            }
                          };
-control_block_end: '}' { scopes = pop_scope(scopes); };
+control_block_end: '}' {  
+                          //On end of anonymous blocks we must inject the offset
+                          //so  next declarations have the correct offset
+                          if(!is_function_block){
+                            inject_offset(scopes);
+                          }
+                          scopes = pop_scope(scopes);
+                       };
 
 assign_command: identifier '=' assign_expression {  
                 check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
@@ -517,7 +530,7 @@ assign_command: identifier '=' assign_expression {
                 check_for_assignment_type_error(scopes, $1->label, $3, $1->data->line_number);
                 check_error_string_max(scopes, $1->label, $3, get_line_number());
                 $$ = create_binary_tree("=", AST_ASSIGN,$1, $3);
-                create_instr_unary($$, $3); // TODO, It will be other function
+                create_instr_assignment($$, $1, scopes, $3);
               }
               | vector_identifier '=' assign_expression { 
                 check_for_vector_assignment_type_error($1, scopes, $3, get_line_number());            
