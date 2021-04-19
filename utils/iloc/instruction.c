@@ -201,9 +201,24 @@ void print_instruction(Instruction* i) {
 
 void print_iloc_code(Instruction* head) {
   
-  Instruction* instr = head;
+  Instruction* instr = reverse_instr_list(head);
   while (instr != NULL) {
     print_instruction(instr);
     instr = instr->previous;
   }
+}
+
+Instruction* reverse_instr_list(Instruction* list) {
+  Instruction* next = NULL;
+  Instruction* curr = list;
+  Instruction* prev = NULL;
+
+  while (curr != NULL) {
+    next = curr->previous;
+    curr->previous = prev;
+    prev = curr;
+    curr = next;
+  }
+  list = prev;
+  return list;
 }

@@ -42,5 +42,6 @@ Instruction* concat_instructions(Instruction* head, Instruction* new_instr);
 
 void print_instruction(Instruction* i);
 void print_iloc_code(Instruction* head);
+Instruction* reverse_instr_list(Instruction* list);
 
 #endif //  __INSTRUCTION_H__
