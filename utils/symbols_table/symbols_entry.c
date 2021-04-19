@@ -2,18 +2,6 @@
 #include "../ast/ast.h"
 #include "../check_error.h"
 
-// Symbol_Entry* create_id_entry(Node *id){
-//     TokenValue value = (TokenValue) 0;
-//     Symbol_Entry* new_id_entry = create_symbol_entry(
-//         id->label,
-//         id->data->line_number,
-//         VAR,
-//         NULL,
-//         NULL,
-//         value
-//         );
-// }
-
 void inject_value_type_from_scopes(Node* node, Table_Stack* scopes){
   Symbol_Entry* entry = search_all_scopes(scopes, node->label);
   node->value_type = entry->type;
@@ -121,8 +109,7 @@ void print_id_list(Id_List* list){
     }
 }
 
-//TODO: Rename to create_global_id_entry to avoid problems 
-Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
+Symbol_Entry* create_global_entry(Id_List* id_list, TokenValueType type){
     Symbol_Nature nature = id_list->vector_size > 1 ? VECTOR : VAR;
     int size = get_type_lenght(type);
     size = id_list->vector_size * size;
@@ -136,7 +123,8 @@ Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
                                   nature,
                                   type,
                                   size,
-                                  (TokenValue) ""
+                                  (TokenValue) "",
+                                  true
                                   );
     return new_entry;
 }
@@ -148,7 +136,8 @@ Symbol_Entry* create_function_entry(const char* key, Argument_List* arg_list, To
         FUNCTION,
         returnType,
         get_type_lenght(returnType),
-        (TokenValue) 0
+        (TokenValue) 0,
+        false
     );
 
     new_entry->arg_list = arg_list;
@@ -163,7 +152,8 @@ Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type)
         VAR,
         type,
         get_type_lenght(type),
-        (TokenValue) 0
+        (TokenValue) 0,
+        false
     );
     return new_entry;
 }
@@ -179,7 +169,8 @@ Symbol_Entry* create_literal_entry(const char* key, TokenValue value, int line, 
         LITERAL,
         type,
         get_type_lenght(type),
-        value
+        value,
+        false
     );
     return new_entry;
 }
@@ -270,7 +261,8 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
                                                             VAR,
                                                             arg_list->type,
                                                             get_type_lenght(arg_list->type),
-                                                            (TokenValue) 0
+                                                            (TokenValue) 0,
+                                                            false
                                                             );
         check_arg_redeclared(scopes, arg_list->id, i, get_line_number());
         insert_entry_at_table(new_symbol_entry, func_scope);

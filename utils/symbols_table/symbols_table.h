@@ -44,7 +44,8 @@ Symbol_Entry* create_symbol_entry(const char* key,
     Symbol_Nature nature,
     TokenValueType type,
     int lenght,
-    TokenValue token_value);
+    TokenValue token_value,
+    bool is_global);
 
 int hash(const char *key);
 
