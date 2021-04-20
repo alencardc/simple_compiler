@@ -10,5 +10,5 @@ int fatorial (int n){
 }
 
 int main(){
-    globalzona = fatorial(3);
+    globalzona = fatorial(4);
 }

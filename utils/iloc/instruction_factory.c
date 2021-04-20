@@ -586,7 +586,14 @@ void create_program_start_instr(Node* node, Table_Stack* scopes) {
   
   Symbol_Entry* main_func = search_deep_scope(scopes, "main");
   if (main_func->nature == FUNCTION) {
-    Instruction* jump = create_instruction("jumpI", main_func->function_label, NULL, NULL, NULL);
+    Instruction* rfp_load =  create_instruction("loadI", "1024", NULL, "rfp", NULL);
+    Instruction* rsp_load =  create_instruction("loadI", "1024", NULL, "rsp", rfp_load);
+    int instruction_count = count_instructions(node->instr);
+    instruction_count += 4;
+    char str_count[12];
+    sprintf(str_count, "%d", instruction_count);
+    Instruction* rbss_load =  create_instruction("loadI", str_count, NULL, "rbss", rsp_load);
+    Instruction* jump = create_instruction("jumpI", main_func->function_label, NULL, NULL, rbss_load);
     node->instr = concat_instructions(node->instr, jump);
   }
 }
