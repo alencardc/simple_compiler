@@ -228,3 +228,13 @@ Instruction* reverse_instr_list(Instruction* list) {
   list = prev;
   return list;
 }
+
+int count_instructions(Instruction* head) {
+  int count = 0;
+  Instruction* instr = head;
+  while (instr != NULL) {
+    count += 1;
+    instr = instr->previous;
+  }
+  return count;
+}
