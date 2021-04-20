@@ -263,6 +263,7 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
 
     Symbol_Entry** func_scope = top_scope(scopes);
     int i = 1;
+    int initial_offset = 8;
     while(arg_list != NULL){
         Symbol_Entry* new_symbol_entry = create_symbol_entry(arg_list->id, 
                                                             func_entry->line_number, 
@@ -273,8 +274,13 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
                                                             false
                                                             );
         check_arg_redeclared(scopes, arg_list->id, i, get_line_number());
+        new_symbol_entry->offset = initial_offset + i * 4;
         insert_entry_at_table(new_symbol_entry, func_scope);
         arg_list = arg_list->next;
         i++;
+    }
+    //Only non main functions have parameters, rfp, rsp and return address
+    if(strcmp(function_id, "main") != 0){
+        scopes->offset = initial_offset + i * 4;
     }
 }
