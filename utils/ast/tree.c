@@ -190,7 +190,28 @@ void export_relations(Node *root) {
   }
 }
 
+void clean_invalid_nodes(Node* root) {
+  if (root == NULL) {
+    return;
+  }
+
+  for (int i = 0; i < root->children_amount; i += 1) {
+    if (root->children[i]->type == AST_INVALID_NODE) {
+      if (root->children[i]->children_amount > 0) {
+        Node* temp = root->children[i];
+        root->children[i] = root->children[i]->children[0];
+        for (int i = 0; i < temp->children_amount; i += 1)
+          temp->children[i] = NULL; 
+        free_node(temp);
+      }
+    }
+
+    clean_invalid_nodes(root->children[i]);
+  }
+}
+
 void exporta(void *arvore) {
+  clean_invalid_nodes((Node*) arvore);
   export_relations((Node*) arvore);
   export_labels((Node*) arvore);
 }

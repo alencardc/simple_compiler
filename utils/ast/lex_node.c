@@ -248,5 +248,10 @@ Node* free_all_id_nodes(Node* root) {
       node = NULL;
     }
   }
+
+  // Code required to make local declaration code to be propagated
+  if (root == NULL) {
+    root = create_node_with_label("$empty$", AST_INVALID_NODE);
+  }
   return root;
 }

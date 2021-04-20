@@ -242,9 +242,9 @@ vector_length: TK_LIT_INT {$$ = $1;} | '+' TK_LIT_INT {$$ = $2;};
 local_decl: storage_modifier var_qualifier type local_var_list {
   insert_local_entry_from_list($4, $3, scopes, get_line_number());
   create_instr_from_local_list($4, scopes);
-  Instruction* temp = $4->instr;
+  Instruction* list_instructions = $4->instr; // avoid lost pointers
   $$ = free_all_id_nodes($4);
-  $$->instr = temp;
+  $$->instr = list_instructions;
 };
 
 local_var_list: local_var_init { $$ = $1; }

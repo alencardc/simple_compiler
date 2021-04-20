@@ -92,11 +92,10 @@ void create_instr_from_local_list(Node* list, Table_Stack* scopes) {
       entry = get_entry_from_table(node->children[0]->label, scopes->table);
     else
       entry = get_entry_from_table(node->label, scopes->table);
-    
+      
     char buff[12];
     sprintf(buff, "%d", entry->length);
     Instruction* instr = create_instruction("addI", "rsp", buff, "rsp", NULL);
-
     if (node->type == AST_ASSIGN) {
       Node* value = node->children[1];
       if (value->type == AST_LITERAL) {
@@ -113,7 +112,6 @@ void create_instr_from_local_list(Node* list, Table_Stack* scopes) {
     }
     node->instr = instr;
     instr_list = concat_instructions(node->instr, instr_list);
-
     if (node->children_amount > expected_children_amount(node->type)) {
       node = node->children[node->children_amount-1];
     } else {

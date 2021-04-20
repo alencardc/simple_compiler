@@ -1,14 +1,14 @@
-int a;
-int b;
+// int a;
+// int b;
 int main(){
-    int rfp0;
+    // int rfp0;
     int rfp4;
     int rfp8;
     
     int buffer;
 
-    buffer = rfp0;
-    buffer = rfp8;
+    // buffer = rfp0;
+    // buffer = rfp8;
     // {
     //     int rfp16;
     //     buffer = rfp16;
