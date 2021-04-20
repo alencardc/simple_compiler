@@ -486,7 +486,7 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
   char* return_reg = exp->temp;
   Instruction* store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
 
-  char* ret_addr_reg = store->operand1 == NULL ? get_new_register() : store->operand1; // reuse
+  char* ret_addr_reg = /*store->operand1 == NULL ?*/ get_new_register() /*: store->operand1*/; // reuse
   Instruction* ret_addr = create_instruction("loadAI", "rfp", "0", ret_addr_reg, store);
   char* rsp_reg = get_new_register();
   Instruction* rsp_load = create_instruction("loadAI", "rfp", "4", rsp_reg, ret_addr);
