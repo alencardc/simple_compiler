@@ -34,6 +34,8 @@ typedef struct sSymbol_Entry {
     int offset; // Offset from rfp or rbss
     bool global; // Is global or not
     struct sSymbol_Entry* next;
+    int return_offset;
+    char* function_label;
 } Symbol_Entry;
 
 

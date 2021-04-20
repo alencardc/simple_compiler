@@ -409,3 +409,42 @@ void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* ex
   Instruction* assignment_instr = create_instruction("storeAI", exp->temp, base_register, offset, exp->instr);
   head->instr = assignment_instr;
 }
+
+Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
+  //i2i rsp => rfp     // Atualiza o rfp (RFP)
+  //addI rsp, 20 => rsp    // Atualiza o rsp (SP)
+  if (strcmp(function_id, "main")){
+    return NULL;
+  }
+
+  int rsp_offset = scopes->offset;
+  char rsp_offset_str[12];
+  sprintf(rsp_offset_str, "%d", rsp_offset);
+  
+  char* function_label = get_new_label();
+  Instruction* label_start = create_label(function_label, NULL);
+  
+  Symbol_Entry* function_entry = search_deep_scope(scopes, function_id);
+  function_entry->function_label = strdup(function_label);
+  
+  Instruction* att_rfp = create_instruction("i2i", "rsp", NULL, "rfp", label_start);
+  Instruction* att_rsp = create_instruction("addI", "rsp", rsp_offset_str,  "rsp", att_rfp);
+
+  return att_rsp;  
+}
+
+Instruction* create_function_call_code(char* function_id, Table_Stack* scopes){
+// addI rpc, 7  => r1      // Calcula o endereço de retorno (7 instruções abaixo)
+// storeAI r1  => rsp, 0  // Salva o endereço de retorno
+// storeAI rsp => rsp, 4  // Salva o rsp (SP)
+// storeAI rfp => rsp, 8  // Salva o rfp (RFP)
+// loadAI  rfp, 0 => r0   // Carrega o valor da variável x em r0
+// storeAI r0 => rsp, 12  // Empilha o parâmetro
+// jumpI => L0            // Salta para o início da função chamada
+  return NULL; 
+}
+
+
+// void create_function_call(char* function_id, Table_Stack* scopes){
+//   Symbol_Entry* function_entry = search_deep_scope()
+// }

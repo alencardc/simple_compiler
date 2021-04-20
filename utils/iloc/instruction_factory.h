@@ -26,6 +26,10 @@ void create_instr_if_else(Node* if_else_node, Node* if_node, Node* block);
 void create_instr_while(Node* while_node, Node* exp, Node* block);
 void create_instr_for(Node* for_node, Node* assign, Node* exp, Node* inc, Node* block);
 
+Instruction* create_start_function_code(char* function_id, Table_Stack* scopes);
+
+Instruction* create_function_call_code(char* function_id, Table_Stack* scopes);
+
 char* get_arithop_instr(const char* op);
 char* get_relop_instr(const char* op);
 char* get_logop_instr(const char* op);

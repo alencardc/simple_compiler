@@ -164,6 +164,11 @@ void print_instruction(Instruction* i) {
   else if (strcmp("rsubI", i->opcode) == 0) {
     printf("rsubI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
   }
+  //i2i rsp => rfp
+  //Instruction* att_rfp = create_instruction("i2i", "rsp", NULL, "rfp", NULL);
+  else if (strcmp("i2i", i->opcode) == 0) {
+    printf("i2i %s => %s\n", i->operand1, i->operand3);
+  }
   else if (strcmp("add", i->opcode) == 0) {
     printf("add %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
   }

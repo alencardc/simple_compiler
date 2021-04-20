@@ -281,6 +281,7 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
     }
     //Only non main functions have parameters, rfp, rsp and return address
     if(strcmp(function_id, "main") != 0){
+        i++; // The next offset is for returning values
         scopes->offset = initial_offset + i * 4;
     }
 }
