@@ -7,7 +7,6 @@ int foo(int rfp12){
 
     buffer = rfp24;
     buffer = rfp20;
-    buffer = b;
     // {
     //     int rfp16;
     //     buffer = rfp16;

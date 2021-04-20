@@ -92,10 +92,11 @@ void create_instr_from_local_list(Node* list, Table_Stack* scopes) {
       entry = get_entry_from_table(node->children[0]->label, scopes->table);
     else
       entry = get_entry_from_table(node->label, scopes->table);
-      
+    
     char buff[12];
     sprintf(buff, "%d", entry->length);
     Instruction* instr = create_instruction("addI", "rsp", buff, "rsp", NULL);
+
     if (node->type == AST_ASSIGN) {
       Node* value = node->children[1];
       if (value->type == AST_LITERAL) {
@@ -112,6 +113,7 @@ void create_instr_from_local_list(Node* list, Table_Stack* scopes) {
     }
     node->instr = instr;
     instr_list = concat_instructions(node->instr, instr_list);
+
     if (node->children_amount > expected_children_amount(node->type)) {
       node = node->children[node->children_amount-1];
     } else {
@@ -413,7 +415,7 @@ void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* ex
 Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   //i2i rsp => rfp     // Atualiza o rfp (RFP)
   //addI rsp, 20 => rsp    // Atualiza o rsp (SP)
-  if (strcmp(function_id, "main")){
+  if (strcmp(function_id, "main") == 0){
     return NULL;
   }
 
@@ -436,12 +438,21 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
 Instruction* create_function_call_code(char* function_id, Table_Stack* scopes){
 // addI rpc, 7  => r1      // Calcula o endereço de retorno (7 instruções abaixo)
 // storeAI r1  => rsp, 0  // Salva o endereço de retorno
-// storeAI rsp => rsp, 4  // Salva o rsp (SP)
-// storeAI rfp => rsp, 8  // Salva o rfp (RFP)
-// loadAI  rfp, 0 => r0   // Carrega o valor da variável x em r0
-// storeAI r0 => rsp, 12  // Empilha o parâmetro
-// jumpI => L0            // Salta para o início da função chamada
-  return NULL; 
+
+  char* function_label = search_deep_scope(scopes, function_id)->function_label;
+  // storeAI rsp => rsp, 4  // Salva o rsp (SP)
+  // storeAI rfp => rsp, 8  // Salva o rfp (RFP)
+  Instruction* save_rsp = create_instruction("storeAI", "rsp", "rsp", "4", NULL);
+  Instruction* save_rfp = create_instruction("storeAI", "rfp", "rsp", "8", save_rsp);
+  // loadAI  rfp, 0 => r0   // Carrega o valor da variável x em r0
+  // storeAI r0 => rsp, 12  // Empilha o parâmetro
+  // jumpI => L0            // Salta para o início da função chamada
+  Instruction* jump_to_function = create_instruction("jumpI", function_label, NULL, NULL, NULL);
+    return NULL; 
+}
+
+Instruction* create_params_save(Node* a){
+  return NULL;
 }
 
 
