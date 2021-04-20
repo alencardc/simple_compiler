@@ -392,11 +392,8 @@ void create_instr_while(Node* while_node, Node* exp, Node* block) {
   char* false_label = get_new_label();
   char* loop_label = get_new_label();
 
-  printf("A %s", true_label);
   backpatch(exp->tl, true_label);
-  printf("B");
   backpatch(exp->fl, false_label);
-  printf("C");
 
   Instruction* temp = NULL;
   Instruction* loop_label_instr = create_label(loop_label, NULL);
