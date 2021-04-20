@@ -503,7 +503,7 @@ command: assign_command { $$ = $1; }
        | control_commands { $$ = $1; }
        ;
 
-control_block: control_block_start command_list control_block_end { $$ = $2; $$->instr = concat_instructions($2->instr, $1);}
+control_block: control_block_start command_list control_block_end { $$ = $2; $$->instr = concat_instructions($$->instr, $1); }
              | control_block_start control_block_end { $$ = NULL; }
              ;
 
@@ -521,6 +521,7 @@ control_block_start: '{' {
                             }
                             else{ //Anonymous block scope
                               scopes = push_new_scope(scopes, "", scopes->offset);
+                              $$ = NULL;
                             }
                          };
 control_block_end: '}' {  
