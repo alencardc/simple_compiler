@@ -156,10 +156,19 @@ extern void *arvore;
 
 %%
 
-root: programa { arvore = (void*)$1; pop_scope(scopes); }
+root: programa { 
+  arvore = (void*)$1;
+  create_program_start_instr($1, scopes);
+  print_iloc_code($1->instr); 
+  pop_scope(scopes); 
+}
 
-programa: global_decl_list programa {$$ = $2;};
-        | func_decl programa { $$ = $1; append_child($$, $2); }
+programa: global_decl_list programa { $$ = $2; };
+        | func_decl programa { 
+          $$ = $1; append_child($$, $2);
+          if ($2 != NULL)
+            $$->instr = concat_instructions($2->instr, $$->instr);
+        }
         | %empty { $$ = NULL; }
         ;
 
@@ -298,7 +307,7 @@ func_decl: func_header control_block {
   if(function_id != NULL){
     free(function_id);
   }
-  print_iloc_code($2->instr);
+  $$->instr = concat_instructions($1->instr, $2->instr);
 };
 
 params: param_list { $$ = $1; }| %empty { $$ = NULL; };

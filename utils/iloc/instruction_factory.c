@@ -503,6 +503,9 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   char* function_label = get_new_label();
   Instruction* label_start = create_label(function_label, NULL);
 
+  Symbol_Entry* function_entry = search_deep_scope(scopes, function_id);
+  function_entry->function_label = strdup(function_label);
+
   if (strcmp(function_id, "main") == 0){
     return label_start;
   }
@@ -510,9 +513,6 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   int rsp_offset = scopes->offset;
   char rsp_offset_str[12];
   sprintf(rsp_offset_str, "%d", rsp_offset);
-  
-  Symbol_Entry* function_entry = search_deep_scope(scopes, function_id);
-  function_entry->function_label = strdup(function_label);
   
   Instruction* att_rfp = create_instruction("i2i", "rsp", NULL, "rfp", label_start);
   Instruction* att_rsp = create_instruction("addI", "rsp", rsp_offset_str,  "rsp", att_rfp);
@@ -576,4 +576,16 @@ Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
   }
   
   return previous_instructions;
+}
+
+
+void create_program_start_instr(Node* node, Table_Stack* scopes) {
+  if (node == NULL)
+    return;
+  
+  Symbol_Entry* main_func = search_deep_scope(scopes, "main");
+  if (main_func->nature == FUNCTION) {
+    Instruction* jump = create_instruction("jumpI", main_func->function_label, NULL, NULL, NULL);
+    node->instr = concat_instructions(node->instr, jump);
+  }
 }
