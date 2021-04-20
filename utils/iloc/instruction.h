@@ -44,4 +44,6 @@ void print_instruction(Instruction* i);
 void print_iloc_code(Instruction* head);
 Instruction* reverse_instr_list(Instruction* list);
 
+int count_instructions(Instruction* head);
+
 #endif //  __INSTRUCTION_H__
