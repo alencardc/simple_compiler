@@ -594,7 +594,7 @@ function_call: TK_IDENTIFICADOR '(' arguments ')' {
   Symbol_Entry* entry = search_all_scopes(scopes, id);
   $$->value_type = entry->type;
 
-  Instruction* function_call = create_function_call_code(id, scopes, $3);
+  Instruction* function_call = create_function_call_code(id, scopes, $3, $$);
   $$->instr = function_call;
 };
 

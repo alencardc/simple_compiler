@@ -17,7 +17,7 @@ int foo(int rfp12){
     buffer = rfp24;
     buffer = rfp20;
 
-    abc(a + b, b + c, a + rfp20);
+    buffer = a + abc(a + b, b + c, a + rfp20);
     // {
     //     int rfp16;
     //     buffer = rfp16;

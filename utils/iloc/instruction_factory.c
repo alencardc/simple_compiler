@@ -433,7 +433,7 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   return att_rsp;  
 }
 
-Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, Node* arguments){
+Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, Node* arguments, Node* function_call){
   char* function_label = search_deep_scope(scopes, function_id)->function_label;
   
   //Instructions to save rsp and rfp on function frame
@@ -455,8 +455,16 @@ Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, N
   Instruction* save_return_addr = create_instruction("storeAI", new_register, "rsp", "0", calc_new_rpc);
   //Concatenate the save return address instructions before save_rsp and save_rfp
   save_rsp->previous = save_return_addr;
+
+  //loadAI rsp, 16 => r0 
+  int return_offset = search_deep_scope(scopes, function_id)->return_offset;
+  char return_offset_str[12];
+  sprintf(return_offset_str, "%d", return_offset);
+  char* return_register = get_new_register();
+  Instruction* put_return_on_temp = create_instruction("loadAI", "rsp", return_offset_str, return_register, jump_to_function);
+  function_call->temp = return_register;
   
-  return jump_to_function;
+  return put_return_on_temp;
 }
 
 Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
@@ -482,8 +490,3 @@ Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
   
   return previous_instructions;
 }
-
-
-// void create_function_call(char* function_id, Table_Stack* scopes){
-//   Symbol_Entry* function_entry = search_deep_scope()
-// }
