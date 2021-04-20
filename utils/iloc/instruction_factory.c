@@ -492,8 +492,8 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
   Instruction* rsp_load = create_instruction("loadAI", "rfp", "4", rsp_reg, ret_addr);
   char* rfp_reg = get_new_register();
   Instruction* rfp_load = create_instruction("loadAI", "rfp", "8", rfp_reg, rsp_load);
-  Instruction* rsp_store = create_instruction("store", rsp_reg, "rsp", NULL, rfp_load);
-  Instruction* rfp_store = create_instruction("store", rfp_reg, "rfp", NULL, rsp_store);
+  Instruction* rsp_store = create_instruction("i2i", rsp_reg, NULL,  "rsp", rfp_load);
+  Instruction* rfp_store = create_instruction("i2i", rfp_reg, NULL, "rfp", rsp_store);
   Instruction* jump = create_instruction("jump", ret_addr_reg, NULL, NULL, rfp_store);
 
   return_node->instr = jump;
@@ -507,7 +507,8 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   function_entry->function_label = strdup(function_label);
 
   if (strcmp(function_id, "main") == 0){
-    return label_start;
+    Instruction* init_rsp = create_instruction("i2i", "rfp", NULL, "rsp", label_start);
+    return init_rsp;
   }
 
   int rsp_offset = scopes->offset;
