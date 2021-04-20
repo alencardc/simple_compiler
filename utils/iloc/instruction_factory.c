@@ -92,10 +92,11 @@ void create_instr_from_local_list(Node* list, Table_Stack* scopes) {
       entry = get_entry_from_table(node->children[0]->label, scopes->table);
     else
       entry = get_entry_from_table(node->label, scopes->table);
-      
+    
     char buff[12];
     sprintf(buff, "%d", entry->length);
     Instruction* instr = create_instruction("addI", "rsp", buff, "rsp", NULL);
+
     if (node->type == AST_ASSIGN) {
       Node* value = node->children[1];
       if (value->type == AST_LITERAL) {
@@ -112,6 +113,7 @@ void create_instr_from_local_list(Node* list, Table_Stack* scopes) {
     }
     node->instr = instr;
     instr_list = concat_instructions(node->instr, instr_list);
+
     if (node->children_amount > expected_children_amount(node->type)) {
       node = node->children[node->children_amount-1];
     } else {
@@ -238,6 +240,36 @@ bool create_instr_log_op(Node* op_node, Node* left, Node* right) {
 
   free(new_label);
   return is_log_op;
+}
+
+void evaluate_expression(Node* exp) {
+  if (exp == NULL)
+    return;
+
+  if (exp->tl == NULL && exp->fl == NULL)
+    return;
+
+  char* result_reg = get_new_register();
+  char* end_label = get_new_label();
+  char* true_label = get_new_label();
+  char* false_label = get_new_label();
+  backpatch(exp->tl, true_label);
+  backpatch(exp->fl, false_label);
+
+  Instruction* true_label_instr = create_label(true_label, exp->instr);
+  Instruction* load_true = create_instruction("loadI", "1", NULL, result_reg, true_label_instr);
+  Instruction* jump = create_instruction("jumpI", end_label, NULL, NULL, load_true);
+  Instruction* false_label_instr = create_label(false_label, jump);
+  Instruction* load_false = create_instruction("loadI", "0", NULL, result_reg, false_label_instr);
+  jump = create_instruction("jumpI", end_label, NULL, NULL, load_false);
+  Instruction* end_label_instr = create_label(end_label, jump);
+
+  exp->temp = result_reg;
+  exp->instr = end_label_instr;
+
+  free(end_label);
+  free(true_label);
+  free(false_label);
 }
 
 char* get_arithop_instr(const char* op) {
@@ -412,26 +444,98 @@ void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* ex
 
 extern char* function_id;
 void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
-  
   Symbol_Entry* entry = get_entry_from_table(exp->label, scopes->table);
   Symbol_Entry* curr_function = search_deep_scope(scopes, function_id);
-  if (curr_function == NULL)
+
+  if (curr_function == NULL || curr_function->nature != FUNCTION)
     return;
 
-  int return_offset = calculate_return_offset(curr_function->arg_list);
-  printf("Offset: %d\n", return_offset);
-  return;
+  int return_offset = curr_function->return_offset;
+  char str_offset[12];
+  sprintf(str_offset, "%d", return_offset);
+
+
   if (entry == NULL) {
     // Returned value is a expression
-  } else if (entry->nature == LITERAL) {
-    create_instr_literal(exp, scopes);
-    char* return_reg = exp->instr->operand3;
+    evaluate_expression(exp);
+  }
 
-    Instruction* store = create_instruction("storeAI", return_reg, "rfp", "return_offset", exp->instr);
+  Instruction* store = NULL;
+  char* return_reg = exp->temp;
+  store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
+  // if (entry == NULL) {
+  //   // Returned value is a expression
+  //   char* return_reg = exp->temp;
+  //   store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
+  // } else if (entry->nature == LITERAL) {
+  //   char* return_reg = exp->instr->operand3;
+  //   store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
+  // } else if (entry->nature == VAR || entry->nature == VECTOR) {
+  //   char* return_reg = exp->instr->operand3;
+  //   store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
+  // } else if (entry->nature == FUNCTION) {
 
-  } else if (entry->nature == VAR || entry->nature == VECTOR) {
+  // }
 
-  } else if (entry->nature == FUNCTION) {
+  if (store != NULL) {
+    char* ret_addr_reg = store->operand1 == NULL ? get_new_register() : store->operand1; // reuse
+    Instruction* ret_addr = create_instruction("loadAI", "rfp", "0", ret_addr_reg, store);
+    char* rsp_reg = get_new_register();
+    Instruction* rsp_load = create_instruction("loadAI", "rfp", "4", rsp_reg, ret_addr);
+    char* rfp_reg = get_new_register();
+    Instruction* rfp_load = create_instruction("loadAI", "rfp", "8", rfp_reg, rsp_load);
+    Instruction* rsp_store = create_instruction("store", rsp_reg, "rsp", NULL, rfp_load);
+    Instruction* rfp_store = create_instruction("store", rfp_reg, "rfp", NULL, rsp_store);
+    Instruction* jump = create_instruction("jump", ret_addr_reg, NULL, NULL, rfp_store);
 
+    return_node->instr = jump;
   }
 }
+
+Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
+  //i2i rsp => rfp     // Atualiza o rfp (RFP)
+  //addI rsp, 20 => rsp    // Atualiza o rsp (SP)
+  if (strcmp(function_id, "main") == 0){
+    return NULL;
+  }
+
+  int rsp_offset = scopes->offset;
+  char rsp_offset_str[12];
+  sprintf(rsp_offset_str, "%d", rsp_offset);
+  
+  char* function_label = get_new_label();
+  Instruction* label_start = create_label(function_label, NULL);
+  
+  Symbol_Entry* function_entry = search_deep_scope(scopes, function_id);
+  function_entry->function_label = strdup(function_label);
+  
+  Instruction* att_rfp = create_instruction("i2i", "rsp", NULL, "rfp", label_start);
+  Instruction* att_rsp = create_instruction("addI", "rsp", rsp_offset_str,  "rsp", att_rfp);
+
+  return att_rsp;  
+}
+
+Instruction* create_function_call_code(char* function_id, Table_Stack* scopes){
+// addI rpc, 7  => r1      // Calcula o endereço de retorno (7 instruções abaixo)
+// storeAI r1  => rsp, 0  // Salva o endereço de retorno
+
+  char* function_label = search_deep_scope(scopes, function_id)->function_label;
+  // storeAI rsp => rsp, 4  // Salva o rsp (SP)
+  // storeAI rfp => rsp, 8  // Salva o rfp (RFP)
+  Instruction* save_rsp = create_instruction("storeAI", "rsp", "rsp", "4", NULL);
+  Instruction* save_rfp = create_instruction("storeAI", "rfp", "rsp", "8", save_rsp);
+  // loadAI  rfp, 0 => r0   // Carrega o valor da variável x em r0
+  // storeAI r0 => rsp, 12  // Empilha o parâmetro
+  // jumpI => L0            // Salta para o início da função chamada
+  Instruction* jump_to_function = create_instruction("jumpI", function_label, NULL, NULL, NULL);
+    return NULL; 
+}
+
+Instruction* create_params_save(Node* a){
+  return NULL;
+}
+
+
+// void create_function_call(char* function_id, Table_Stack* scopes){
+//   Symbol_Entry* function_entry = search_deep_scope()
+// }

@@ -26,6 +26,7 @@ extern void *arvore;
   Id_List* id_list;
   TokenValueType type;
   Argument_List* arg_list;
+  Instruction* instr;
 }
 
 %token TK_PR_INT
@@ -137,6 +138,7 @@ extern void *arvore;
 %type <node> if_simples
 %type <node> if_else
 %type <node> for
+%type <instr> control_block_start
 
 %type <node> return
 %type <node> func_header
@@ -482,7 +484,8 @@ constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL);
 command_list: generic_command { $$ = $1; }
             | generic_command command_list { $$ = $1; append_child($$,$2); $$->instr = concat_instructions($2->instr,$$->instr); /* TODO, Will probably change */ }
             | local_decl ';' { $$ = $1; }
-            | local_decl ';' command_list { $$ = join_local_with_commands($1, $3); $$->instr = concat_instructions($3->instr,$$->instr);}
+            | local_decl ';' command_list { $$ = join_local_with_commands($1, $3); $$->instr = concat_instructions($3->instr,$$->instr);
+            }
             | block_command ';' { $$ = $1; }
             | block_command ';' command_list { $$ = join_command_lists($1, $3); $$->instr = concat_instructions($3->instr,$$->instr); }
             ;
@@ -500,7 +503,7 @@ command: assign_command { $$ = $1; }
        | control_commands { $$ = $1; }
        ;
 
-control_block: control_block_start command_list control_block_end { $$ = $2; }
+control_block: control_block_start command_list control_block_end { $$ = $2; $$->instr = concat_instructions($2->instr, $1);}
              | control_block_start control_block_end { $$ = NULL; }
              ;
 
@@ -510,6 +513,9 @@ control_block_start: '{' {
                             if(is_function_block){
                               scopes = push_new_scope(scopes, "", 0);
                               insert_arg_list_at_func_scope(function_id, scopes);
+                              Instruction* start_function = create_start_function_code(function_id, scopes);
+                              //print_iloc_code(start_function);
+                              $$ = start_function;
                               //Switch bool value to only insert once
                               is_function_block = false;
                             }
@@ -604,7 +610,7 @@ control_commands: return { $$ = $1; }
 return: TK_PR_RETURN assign_expression { 
                                           $$ = create_node_with_label("return", AST_RETURN); 
                                           append_child($$, $2);
-                                          $$->instr = concat_instructions($2->instr, $$->instr); /* TODO, Will probably change */
+                                          //$$->instr = concat_instructions($2->instr, $$->instr); /* TODO, Will probably change */
                                           check_wrong_return_type(function_id, scopes, $2->value_type, get_line_number());
                                           create_instr_return($$, $2, scopes);
                                         }; 

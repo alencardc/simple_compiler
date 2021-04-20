@@ -155,6 +155,9 @@ void print_instruction(Instruction* i) {
   else if (strcmp("loadAI", i->opcode) == 0) {
     printf("loadAI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
   }
+  else if (strcmp("store", i->opcode) == 0) {
+    printf("store %s => %s\n", i->operand1, i->operand2);
+  }  
   else if (strcmp("storeAI", i->opcode) == 0) {
     printf("storeAI %s => %s, %s\n", i->operand1, i->operand2, i->operand3);
   }  
@@ -163,6 +166,9 @@ void print_instruction(Instruction* i) {
   }
   else if (strcmp("rsubI", i->opcode) == 0) {
     printf("rsubI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+  }
+  else if (strcmp("i2i", i->opcode) == 0) {
+    printf("i2i %s => %s\n", i->operand1, i->operand3);
   }
   else if (strcmp("add", i->opcode) == 0) {
     printf("add %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
@@ -182,8 +188,11 @@ void print_instruction(Instruction* i) {
   else if (strcmp("cbr", i->opcode) == 0) {
     printf("cbr %s -> %s, %s\n", i->operand1, i->operand2, i->operand3);
   }
+  else if (strcmp("jump", i->opcode) == 0) {
+    printf("jump -> %s\n", i->operand1);
+  }  
   else if (strcmp("jumpI", i->opcode) == 0) {
-    printf("jumpI %s\n", i->operand1);
+    printf("jumpI -> %s\n", i->operand1);
   }
   else if (strcmp("cmp_LT", i->opcode) == 0) {
     printf("cmp_LT %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);
