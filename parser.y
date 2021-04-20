@@ -304,10 +304,11 @@ func_header: storage_modifier type identifier '(' params ')'{
 
 func_decl: func_header control_block {
   $$ = create_function_node($1, $2);
+  $$->instr = concat_instructions($1->instr, $2->instr);
+  complete_holes($$->instr, scopes);
   if(function_id != NULL){
     free(function_id);
   }
-  $$->instr = concat_instructions($1->instr, $2->instr);
 };
 
 params: param_list { $$ = $1; }| %empty { $$ = NULL; };
