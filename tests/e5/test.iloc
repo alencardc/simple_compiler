@@ -1,16 +1,16 @@
 loadI 1024 => rfp
 loadI 1024 => rsp
-loadI 79 => rbss
-jumpI -> L3
+loadI 38 => rbss
+jumpI -> L1
 L0: nop
 i2i rsp => rfp
 addI rsp, 20 => rsp
+addI rsp, 4 => rsp
 loadAI rfp, 12 => r0
 loadI 1 => r1
-cmp_EQ r0, r1 -> r2
-cbr r2 -> L1, L2
-L1: nop
-loadI 1 => r3
+add r0, r1 => r2
+storeAI r2 => rfp, 20
+loadAI rfp, 20 => r3
 storeAI r3 => rfp, 16
 loadAI rfp, 0 => r4
 loadAI rfp, 4 => r5
@@ -18,62 +18,21 @@ loadAI rfp, 8 => r6
 i2i r5 => rsp
 i2i r6 => rfp
 jump -> r4
-L2: nop
-addI rpc, 9 => r10
-storeAI r10 => rsp, 0
-storeAI rsp => rsp, 4
-storeAI rfp => rsp, 8
-loadAI rfp, 12 => r7
-loadI 1 => r8
-sub r7, r8 => r9
-storeAI r9 => rsp, 12
-storeAI r1 => rsp, 20
-storeAI r0 => rsp, 24
-storeAI r2 => rsp, 28
-storeAI r3 => rsp, 32
-storeAI r5 => rsp, 36
-storeAI r6 => rsp, 40
-storeAI r4 => rsp, 44
-storeAI r10 => rsp, 48
-storeAI r8 => rsp, 52
-storeAI r7 => rsp, 56
-storeAI r9 => rsp, 60
-jumpI -> L0
-loadAI rsp, 20 => r1
-loadAI rsp, 24 => r0
-loadAI rsp, 28 => r2
-loadAI rsp, 32 => r3
-loadAI rsp, 36 => r5
-loadAI rsp, 40 => r6
-loadAI rsp, 44 => r4
-loadAI rsp, 48 => r10
-loadAI rsp, 52 => r8
-loadAI rsp, 56 => r7
-loadAI rsp, 60 => r9
-loadAI rsp, 16 => r11
-loadAI rfp, 12 => r12
-mult r11, r12 => r13
-storeAI r13 => rfp, 16
-loadAI rfp, 0 => r14
-loadAI rfp, 4 => r15
-loadAI rfp, 8 => r16
-i2i r15 => rsp
-i2i r16 => rfp
-jump -> r14
-L3: nop
+L1: nop
 i2i rfp => rsp
-addI rpc, 7 => r18
-storeAI r18 => rsp, 0
+addI rsp, 4 => rsp
+addI rpc, 7 => r8
+storeAI r8 => rsp, 0
 storeAI rsp => rsp, 4
 storeAI rfp => rsp, 8
-loadI 3 => r17
-storeAI r17 => rsp, 12
-storeAI r18 => rsp, 16
-storeAI r17 => rsp, 20
+loadI 999 => r7
+storeAI r7 => rsp, 12
+storeAI r8 => rsp, 16
+storeAI r7 => rsp, 20
 jumpI -> L0
-loadAI rsp, 16 => r18
-loadAI rsp, 20 => r17
-loadAI rsp, 16 => r19
-storeAI r19 => rbss, 0
-loadI 25 => r20
+loadAI rsp, 16 => r8
+loadAI rsp, 20 => r7
+loadAI rsp, 16 => r9
+storeAI r9 => rbss, 0
+loadI 25 => r10
 halt

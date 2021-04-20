@@ -677,6 +677,16 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
         i += 1;
         item = item->next;
       }
+
+      // Update offset to return to update PC
+      if (prev!=NULL) {
+        int return_offset = atoi(prev->operand2);
+        return_offset += 2*(i-1);
+        char return_offset_str[12];
+        sprintf(return_offset_str, "%d", return_offset);
+        free(prev->operand2);
+        prev->operand2 = strdup(return_offset_str);
+      }
       
       Instruction* jump = instr->previous;
       stores = concat_instructions(stores, jump->previous);
