@@ -319,8 +319,12 @@ char* get_relop_instr(const char* op) {
 }
 
 void create_instr_if(Node* if_node, Node* exp, Node* block) {
-  if (exp == NULL || block == NULL)
+  if (exp == NULL)
     return;
+  
+  Instruction* code_block = NULL;
+  if (block != NULL)
+    code_block = block->instr;
 
   char* true_label = get_new_label();
   char* false_label = get_new_label();
@@ -331,7 +335,7 @@ void create_instr_if(Node* if_node, Node* exp, Node* block) {
   Instruction* false_label_instr = create_label(false_label, NULL);
   //if_node->instr = concat_instructions(false_label_instr, true_label_instr);
   if_node->instr = concat_instructions(true_label_instr, exp->instr);
-  if_node->instr = concat_instructions(block->instr, if_node->instr);
+  if_node->instr = concat_instructions(code_block, if_node->instr);
   if_node->instr = concat_instructions(false_label_instr, if_node->instr);
 
   free(true_label);
@@ -339,8 +343,13 @@ void create_instr_if(Node* if_node, Node* exp, Node* block) {
 }
 
 void create_instr_if_else(Node* if_else_node, Node* if_node, Node* block) {
-  if (if_else_node == NULL && if_node == NULL && block == NULL)
+  if (if_else_node == NULL && if_node == NULL)
     return;
+
+  Instruction* code_block = NULL;
+  if (block != NULL)
+    code_block = block->instr;
+  
   // Find false label
   Instruction* false_label_instr = if_node->instr;
   if (false_label_instr->label == NULL)
@@ -363,7 +372,7 @@ void create_instr_if_else(Node* if_else_node, Node* if_node, Node* block) {
   false_label_instr->previous = true_jump;
 
   // Concatenate code from else block
-  if_else_node->instr = concat_instructions(block->instr, false_label_instr);
+  if_else_node->instr = concat_instructions(code_block, false_label_instr);
   // Create else jump to end of if else and concatenate with end label instruction
   if_else_node->instr = create_instruction("jumpI", end_label, NULL, NULL, if_else_node->instr);
   if_else_node->instr = create_label(end_label, if_else_node->instr);
@@ -372,8 +381,13 @@ void create_instr_if_else(Node* if_else_node, Node* if_node, Node* block) {
 }
 
 void create_instr_while(Node* while_node, Node* exp, Node* block) {
-  if (while_node == NULL && exp == NULL && block == NULL)
+  if (while_node == NULL && exp == NULL)
     return;
+  
+  Instruction* code_block = NULL;
+  if (block != NULL)
+    code_block = block->instr;
+
   char* true_label = get_new_label();
   char* false_label = get_new_label();
   char* loop_label = get_new_label();
@@ -388,7 +402,7 @@ void create_instr_while(Node* while_node, Node* exp, Node* block) {
   Instruction* loop_label_instr = create_label(loop_label, NULL);
   temp = concat_instructions(exp->instr, loop_label_instr);
   Instruction* true_label_instr = create_label(true_label, temp);
-  temp = concat_instructions(block->instr, true_label_instr);
+  temp = concat_instructions(code_block, true_label_instr);
   Instruction* jump = create_instruction("jumpI", loop_label, NULL, NULL, temp);
   Instruction* false_label_instr = create_label(false_label, jump);
 
@@ -399,8 +413,12 @@ void create_instr_while(Node* while_node, Node* exp, Node* block) {
 }
 
 void create_instr_for(Node* for_node, Node* assign, Node* exp, Node* inc, Node* block) {
-  if (for_node == NULL && assign == NULL && inc == NULL && exp == NULL && block == NULL)
+  if (for_node == NULL && assign == NULL && inc == NULL && exp == NULL)
     return;
+
+  Instruction* code_block = NULL;
+  if (block != NULL)
+    code_block = block->instr;
 
   char* true_label = get_new_label();
   char* false_label = get_new_label();
@@ -413,7 +431,7 @@ void create_instr_for(Node* for_node, Node* assign, Node* exp, Node* inc, Node* 
   Instruction* loop_label_instr = create_label(loop_label, assign->instr);
   temp = concat_instructions(exp->instr, loop_label_instr);
   Instruction* true_label_instr = create_label(true_label, temp);
-  temp = concat_instructions(block->instr, true_label_instr);
+  temp = concat_instructions(code_block, true_label_instr);
   temp = concat_instructions(inc->instr, temp);
   Instruction* jump = create_instruction("jumpI", loop_label, NULL, NULL, temp);
   Instruction* false_label_instr = create_label(false_label, jump);
@@ -447,6 +465,10 @@ void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* ex
 
 extern char* function_id;
 void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
+  if (strcmp(function_id, "main") == 0){
+    return;
+  }
+
   Symbol_Entry* entry = get_entry_from_table(exp->label, scopes->table);
   Symbol_Entry* curr_function = search_deep_scope(scopes, function_id);
 
@@ -463,36 +485,20 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
     evaluate_expression(exp);
   }
 
-  Instruction* store = NULL;
   char* return_reg = exp->temp;
-  store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
-  // if (entry == NULL) {
-  //   // Returned value is a expression
-  //   char* return_reg = exp->temp;
-  //   store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
-  // } else if (entry->nature == LITERAL) {
-  //   char* return_reg = exp->instr->operand3;
-  //   store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
-  // } else if (entry->nature == VAR || entry->nature == VECTOR) {
-  //   char* return_reg = exp->instr->operand3;
-  //   store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
-  // } else if (entry->nature == FUNCTION) {
+  Instruction* store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
 
-  // }
+  char* ret_addr_reg = store->operand1 == NULL ? get_new_register() : store->operand1; // reuse
+  Instruction* ret_addr = create_instruction("loadAI", "rfp", "0", ret_addr_reg, store);
+  char* rsp_reg = get_new_register();
+  Instruction* rsp_load = create_instruction("loadAI", "rfp", "4", rsp_reg, ret_addr);
+  char* rfp_reg = get_new_register();
+  Instruction* rfp_load = create_instruction("loadAI", "rfp", "8", rfp_reg, rsp_load);
+  Instruction* rsp_store = create_instruction("store", rsp_reg, "rsp", NULL, rfp_load);
+  Instruction* rfp_store = create_instruction("store", rfp_reg, "rfp", NULL, rsp_store);
+  Instruction* jump = create_instruction("jump", ret_addr_reg, NULL, NULL, rfp_store);
 
-  if (store != NULL) {
-    char* ret_addr_reg = store->operand1 == NULL ? get_new_register() : store->operand1; // reuse
-    Instruction* ret_addr = create_instruction("loadAI", "rfp", "0", ret_addr_reg, store);
-    char* rsp_reg = get_new_register();
-    Instruction* rsp_load = create_instruction("loadAI", "rfp", "4", rsp_reg, ret_addr);
-    char* rfp_reg = get_new_register();
-    Instruction* rfp_load = create_instruction("loadAI", "rfp", "8", rfp_reg, rsp_load);
-    Instruction* rsp_store = create_instruction("store", rsp_reg, "rsp", NULL, rfp_load);
-    Instruction* rfp_store = create_instruction("store", rfp_reg, "rfp", NULL, rsp_store);
-    Instruction* jump = create_instruction("jump", ret_addr_reg, NULL, NULL, rfp_store);
-
-    return_node->instr = jump;
-  }
+  return_node->instr = jump;
 }
 
 Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
