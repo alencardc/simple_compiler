@@ -29,7 +29,8 @@ void create_instr_for(Node* for_node, Node* assign, Node* exp, Node* inc, Node* 
 
 Instruction* create_start_function_code(char* function_id, Table_Stack* scopes);
 
-Instruction* create_function_call_code(char* function_id, Table_Stack* scopes);
+Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, Node* arguments, Node* function_call);
+Instruction* create_params_save(Node* arguments, Table_Stack* scopes);
 
 char* get_arithop_instr(const char* op);
 char* get_relop_instr(const char* op);

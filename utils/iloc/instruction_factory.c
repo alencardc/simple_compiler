@@ -496,8 +496,6 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
 }
 
 Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
-  //i2i rsp => rfp     // Atualiza o rfp (RFP)
-  //addI rsp, 20 => rsp    // Atualiza o rsp (SP)
   if (strcmp(function_id, "main") == 0){
     return NULL;
   }
@@ -518,27 +516,60 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   return att_rsp;  
 }
 
-Instruction* create_function_call_code(char* function_id, Table_Stack* scopes){
-// addI rpc, 7  => r1      // Calcula o endereço de retorno (7 instruções abaixo)
-// storeAI r1  => rsp, 0  // Salva o endereço de retorno
-
+Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, Node* arguments, Node* function_call){
   char* function_label = search_deep_scope(scopes, function_id)->function_label;
-  // storeAI rsp => rsp, 4  // Salva o rsp (SP)
-  // storeAI rfp => rsp, 8  // Salva o rfp (RFP)
+  
+  //Instructions to save rsp and rfp on function frame
   Instruction* save_rsp = create_instruction("storeAI", "rsp", "rsp", "4", NULL);
   Instruction* save_rfp = create_instruction("storeAI", "rfp", "rsp", "8", save_rsp);
-  // loadAI  rfp, 0 => r0   // Carrega o valor da variável x em r0
-  // storeAI r0 => rsp, 12  // Empilha o parâmetro
-  // jumpI => L0            // Salta para o início da função chamada
-  Instruction* jump_to_function = create_instruction("jumpI", function_label, NULL, NULL, NULL);
-    return NULL; 
+  
+  //Generate instructions to save params on function frame
+  Instruction* save_params = create_params_save(arguments, scopes);
+  save_params = concat_instructions(save_params, save_rfp);
+  
+  Instruction* jump_to_function = create_instruction("jumpI", function_label, NULL, NULL, save_params);
+
+  //Generate instructions to  save return address
+  int num_instructions = count_instructions(jump_to_function);
+  char offset_rpc[12];
+  sprintf(offset_rpc, "%d", num_instructions + 2);
+  char* new_register = get_new_register();
+  Instruction* calc_new_rpc = create_instruction("addI", "rpc", offset_rpc, new_register, NULL);
+  Instruction* save_return_addr = create_instruction("storeAI", new_register, "rsp", "0", calc_new_rpc);
+  //Concatenate the save return address instructions before save_rsp and save_rfp
+  save_rsp->previous = save_return_addr;
+
+  //loadAI rsp, 16 => r0 
+  int return_offset = search_deep_scope(scopes, function_id)->return_offset;
+  char return_offset_str[12];
+  sprintf(return_offset_str, "%d", return_offset);
+  char* return_register = get_new_register();
+  Instruction* put_return_on_temp = create_instruction("loadAI", "rsp", return_offset_str, return_register, jump_to_function);
+  function_call->temp = return_register;
+  
+  return put_return_on_temp;
 }
 
-Instruction* create_params_save(Node* a){
-  return NULL;
+Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
+
+  int offset = 12;
+  Instruction* previous_instructions = NULL;
+  Node* current_argument = arguments;
+  while (current_argument != NULL)
+  {
+    char* temp = current_argument->temp;
+    char rsp_offset[12];
+    sprintf(rsp_offset, "%d", offset);
+    Instruction* store_param = create_instruction("storeAI", temp, "rsp", rsp_offset, current_argument->instr);
+    
+    previous_instructions = concat_instructions(store_param, previous_instructions);
+    offset += get_type_lenght(current_argument->value_type);
+    if(current_argument->children_amount > expected_children_amount(current_argument->type)){
+      current_argument = current_argument->children[current_argument->children_amount - 1];
+    } else{
+      current_argument = NULL;
+    }
+  }
+  
+  return previous_instructions;
 }
-
-
-// void create_function_call(char* function_id, Table_Stack* scopes){
-//   Symbol_Entry* function_entry = search_deep_scope()
-// }
