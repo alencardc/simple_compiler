@@ -462,25 +462,26 @@ void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* ex
 
 extern char* function_id;
 void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
-  if (strcmp(function_id, "main") == 0){
-    return;
-  }
 
   Symbol_Entry* entry = get_entry_from_table(exp->label, scopes->table);
   Symbol_Entry* curr_function = search_deep_scope(scopes, function_id);
 
   if (curr_function == NULL || curr_function->nature != FUNCTION)
     return;
-
-  int return_offset = curr_function->return_offset;
-  char str_offset[12];
-  sprintf(str_offset, "%d", return_offset);
-
-
+  
   if (entry == NULL) {
     // Returned value is a expression
     evaluate_expression(exp);
   }
+
+  if (strcmp(function_id, "main") == 0){
+    return_node->instr = create_instruction("halt", NULL, NULL, NULL, exp->instr);
+    return;
+  }
+
+  int return_offset = curr_function->return_offset;
+  char str_offset[12];
+  sprintf(str_offset, "%d", return_offset);
 
   char* return_reg = exp->temp;
   Instruction* store = create_instruction("storeAI", return_reg, "rfp", str_offset, exp->instr);
@@ -499,16 +500,16 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
 }
 
 Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
+  char* function_label = get_new_label();
+  Instruction* label_start = create_label(function_label, NULL);
+
   if (strcmp(function_id, "main") == 0){
-    return NULL;
+    return label_start;
   }
 
   int rsp_offset = scopes->offset;
   char rsp_offset_str[12];
   sprintf(rsp_offset_str, "%d", rsp_offset);
-  
-  char* function_label = get_new_label();
-  Instruction* label_start = create_label(function_label, NULL);
   
   Symbol_Entry* function_entry = search_deep_scope(scopes, function_id);
   function_entry->function_label = strdup(function_label);

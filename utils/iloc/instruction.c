@@ -212,6 +212,9 @@ void print_instruction(Instruction* i) {
   else if (strcmp("cmp_GE", i->opcode) == 0) {
     printf("cmp_GE %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);
   }
+  else if (strcmp("halt", i->opcode) == 0) {
+    printf("halt\n");
+  }
 }
 
 void print_iloc_code(Instruction* head) {

@@ -265,14 +265,15 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
     int i = 1;
     int initial_offset = 8;
     while(arg_list != NULL){
-        Symbol_Entry* new_symbol_entry = create_symbol_entry(arg_list->id, 
-                                                            func_entry->line_number, 
-                                                            VAR,
-                                                            arg_list->type,
-                                                            get_type_lenght(arg_list->type),
-                                                            (TokenValue) 0,
-                                                            false
-                                                            );
+        Symbol_Entry* new_symbol_entry = create_symbol_entry(
+            arg_list->id, 
+            func_entry->line_number, 
+            VAR,
+            arg_list->type,
+            get_type_lenght(arg_list->type),
+            (TokenValue) 0,
+            false
+        );
         check_arg_redeclared(scopes, arg_list->id, i, get_line_number());
         new_symbol_entry->offset = initial_offset + i * 4;
         insert_entry_at_table(new_symbol_entry, func_scope);
