@@ -590,8 +590,12 @@ function_call: TK_IDENTIFICADOR '(' arguments ')' {
   check_wrong_arg_size($3, $1.token_value.s_value, scopes, $1.line_number);
   check_wrong_arg_type($3, $1.token_value.s_value, scopes, $1.line_number);
   $$ = create_func_call_node($1, $3);
-  Symbol_Entry* entry = search_all_scopes(scopes, ($$->label + 5));
+  char *id = $$->label + 5;
+  Symbol_Entry* entry = search_all_scopes(scopes, id);
   $$->value_type = entry->type;
+
+  Instruction* function_call = create_function_call_code(id, scopes, $3);
+  $$->instr = function_call;
 };
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
