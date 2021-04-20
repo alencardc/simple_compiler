@@ -4,6 +4,7 @@
 #include "instruction.h"
 #include "../ast/ast.h"
 #include "../symbols_table/table_stack.h"
+#include "../symbols_table/symbols_entry.h"
 
 static char* get_new_register();
 static char* get_new_label(); 
@@ -29,5 +30,7 @@ void create_instr_for(Node* for_node, Node* assign, Node* exp, Node* inc, Node* 
 char* get_arithop_instr(const char* op);
 char* get_relop_instr(const char* op);
 char* get_logop_instr(const char* op);
+
+void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes);
 
 #endif // __INSTRUCTION_FACTORY_H__

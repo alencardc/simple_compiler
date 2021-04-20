@@ -409,3 +409,29 @@ void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* ex
   Instruction* assignment_instr = create_instruction("storeAI", exp->temp, base_register, offset, exp->instr);
   head->instr = assignment_instr;
 }
+
+extern char* function_id;
+void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
+  
+  Symbol_Entry* entry = get_entry_from_table(exp->label, scopes->table);
+  Symbol_Entry* curr_function = search_deep_scope(scopes, function_id);
+  if (curr_function == NULL)
+    return;
+
+  int return_offset = calculate_return_offset(curr_function->arg_list);
+  printf("Offset: %d\n", return_offset);
+  return;
+  if (entry == NULL) {
+    // Returned value is a expression
+  } else if (entry->nature == LITERAL) {
+    create_instr_literal(exp, scopes);
+    char* return_reg = exp->instr->operand3;
+
+    Instruction* store = create_instruction("storeAI", return_reg, "rfp", "return_offset", exp->instr);
+
+  } else if (entry->nature == VAR || entry->nature == VECTOR) {
+
+  } else if (entry->nature == FUNCTION) {
+
+  }
+}

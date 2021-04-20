@@ -523,6 +523,7 @@ control_block_end: '}' {
                           if(!is_function_block){
                             inject_offset(scopes);
                           }
+                          //print_table_stack(scopes);
                           scopes = pop_scope(scopes);
                        };
 
@@ -605,6 +606,7 @@ return: TK_PR_RETURN assign_expression {
                                           append_child($$, $2);
                                           $$->instr = concat_instructions($2->instr, $$->instr); /* TODO, Will probably change */
                                           check_wrong_return_type(function_id, scopes, $2->value_type, get_line_number());
+                                          create_instr_return($$, $2, scopes);
                                         }; 
 
 
