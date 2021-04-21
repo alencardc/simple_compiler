@@ -136,7 +136,7 @@ Instruction* concat_instructions(Instruction* head, Instruction* new_instr) {
     return new_instr;
   if (new_instr == NULL) 
     return head;
-  
+    
   Instruction* temp = head;
   while (temp->previous != NULL) 
     temp = temp->previous;
@@ -220,8 +220,11 @@ void print_instruction(Instruction* i) {
   else if (strcmp("halt", i->opcode) == 0) {
     printf("halt\n");
   }
-   else if (strcmp("$load$", i->opcode) == 0) {
+  else if (strcmp("$load$", i->opcode) == 0) {
     printf("$load$\n");
+  }
+  else if (strcmp("$store$", i->opcode) == 0) {
+    printf("$store$\n");
   } else if (strcmp("nop", i->opcode) == 0) {
     printf("nop\n");
   }
