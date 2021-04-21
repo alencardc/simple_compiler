@@ -58,11 +58,10 @@ void free_node(Node *node) {
 
   free(node->label);
   free(node->children);
-  // It should be made in free_code() function before calling this function
-  // free(node->temp);
-  // //free_instruction(node->instr); // Instructions should be freed at libera() to avoid double free
-  // free_placeholder(node->tl);
-  // free_placeholder(node->fl);
+  node->instr = NULL; //This field is freed in free_instruction()
+  node->tl = NULL;
+  node->fl = NULL;
+  free(node->temp);
   free(node);
   node = NULL;
 }
@@ -217,5 +216,7 @@ void exporta(void *arvore) {
 }
 
 void libera(void *arvore) {
-  free_node((Node*)arvore);
+  Node* root = (Node*)arvore;
+  //free_instruction(root->instr);
+  free_node(root);
 }

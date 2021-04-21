@@ -40,6 +40,8 @@ Symbol_Entry* create_symbol_entry(const char* key,
     entry->type = type;
     entry->offset = 0; // TODO
     entry->global = is_global; // TODO
+    entry->return_offset = 0;
+    entry->function_label = NULL;
 
     return entry;
 }
@@ -139,6 +141,7 @@ void free_entry(Symbol_Entry *entry){
     }
     
     free_arg_list(entry->arg_list);
+    free(entry->function_label);
 
     free_entry(entry->next);
     
