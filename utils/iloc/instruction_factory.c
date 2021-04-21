@@ -561,9 +561,8 @@ Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, N
 
   Instruction* load_hole = create_instruction("$load$", NULL, NULL, NULL, put_return_on_temp);
   
-
   free(new_register);
-  return put_return_on_temp;
+  return load_hole;
 }
 
 Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
@@ -701,6 +700,7 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
         stores->previous = instr->previous;
       }
       else{
+        free(instr->opcode);
         instr->opcode = strdup("nop");
       }
     }
@@ -724,6 +724,7 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
         pre_load->previous = instr->previous;
       }
       else{
+        free(instr->opcode);
         instr->opcode = strdup("nop");
       }
     }

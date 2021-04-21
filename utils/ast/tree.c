@@ -217,6 +217,6 @@ void exporta(void *arvore) {
 
 void libera(void *arvore) {
   Node* root = (Node*)arvore;
-  //free_instruction(root->instr);
+  free_instruction(root->instr);
   free_node(root);
 }

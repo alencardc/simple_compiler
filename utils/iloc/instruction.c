@@ -109,8 +109,7 @@ void free_instruction(Instruction* instr) {
     return;
   
   //print_instruction(instr);
-  while (instr->previous != NULL) {
-    free_instruction(instr->previous);}
+  free_instruction(instr->previous);
 
   free(instr->label);
   free(instr->opcode);
@@ -229,8 +228,7 @@ void print_instruction(Instruction* i) {
 }
 
 void print_iloc_code(Instruction* head) {
-  
-  Instruction* instr = reverse_instr_list(head);
+  Instruction* instr = head;
   while (instr != NULL) {
     print_instruction(instr);
     instr = instr->previous;

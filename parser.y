@@ -159,10 +159,8 @@ extern void *arvore;
 root: programa { 
   arvore = (void*)$1;
   create_program_start_instr($1, scopes);
-  printf("\nTotal %d\n", count_instructions($1->instr));
+  $1->instr = reverse_instr_list($1->instr);
   print_iloc_code($1->instr); 
-  free_instruction($1->instr);
-  $1->instr = NULL;
   pop_scope(scopes); 
 }
 
