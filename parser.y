@@ -666,4 +666,5 @@ while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {
 
 void yyerror (char const *s) {
   printf("Error: %s at line %d\n", s, get_line_number());
+  exit(-1);
 }
