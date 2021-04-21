@@ -650,6 +650,14 @@ RegList* insert_if_not_exists(char* reg, RegList* list) {
   return list;
 }
 
+void free_reglist(RegList* list) {
+  if (list == NULL)
+    return;
+  free_reglist(list->next);
+  list->reg = NULL;
+  free(list);
+}
+
 void complete_holes(Instruction* code, Table_Stack* scopes) {
   if (code == NULL)
     return;
@@ -685,6 +693,7 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
         i += 1;
         item = item->next;
       }
+      //free_reglist(regs); //Uncomment after merge
 
       if(stores != NULL){
         char stack_offset[12];
