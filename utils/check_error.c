@@ -183,7 +183,7 @@ bool check_wrong_par_output(const char* key, LexValue literal, Table_Stack* scop
 }
 
 char* get_type_name(TokenValueType type){
-  char* type_name = (char*) malloc(sizeof(char) * 15);
+  char* type_name = NULL;
   switch (type)
   {
   case FLOAT_VAL: type_name = strdup("float");

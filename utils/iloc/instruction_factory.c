@@ -681,8 +681,9 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
   Instruction* prev = NULL;
   Instruction* instr = code;
   while (instr != NULL) {
+    bool found_load = false;
     if (strcmp(instr->opcode, "$load$") == 0) {
-      
+      found_load = true;
       RegList* regs = find_used_registers(instr->previous);
 
       // Create load and store instructions
@@ -704,17 +705,18 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
       char stack_offset[12];
       sprintf(stack_offset, "%d", 4*(i - 1));
 
-      free_reglist(regs); //Uncomment after merge
+      free_reglist(regs);
       
+      // Add load instructions on flag location
       if (loads != NULL) {
         Instruction* pre_load = create_instruction("subI", "rsp", stack_offset, "rsp", instr->previous);
         loads = concat_instructions(loads, pre_load);
         Instruction* pos_load = create_instruction("addI", "rsp", stack_offset, "rsp", loads);
         prev->previous = pos_load;
-      } else {
-        free(instr->opcode);
-        instr->opcode = strdup("nop");
-      }
+      } // else {
+      //   free(instr->opcode);
+      //   instr->opcode = strdup("nop");
+      // }
       
       // Find $store$
       Instruction* store_prev = instr;
@@ -724,18 +726,29 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
         store_search = store_search->previous;
       }
 
-      if(stores != NULL){
-        stores = create_instruction("addI", "rsp", stack_offset, "rsp", stores);
-        stores = concat_instructions(stores, store_search->previous);
-        store_prev->previous = stores;
-      } else {
-        free(store_search->opcode);
-        store_search->opcode = strdup("nop");
+      // Add store instructions on flag location
+      if(store_search != NULL) {
+        if (stores != NULL) {
+          stores = create_instruction("addI", "rsp", stack_offset, "rsp", stores);
+          stores = concat_instructions(stores, store_search->previous);
+          store_prev->previous = stores;
+        }
+        store_search->previous = NULL;
+        free_instruction(store_search);
+        store_search = NULL;
       }
     }
     
-    prev = instr;
-    instr = instr->previous;
+    // Continue loop searching for $load$
+    if (found_load) {
+      Instruction* aux = instr;
+      instr = instr->previous;
+      aux->previous = NULL;
+      free_instruction(aux);
+    } else {
+      prev = instr;
+      instr = instr->previous;
+    }
   }
 }
 
