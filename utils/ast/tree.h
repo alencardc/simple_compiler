@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "lex_value.h"
+#include "../iloc/instruction.h"
 
 typedef enum sNodeType {
   AST_IDENTIFIER,
@@ -22,15 +23,23 @@ typedef enum sNodeType {
   AST_UNARY_EXP,
   AST_BINARY_EXP,
   AST_TERNARY,
+  AST_INVALID_NODE
 } NodeType;
 
 typedef struct sNode {
+  // AST fields
   LexValue *data;
   char *label;
   NodeType type;
   int children_amount;
   struct sNode **children;
   TokenValueType value_type;
+
+  // ILOC fields
+  Instruction* instr;
+  char* temp;
+  Placeholder* tl; // true list
+  Placeholder* fl; // false list
 } Node;
 
 Node* create_node(LexValue *data, const char *label, NodeType type);
@@ -46,6 +55,8 @@ int expected_children_amount(NodeType type);
 void print_debug_node(Node *root);
 void export_labels(Node *root);
 void export_relations(Node *root);
+
+void clean_invalid_nodes(Node* root);
 
 void exporta(void *arvore);
 void libera(void *arvore);

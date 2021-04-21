@@ -20,7 +20,9 @@ Symbol_Entry* create_symbol_entry(const char* key,
     Symbol_Nature nature,
     TokenValueType type,
     int lenght,
-    TokenValue token_value){
+    TokenValue token_value,
+    bool is_global
+    ){
     Symbol_Entry* entry = malloc(sizeof(Symbol_Entry));
 
     if(entry == NULL){
@@ -36,6 +38,10 @@ Symbol_Entry* create_symbol_entry(const char* key,
     entry->nature = nature;
     entry->next = NULL;
     entry->type = type;
+    entry->offset = 0; // TODO
+    entry->global = is_global; // TODO
+    entry->return_offset = 0;
+    entry->function_label = NULL;
 
     return entry;
 }
@@ -135,6 +141,7 @@ void free_entry(Symbol_Entry *entry){
     }
     
     free_arg_list(entry->arg_list);
+    free(entry->function_label);
 
     free_entry(entry->next);
     

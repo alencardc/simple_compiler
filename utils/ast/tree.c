@@ -16,6 +16,12 @@ Node* create_node(LexValue *data, const char *label, NodeType type) {
   node->children_amount = 0;
   node->children = NULL;
 
+  // This fields are filled by ILOC instruction factory functions
+  node->instr = NULL;
+  node->temp = NULL;
+  node->tl = NULL;
+  node->fl = NULL;
+
   return node;
 }
 
@@ -52,7 +58,12 @@ void free_node(Node *node) {
 
   free(node->label);
   free(node->children);
+  node->instr = NULL; //This field is freed in free_instruction()
+  node->tl = NULL;
+  node->fl = NULL;
+  free(node->temp);
   free(node);
+  node = NULL;
 }
 
 bool free_last_child_and_merge(Node* parent) {
@@ -178,11 +189,34 @@ void export_relations(Node *root) {
   }
 }
 
+void clean_invalid_nodes(Node* root) {
+  if (root == NULL) {
+    return;
+  }
+
+  for (int i = 0; i < root->children_amount; i += 1) {
+    if (root->children[i]->type == AST_INVALID_NODE) {
+      if (root->children[i]->children_amount > 0) {
+        Node* temp = root->children[i];
+        root->children[i] = root->children[i]->children[0];
+        for (int i = 0; i < temp->children_amount; i += 1)
+          temp->children[i] = NULL; 
+        free_node(temp);
+      }
+    }
+
+    clean_invalid_nodes(root->children[i]);
+  }
+}
+
 void exporta(void *arvore) {
+  clean_invalid_nodes((Node*) arvore);
   export_relations((Node*) arvore);
   export_labels((Node*) arvore);
 }
 
 void libera(void *arvore) {
-  free_node((Node*)arvore);
+  Node* root = (Node*)arvore;
+  //free_instruction(root->instr);
+  free_node(root);
 }

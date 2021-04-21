@@ -4,6 +4,7 @@
 #include "utils/check_error.h"
 #include "utils/ast/ast.h"
 #include "errors.h"
+#include "utils/iloc/instruction_factory.h"
 
 int yylex(void);
 void yyerror (char const *s);
@@ -25,6 +26,7 @@ extern void *arvore;
   Id_List* id_list;
   TokenValueType type;
   Argument_List* arg_list;
+  Instruction* instr;
 }
 
 %token TK_PR_INT
@@ -136,6 +138,7 @@ extern void *arvore;
 %type <node> if_simples
 %type <node> if_else
 %type <node> for
+%type <instr> control_block_start
 
 %type <node> return
 %type <node> func_header
@@ -153,10 +156,22 @@ extern void *arvore;
 
 %%
 
-root: programa { arvore = (void*)$1; pop_scope(scopes); }
+root: programa { 
+  arvore = (void*)$1;
+  create_program_start_instr($1, scopes);
+  printf("\nTotal %d\n", count_instructions($1->instr));
+  print_iloc_code($1->instr); 
+  free_instruction($1->instr);
+  $1->instr = NULL;
+  pop_scope(scopes); 
+}
 
-programa: global_decl_list programa {$$ = $2;};
-        | func_decl programa { $$ = $1; append_child($$, $2); }
+programa: global_decl_list programa { $$ = $2; };
+        | func_decl programa { 
+          $$ = $1; append_child($$, $2); 
+          if ($2 != NULL)
+            $$->instr = concat_instructions($2->instr, $$->instr);
+        }
         | %empty { $$ = NULL; }
         ;
 
@@ -195,7 +210,7 @@ literal: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL); $$->value_type
 *************************************/
 global_decl_list: storage_modifier type global_var_list ';'{
     if(scopes == NULL){
-      scopes = push_new_scope(scopes, "global");
+      scopes = push_new_scope(scopes, "global", 0);
     }
 
     Id_List* id_list = $3;
@@ -204,7 +219,9 @@ global_decl_list: storage_modifier type global_var_list ';'{
     while(id_list != NULL){
       if(!check_identifier_redeclared(scopes,id_list->id, get_line_number())){
         check_for_wrong_vector_string(id_list, $2, get_line_number());
-        Symbol_Entry* new_entry = create_id_entry(id_list, $2);
+        Symbol_Entry* new_entry = create_global_entry(id_list, $2);
+        new_entry->offset = scopes->offset;
+        scopes->offset += new_entry->length;
       
         insert_entry_at_table(new_entry, global_scope);
       }
@@ -238,29 +255,31 @@ vector_length: TK_LIT_INT {$$ = $1;} | '+' TK_LIT_INT {$$ = $2;};
 
 local_decl: storage_modifier var_qualifier type local_var_list {
   insert_local_entry_from_list($4, $3, scopes, get_line_number());
+  create_instr_from_local_list($4, scopes);
+  Instruction* list_instructions = $4->instr; // avoid lost pointers
   $$ = free_all_id_nodes($4);
+  $$->instr = list_instructions;
 };
 
 local_var_list: local_var_init { $$ = $1; }
               | local_var_init ',' local_var_list { $$ = create_local_node($1, $3); }
               ;
 
-/*local_var_init: identifier { $$ = $1;  }
-              | identifier local_var_operator local_var_value { $$ = create_binary_exp($2, $1, $3); }
-              ;*/
-
 local_var_init: identifier { $$ = $1; }
-              | identifier TK_OC_LE local_var_value { $$ = create_binary_tree("<=", AST_ASSIGN, $1, $3); free($2.token_value.s_value); }
+              | identifier TK_OC_LE local_var_value { 
+                $$ = create_binary_tree("<=", AST_ASSIGN, $1, $3); 
+                free($2.token_value.s_value);
+              }
               ;
 
-//local_var_operator: TK_OC_LE { $$ = create_node_with_lex($1, AST_ASSIGN); }
-
-//local_var_id: TK_IDENTIFICADOR;
 local_var_value: identifier {
-  check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
-  check_wrong_var(scopes, $1->label, $1->data->line_number);
-  $$ = $1;
-} | vector_identifier {$$ = $1;} | literal  { $$ = $1; };
+                  check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
+                  check_wrong_var(scopes, $1->label, $1->data->line_number);
+                  $$ = $1;
+                } 
+                | vector_identifier {$$ = $1;} 
+                | literal  { $$ = $1; }
+                ;
 
 
 /*************************************
@@ -272,7 +291,7 @@ func_header: storage_modifier type identifier '(' params ')'{
   check_string_return_type($2, get_line_number());
 
    if(scopes == NULL){
-      scopes = push_new_scope(scopes, "global");
+      scopes = push_new_scope(scopes, "global", 0);
   }
 
   check_identifier_redeclared(scopes, $3->label, get_line_number());
@@ -288,6 +307,8 @@ func_header: storage_modifier type identifier '(' params ')'{
 
 func_decl: func_header control_block {
   $$ = create_function_node($1, $2);
+  $$->instr = concat_instructions($1->instr, $2->instr);
+  complete_holes($$->instr, scopes);
   if(function_id != NULL){
     free(function_id);
   }
@@ -314,35 +335,53 @@ param: var_qualifier type identifier
 assign_expression: ternary_expression { $$ = $1; };
 
 ternary_expression: or_expression { $$ = $1; }
-                  | or_expression '?' assign_expression ':' ternary_expression { $$ = create_ternary_node($1, $3, $5); }
+                  | or_expression '?' assign_expression ':' ternary_expression {
+                    $$ = create_ternary_node($1, $3, $5);
+                    create_instr_binary($$, $3, $5); // TODO
+                  }
                   ;
 
 or_expression: and_expression { $$ = $1; }
-             | or_expression or_operator and_expression { $$ = create_binary_exp($2, $1, $3); }
+             | or_expression or_operator and_expression {
+                $$ = create_binary_exp($2, $1, $3);
+                create_instr_binary($$, $1, $3);
+              }
              ;
 
 or_operator: TK_OC_OR { $$ = create_node_with_lex($1, AST_BINARY_EXP); };
 
 and_expression: bit_or_expression { $$ = $1; }
-              | and_expression and_operator bit_or_expression { $$ = create_binary_exp($2, $1, $3); }
+              | and_expression and_operator bit_or_expression {
+                $$ = create_binary_exp($2, $1, $3); 
+                create_instr_binary($$, $1, $3);
+              }
               ;
 
 and_operator: TK_OC_AND { $$ = create_node_with_lex($1, AST_BINARY_EXP); };
 
 bit_or_expression: bit_and_expression { $$ = $1; }
-                 | bit_or_expression bit_or_operator bit_and_expression { $$ = create_binary_exp($2, $1, $3); }
+                 | bit_or_expression bit_or_operator bit_and_expression {
+                    $$ = create_binary_exp($2, $1, $3);
+                    create_instr_binary($$, $1, $3);
+                  }
                  ;
 
 bit_or_operator: '|' { $$ = create_node_with_label("|", AST_BINARY_EXP); };
 
 bit_and_expression: equality_expression { $$ = $1; }
-                  | bit_and_expression bit_and_operator equality_expression { $$ = create_binary_exp($2, $1, $3); }
+                  | bit_and_expression bit_and_operator equality_expression {
+                    $$ = create_binary_exp($2, $1, $3);
+                    create_instr_binary($$, $1, $3);
+                  }
                   ;
 
 bit_and_operator: '&' { $$ = create_node_with_label("&", AST_BINARY_EXP); };
 
 equality_expression: relational_expression { $$ = $1; }
-                   | equality_expression equality_operator relational_expression { $$ = create_binary_exp($2, $1, $3); }
+                   | equality_expression equality_operator relational_expression {
+                      $$ = create_binary_exp($2, $1, $3); 
+                      create_instr_binary($$, $1, $3);
+                    }
                    ;
 
 equality_operator: TK_OC_EQ { $$ = create_node_with_lex($1, AST_BINARY_EXP); }
@@ -350,7 +389,10 @@ equality_operator: TK_OC_EQ { $$ = create_node_with_lex($1, AST_BINARY_EXP); }
                  ;
 
 relational_expression: additive_expression { $$ = $1; }
-                     | relational_expression relational_operator additive_expression { $$ = create_binary_exp($2, $1, $3); }
+                     | relational_expression relational_operator additive_expression {
+                        $$ = create_binary_exp($2, $1, $3);
+                        create_instr_binary($$, $1, $3);
+                      }
                      ;
 
 relational_operator: '<' { $$ = create_node_with_label("<", AST_BINARY_EXP); }
@@ -360,7 +402,10 @@ relational_operator: '<' { $$ = create_node_with_label("<", AST_BINARY_EXP); }
                    ;
 
 additive_expression: multiplicative_expression { $$ = $1; }
-                  | additive_expression additive_operator multiplicative_expression { $$ = create_binary_exp($2, $1, $3); }
+                  | additive_expression additive_operator multiplicative_expression {
+                    $$ = create_binary_exp($2, $1, $3);
+                    create_instr_binary($$, $1, $3);
+                  }
                   ;
 
 additive_operator: '+' { $$ = create_node_with_label("+", AST_BINARY_EXP); }
@@ -368,7 +413,11 @@ additive_operator: '+' { $$ = create_node_with_label("+", AST_BINARY_EXP); }
                  ;
 
 multiplicative_expression: exponential_expression { $$ = $1; }
-                         | multiplicative_expression multiplicative_operator exponential_expression { $$ = create_binary_exp($2, $1, $3);};
+                         | multiplicative_expression multiplicative_operator exponential_expression { 
+                            $$ = create_binary_exp($2, $1, $3);
+                            create_instr_binary($$, $1, $3);
+                          }
+                         ;
                                                                                                             
 
 multiplicative_operator: '*' { $$ = create_node_with_label("*", AST_BINARY_EXP); }
@@ -377,16 +426,21 @@ multiplicative_operator: '*' { $$ = create_node_with_label("*", AST_BINARY_EXP);
                        ;
 
 exponential_expression: unary_expression { $$ = $1; }
-                      | exponential_expression exponential_operator unary_expression { $$ = create_binary_exp($2, $1, $3); }
+                      | exponential_expression exponential_operator unary_expression {
+                        $$ = create_binary_exp($2, $1, $3);
+                        create_instr_binary($$, $1, $3);
+                      }
                       ;
 
 exponential_operator: '^' { $$ = create_node_with_label("^", AST_BINARY_EXP); } ;
 
 unary_expression: basic_expression { $$ = $1; }
-                | unary_operator unary_expression { $$ = $1;
-                                                    $$->value_type =  $2->value_type;
-                                                    append_child($$, $2);
-                                                  }
+                | unary_operator unary_expression {
+                  $$ = $1;
+                  $$->value_type = $2->value_type;
+                  append_child($$, $2);
+                  create_instr_unary($$, $2);
+                }
                 ;
 
 unary_operator: '+' { $$ = create_node_with_label("+", AST_UNARY_EXP); }
@@ -400,16 +454,18 @@ unary_operator: '+' { $$ = create_node_with_label("+", AST_UNARY_EXP); }
 
 basic_expression: 
   identifier {
-    if(!check_identifier_undeclared(scopes, $1->label, $1->data->line_number)
-      && !check_wrong_var(scopes, $1->label, $1->data->line_number)
-    ){
-
-      $$ = $1;
-      inject_value_type_from_scopes($$, scopes);
-    } 
+    $$ = $1;
+    check_identifier_exp(scopes, $$);
+    inject_value_type_from_scopes($$, scopes);
+    create_instr_identifier($$, scopes);
   }
-  | vector_identifier { $$ = $1;}
-  | constant { $$ = $1; }
+  | vector_identifier { $$ = $1; }
+  | constant {
+    Symbol_Entry* entry = create_literal_entry($1->label, $1->data->token_value, $1->data->line_number, $1->value_type);
+    insert_entry_at_table(entry, top_scope(scopes));
+    $$ = $1; 
+    create_instr_literal($$, scopes);
+  }
   | function_call { $$ = $1; }
   | '(' assign_expression ')' { $$ = $2 ; }
   ;
@@ -439,18 +495,19 @@ constant: TK_LIT_INT { $$ = create_node_with_lex($1, AST_LITERAL);
 *************************************/
 
 command_list: generic_command { $$ = $1; }
-            | generic_command command_list { $$ = $1; append_child($$,$2); }
+            | generic_command command_list { $$ = $1; append_child($$,$2); $$->instr = concat_instructions($2->instr,$$->instr); /* TODO, Will probably change */ }
             | local_decl ';' { $$ = $1; }
-            | local_decl ';' command_list { $$ = join_local_with_commands($1, $3);}
+            | local_decl ';' command_list { $$ = join_local_with_commands($1, $3); $$->instr = concat_instructions($3->instr,$$->instr);
+            }
             | block_command ';' { $$ = $1; }
-            | block_command ';' command_list { $$ = join_command_lists($1, $3);}
+            | block_command ';' command_list { $$ = join_command_lists($1, $3); $$->instr = concat_instructions($3->instr,$$->instr); }
             ;
 
-generic_command: one_line_command {$$ = $1; }
-               | multiline_command {$$ = $1;}
+generic_command: one_line_command { $$ = $1; }
+               | multiline_command { $$ = $1; }
                ;
 
-one_line_command: command ';' {$$ = $1; };
+one_line_command: command ';' { $$ = $1; };
 
 command: assign_command { $$ = $1; }
        | io_command { $$ = $1; }
@@ -459,32 +516,48 @@ command: assign_command { $$ = $1; }
        | control_commands { $$ = $1; }
        ;
 
-control_block: control_block_start command_list control_block_end { $$ = $2; }
-             | control_block_start control_block_end { $$ = NULL; }
+control_block: control_block_start command_list control_block_end { $$ = $2; $$->instr = concat_instructions($$->instr, $1); }
+             | control_block_start control_block_end { $$ = NULL; free_instruction($1); }
              ;
 
 block_command: control_block { $$ = $1; };
 control_block_start: '{' { 
-                            scopes = push_new_scope(scopes, "");
+                            
                             if(is_function_block){
+                              scopes = push_new_scope(scopes, "", 0);
                               insert_arg_list_at_func_scope(function_id, scopes);
+                              Instruction* start_function = create_start_function_code(function_id, scopes);
+                              //print_iloc_code(start_function);
+                              $$ = start_function;
                               //Switch bool value to only insert once
                               is_function_block = false;
-                            } 
+                            } else{ //Anonymous block scope
+                              scopes = push_new_scope(scopes, "", scopes->offset);
+                              $$ = NULL;
+                            }
                          };
-control_block_end: '}' { scopes = pop_scope(scopes); };
+control_block_end: '}' {  
+                          //On end of anonymous blocks we must inject the offset
+                          //so  next declarations have the correct offset
+                          if(!is_function_block){
+                            inject_offset(scopes);
+                          }
+                          //print_table_stack(scopes);
+                          scopes = pop_scope(scopes);
+                       };
 
 assign_command: identifier '=' assign_expression {  
-                                                    check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
-                                                    check_wrong_var(scopes, $1->label, $1->data->line_number);
-                                                    check_for_assignment_type_error(scopes, $1->label, $3, $1->data->line_number);
-                                                    check_error_string_max(scopes, $1->label, $3, get_line_number());
-                                                    $$ = create_binary_tree("=", AST_ASSIGN,$1, $3); 
-                                                  }
+                check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
+                check_wrong_var(scopes, $1->label, $1->data->line_number);
+                check_for_assignment_type_error(scopes, $1->label, $3, $1->data->line_number);
+                check_error_string_max(scopes, $1->label, $3, get_line_number());
+                $$ = create_binary_tree("=", AST_ASSIGN,$1, $3);
+                create_instr_assignment($$, $1, scopes, $3);
+              }
               | vector_identifier '=' assign_expression { 
-                                                          check_for_vector_assignment_type_error($1, scopes, $3, get_line_number());            
-                                                          $$ = create_binary_tree("=", AST_ASSIGN, $1, $3); 
-                                                        }
+                check_for_vector_assignment_type_error($1, scopes, $3, get_line_number());            
+                $$ = create_binary_tree("=", AST_ASSIGN, $1, $3); 
+              }
               ;
 
 input_command: TK_PR_INPUT identifier {
@@ -494,36 +567,36 @@ input_command: TK_PR_INPUT identifier {
   check_wrong_var(scopes, $2->label, $2->data->line_number);
 };
 output_command: TK_PR_OUTPUT identifier { 
-                                          check_identifier_undeclared(scopes, $2->label, $2->data->line_number);
-                                          check_wrong_var(scopes, $2->label, $2->data->line_number);
-                                          check_wrong_par_output($2->label, *($2->data), scopes, $2->data->line_number);
-                                          $$ = create_io_node($2, "output"); 
-                                        }
+                check_identifier_undeclared(scopes, $2->label, $2->data->line_number);
+                check_wrong_var(scopes, $2->label, $2->data->line_number);
+                check_wrong_par_output($2->label, *($2->data), scopes, $2->data->line_number);
+                $$ = create_io_node($2, "output"); 
+              }
               | TK_PR_OUTPUT literal { 
-                                        check_wrong_par_output(NULL, *($2->data), scopes, $2->data->line_number);
-                                        $$ = create_io_node($2, "output"); 
-                                      }
+                check_wrong_par_output(NULL, *($2->data), scopes, $2->data->line_number);
+                $$ = create_io_node($2, "output"); 
+              }
               ;
               
 io_command: input_command | output_command { $$ = $1; };
 
 shift: TK_OC_SR | TK_OC_SL { $$ = $1;};
 shift_operand: identifier {
-                            check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
-                            check_wrong_var(scopes, $1->label, $1->data->line_number); 
-                            $$ = $1; 
-                          } 
+                check_identifier_undeclared(scopes, $1->label, $1->data->line_number);
+                check_wrong_var(scopes, $1->label, $1->data->line_number); 
+                $$ = $1; 
+              } 
               | vector_identifier { $$ = $1; };
 
 shift_command: shift_operand shift shift_number { $$ = create_shift_node($2, $1, $3); };
 shift_number: TK_LIT_INT {
-                            check_wrong_par_shift($1); 
-                            $$ = create_node_with_lex($1, AST_LITERAL); 
-                          };
+              check_wrong_par_shift($1); 
+              $$ = create_node_with_lex($1, AST_LITERAL); 
+            };
             | '+' TK_LIT_INT { 
-                                check_wrong_par_shift($2);
-                                $$ = create_node_with_lex($2, AST_LITERAL); 
-                              };
+              check_wrong_par_shift($2);
+              $$ = create_node_with_lex($2, AST_LITERAL); 
+            };
 
 function_call: TK_IDENTIFICADOR '(' arguments ')' {
   check_identifier_undeclared(scopes, $1.token_value.s_value, $1.line_number);
@@ -531,8 +604,12 @@ function_call: TK_IDENTIFICADOR '(' arguments ')' {
   check_wrong_arg_size($3, $1.token_value.s_value, scopes, $1.line_number);
   check_wrong_arg_type($3, $1.token_value.s_value, scopes, $1.line_number);
   $$ = create_func_call_node($1, $3);
-  Symbol_Entry* entry = search_all_scopes(scopes, ($$->label + 5));
+  char *id = $$->label + 5;
+  Symbol_Entry* entry = search_all_scopes(scopes, id);
   $$->value_type = entry->type;
+
+  Instruction* function_call = create_function_call_code(id, scopes, $3, $$);
+  $$->instr = function_call;
 };
 
 /*Podemos ter uma lista de 1 ou + argumentos ou nenhum*/
@@ -550,7 +627,9 @@ control_commands: return { $$ = $1; }
 return: TK_PR_RETURN assign_expression { 
                                           $$ = create_node_with_label("return", AST_RETURN); 
                                           append_child($$, $2);
+                                          //$$->instr = concat_instructions($2->instr, $$->instr); /* TODO, Will probably change */
                                           check_wrong_return_type(function_id, scopes, $2->value_type, get_line_number());
+                                          create_instr_return($$, $2, scopes);
                                         }; 
 
 
@@ -563,14 +642,27 @@ multiline_command: if_simples {$$ = $1;}
                  | while {$$ = $1;}
                  ;
 
-if_simples: TK_PR_IF '(' assign_expression ')' control_block {$$ = create_if_node($3,$5);}; 
-if_else: if_simples TK_PR_ELSE control_block { $$ = create_if_else_node($1, $3); };
+if_simples: TK_PR_IF '(' assign_expression ')' control_block {
+  $$ = create_if_node($3,$5);
+  create_instr_if($$, $3, $5);
+  }
+; 
+if_else: if_simples TK_PR_ELSE control_block {
+    $$ = create_if_else_node($1, $3);
+    create_instr_if_else($$, $1, $3);
+  }
+;
 
-for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block 
-  {
+for: TK_PR_FOR '(' assign_command ':' assign_expression ':' assign_command ')' control_block {
     $$ = create_for_node($3,$5,$7,$9);
-  };  
-while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {$$ = create_while_node($3,$6);}; 
+    create_instr_for($$, $3, $5, $7, $9);
+  }
+;  
+while: TK_PR_WHILE '(' assign_expression ')' TK_PR_DO control_block {
+    $$ = create_while_node($3,$6);
+    create_instr_while($$, $3, $6);
+  }
+; 
 
 %%
 

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include "../ast/lex_value.h"
 
 //If you change please put a PRIME NUMBER
@@ -30,7 +31,11 @@ typedef struct sSymbol_Entry {
     int length;
     Argument_List* arg_list;
     TokenValue value;
+    int offset; // Offset from rfp or rbss
+    bool global; // Is global or not
     struct sSymbol_Entry* next;
+    int return_offset;
+    char* function_label;
 } Symbol_Entry;
 
 
@@ -41,7 +46,8 @@ Symbol_Entry* create_symbol_entry(const char* key,
     Symbol_Nature nature,
     TokenValueType type,
     int lenght,
-    TokenValue token_value);
+    TokenValue token_value,
+    bool is_global);
 
 int hash(const char *key);
 

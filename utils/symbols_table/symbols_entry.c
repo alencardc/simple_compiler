@@ -2,18 +2,6 @@
 #include "../ast/ast.h"
 #include "../check_error.h"
 
-// Symbol_Entry* create_id_entry(Node *id){
-//     TokenValue value = (TokenValue) 0;
-//     Symbol_Entry* new_id_entry = create_symbol_entry(
-//         id->label,
-//         id->data->line_number,
-//         VAR,
-//         NULL,
-//         NULL,
-//         value
-//         );
-// }
-
 void inject_value_type_from_scopes(Node* node, Table_Stack* scopes){
   Symbol_Entry* entry = search_all_scopes(scopes, node->label);
   node->value_type = entry->type;
@@ -121,8 +109,7 @@ void print_id_list(Id_List* list){
     }
 }
 
-//TODO: Rename to create_global_id_entry to avoid problems 
-Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
+Symbol_Entry* create_global_entry(Id_List* id_list, TokenValueType type){
     Symbol_Nature nature = id_list->vector_size > 1 ? VECTOR : VAR;
     int size = get_type_lenght(type);
     size = id_list->vector_size * size;
@@ -131,13 +118,15 @@ Symbol_Entry* create_id_entry(Id_List* id_list, TokenValueType type){
     if(type == STRING_VAL)
         size = 0;
 
-    Symbol_Entry* new_entry = create_symbol_entry(id_list->id, 
-                                  id_list->line_number,
-                                  nature,
-                                  type,
-                                  size,
-                                  (TokenValue) ""
-                                  );
+    Symbol_Entry* new_entry = create_symbol_entry(
+        id_list->id, 
+        id_list->line_number,
+        nature,
+        type,
+        size,
+        (TokenValue) "",
+        true
+    );
     return new_entry;
 }
 
@@ -148,7 +137,8 @@ Symbol_Entry* create_function_entry(const char* key, Argument_List* arg_list, To
         FUNCTION,
         returnType,
         get_type_lenght(returnType),
-        (TokenValue) 0
+        (TokenValue) 0,
+        false
     );
 
     new_entry->arg_list = arg_list;
@@ -156,15 +146,21 @@ Symbol_Entry* create_function_entry(const char* key, Argument_List* arg_list, To
     return new_entry;
 }
 
-Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type) {
+Symbol_Entry* create_local_entry(const char* key, int line, TokenValueType type, Table_Stack* scopes) {
     Symbol_Entry* new_entry = create_symbol_entry(
         key, 
         line,
         VAR,
         type,
         get_type_lenght(type),
-        (TokenValue) 0
+        (TokenValue) 0,
+        false
     );
+    
+    //Offset calculation from rfp or rbss
+    new_entry->offset = scopes->offset;
+    scopes->offset += new_entry->length;
+    
     return new_entry;
 }
 
@@ -179,7 +175,8 @@ Symbol_Entry* create_literal_entry(const char* key, TokenValue value, int line, 
         LITERAL,
         type,
         get_type_lenght(type),
-        value
+        value,
+        false
     );
     return new_entry;
 }
@@ -206,8 +203,10 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             Node* node_var = node->children[0];
             Node* node_value = node->children[1];
             
-            Symbol_Entry* new_entry = create_local_entry(node_var->label, node_var->data->line_number, type);
-
+            Symbol_Entry* new_entry = create_local_entry(
+                node_var->label, node_var->data->line_number,
+                type, scopes);
+            
             
             check_identifier_redeclared(scopes, node_var->label, line);
             if (node_value->type == AST_IDENTIFIER) {
@@ -243,7 +242,7 @@ void insert_local_entry_from_list(Node* list, TokenValueType type, Table_Stack* 
             insert_entry_at_table(new_entry, scope);
         } else if (node->type == AST_IDENTIFIER) {
             check_identifier_redeclared(scopes, node->label, line);
-            Symbol_Entry* new_entry = create_local_entry(node->label, node->data->line_number, type);
+            Symbol_Entry* new_entry = create_local_entry(node->label, node->data->line_number, type, scopes);
             if(new_entry->type == STRING_VAL){
                 new_entry->length = 0; //Strings não inicializadas tem tamanho 0.
             }
@@ -264,17 +263,27 @@ void insert_arg_list_at_func_scope(char* function_id, Table_Stack* scopes){
 
     Symbol_Entry** func_scope = top_scope(scopes);
     int i = 1;
+    int initial_offset = 8;
     while(arg_list != NULL){
-        Symbol_Entry* new_symbol_entry = create_symbol_entry(arg_list->id, 
-                                                            func_entry->line_number, 
-                                                            VAR,
-                                                            arg_list->type,
-                                                            get_type_lenght(arg_list->type),
-                                                            (TokenValue) 0
-                                                            );
+        Symbol_Entry* new_symbol_entry = create_symbol_entry(
+            arg_list->id, 
+            func_entry->line_number, 
+            VAR,
+            arg_list->type,
+            get_type_lenght(arg_list->type),
+            (TokenValue) 0,
+            false
+        );
         check_arg_redeclared(scopes, arg_list->id, i, get_line_number());
+        new_symbol_entry->offset = initial_offset + i * 4;
         insert_entry_at_table(new_symbol_entry, func_scope);
         arg_list = arg_list->next;
         i++;
+    }
+    func_entry->return_offset = initial_offset + i * 4;
+    //Only non main functions have parameters, rfp, rsp and return address
+    if(strcmp(function_id, "main") != 0){
+        i++; // The next offset is for returning values
+        scopes->offset = initial_offset + i * 4;
     }
 }
