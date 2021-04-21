@@ -159,13 +159,16 @@ extern void *arvore;
 root: programa { 
   arvore = (void*)$1;
   create_program_start_instr($1, scopes);
+  printf("\nTotal %d\n", count_instructions($1->instr));
   print_iloc_code($1->instr); 
+  free_instruction($1->instr);
+  $1->instr = NULL;
   pop_scope(scopes); 
 }
 
 programa: global_decl_list programa { $$ = $2; };
         | func_decl programa { 
-          $$ = $1; append_child($$, $2);
+          $$ = $1; append_child($$, $2); 
           if ($2 != NULL)
             $$->instr = concat_instructions($2->instr, $$->instr);
         }
@@ -514,7 +517,7 @@ command: assign_command { $$ = $1; }
        ;
 
 control_block: control_block_start command_list control_block_end { $$ = $2; $$->instr = concat_instructions($$->instr, $1); }
-             | control_block_start control_block_end { $$ = NULL; }
+             | control_block_start control_block_end { $$ = NULL; free_instruction($1); }
              ;
 
 block_command: control_block { $$ = $1; };
@@ -528,8 +531,7 @@ control_block_start: '{' {
                               $$ = start_function;
                               //Switch bool value to only insert once
                               is_function_block = false;
-                            }
-                            else{ //Anonymous block scope
+                            } else{ //Anonymous block scope
                               scopes = push_new_scope(scopes, "", scopes->offset);
                               $$ = NULL;
                             }

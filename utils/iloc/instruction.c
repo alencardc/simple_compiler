@@ -58,6 +58,8 @@ void backpatch(Placeholder* list, char* label) {
     *(temp->label_ref) = strdup(label);
     temp = temp->next;
   }
+  free_placeholder(list);
+  list = NULL;
 }
 
 Instruction* create_instruction(
@@ -110,6 +112,7 @@ void free_instruction(Instruction* instr) {
   while (instr->previous != NULL) {
     free_instruction(instr->previous);}
 
+  free(instr->label);
   free(instr->opcode);
   free(instr->operand1);
   free(instr->operand2);

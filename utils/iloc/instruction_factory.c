@@ -458,6 +458,7 @@ void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* ex
   //storeAI temp => rbss|rfp,offset
   Instruction* assignment_instr = create_instruction("storeAI", exp->temp, base_register, offset, exp->instr);
   head->instr = assignment_instr;
+  free(base_register);
 }
 
 extern char* function_id;
@@ -497,6 +498,9 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
   Instruction* jump = create_instruction("jump", ret_addr_reg, NULL, NULL, rfp_store);
 
   return_node->instr = jump;
+  free(ret_addr_reg);
+  free(rsp_reg);
+  free(rfp_reg);
 }
 
 Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
@@ -505,6 +509,7 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
 
   Symbol_Entry* function_entry = search_deep_scope(scopes, function_id);
   function_entry->function_label = strdup(function_label);
+  free(function_label);
 
   if (strcmp(function_id, "main") == 0){
     Instruction* init_rsp = create_instruction("i2i", "rfp", NULL, "rsp", label_start);
@@ -556,7 +561,9 @@ Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, N
 
   Instruction* load_hole = create_instruction("$load$", NULL, NULL, NULL, put_return_on_temp);
   
-  return load_hole;
+
+  free(new_register);
+  return put_return_on_temp;
 }
 
 Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
