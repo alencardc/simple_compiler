@@ -5,10 +5,10 @@ int fatorial (int n){
        return 1;
    }
    
-   return n * fatorial(n - 1);
+   return fatorial(n - 1) * n;
    
 }
 
 int main(){
-    globalzona = fatorial(2);
+    globalzona = fatorial(3);
 }

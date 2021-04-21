@@ -40,4 +40,6 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes);
 
 void create_program_start_instr(Node* node, Table_Stack* scopes);
 
+void complete_holes(Instruction* code, Table_Stack* scopes);
+
 #endif // __INSTRUCTION_FACTORY_H__
