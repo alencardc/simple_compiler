@@ -524,6 +524,7 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
 Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, Node* arguments, Node* function_call){
   char* function_label = search_deep_scope(scopes, function_id)->function_label;
   
+   
   //Instructions to save rsp and rfp on function frame
   Instruction* save_rsp = create_instruction("storeAI", "rsp", "rsp", "4", NULL);
   Instruction* save_rfp = create_instruction("storeAI", "rfp", "rsp", "8", save_rsp);
@@ -533,14 +534,16 @@ Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, N
   save_params = concat_instructions(save_params, save_rfp);
 
   Instruction* jump_to_function = create_instruction("jumpI", function_label, NULL, NULL, save_params);
-  Instruction* hole = create_instruction("$load$", NULL, NULL, NULL, jump_to_function);
+ 
 
   //Generate instructions to  save return address
   int num_instructions = count_instructions(jump_to_function);
   char offset_rpc[12];
   sprintf(offset_rpc, "%d", num_instructions + 2);
   char* new_register = get_new_register();
-  Instruction* calc_new_rpc = create_instruction("addI", "rpc", offset_rpc, new_register, NULL);
+  
+  Instruction* store_hole = create_instruction("$store$", NULL, NULL, NULL, NULL);
+  Instruction* calc_new_rpc = create_instruction("addI", "rpc", offset_rpc, new_register, store_hole);
   Instruction* save_return_addr = create_instruction("storeAI", new_register, "rsp", "0", calc_new_rpc);
   //Concatenate the save return address instructions before save_rsp and save_rfp
   save_rsp->previous = save_return_addr;
@@ -550,10 +553,12 @@ Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, N
   char return_offset_str[12];
   sprintf(return_offset_str, "%d", return_offset);
   char* return_register = get_new_register();
-  Instruction* put_return_on_temp = create_instruction("loadAI", "rsp", return_offset_str, return_register, hole/*jump_to_function*/);
+  Instruction* put_return_on_temp = create_instruction("loadAI", "rsp", return_offset_str, return_register, jump_to_function);
   function_call->temp = return_register;
+
+  Instruction* load_hole = create_instruction("$load$", NULL, NULL, NULL, put_return_on_temp);
   
-  return put_return_on_temp;
+  return load_hole;
 }
 
 Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
@@ -644,18 +649,29 @@ RegList* insert_if_not_exists(char* reg, RegList* list) {
   return list;
 }
 
+//    $load$
+//    save_rpc
+//    save_rsp
+//    save_rfp
+//    save_params
+//    jump_to_function
+//    put_return_on_temp
+
+
 void complete_holes(Instruction* code, Table_Stack* scopes) {
   if (code == NULL)
     return;
 
   Instruction* loads = NULL;
   Instruction* stores = NULL;
-
-  int return_offset = search_deep_scope(scopes, function_id)->return_offset;
+  Instruction* pre_load = NULL;
+  int return_offset = 0;
   Instruction* prev = NULL;
   Instruction* instr = code;
+
   while (instr != NULL) {
-    if (strcmp(instr->opcode, "$load$") == 0) {
+    if (strcmp(instr->opcode, "$store$") == 0) {
+      
       Instruction* search = instr->previous;
       RegList* regs = NULL;
       
@@ -670,7 +686,7 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
       int i = 1;
       while (item != NULL) {
         char stack_offset[12];
-        sprintf(stack_offset, "%d", return_offset + 4*i); // TODO, This size will change dependning on size of return type
+        sprintf(stack_offset, "%d", return_offset + 4*(i-1)); // TODO, This size will change dependning on size of return type
         stores = create_instruction("storeAI", item->reg, "rsp", stack_offset, stores);
         loads = create_instruction("loadAI", "rsp", stack_offset, item->reg, loads);
         
@@ -678,27 +694,63 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
         item = item->next;
       }
 
-      // Update offset to return to update PC
-      if (prev!=NULL) {
-        int return_offset = atoi(prev->operand2);
-        return_offset += 2*(i-1);
-        char return_offset_str[12];
-        sprintf(return_offset_str, "%d", return_offset);
-        free(prev->operand2);
-        prev->operand2 = strdup(return_offset_str);
+      
+
+      if(stores != NULL){
+        char stack_offset[12];
+        sprintf(stack_offset, "%d", 4*(i - 1));
+        stores = create_instruction("addI", "rsp", stack_offset, "rsp", stores);
+        pre_load = create_instruction("subI", "rsp", stack_offset, "rsp", NULL);
+        
+        prev->previous = stores;
+      
+        while(stores->previous != NULL){
+          stores = stores->previous;
+        }
+        stores->previous = instr->previous;
+        
+      }
+      else{
+        instr->opcode = strdup("nop");
       }
       
-      Instruction* jump = instr->previous;
-      stores = concat_instructions(stores, jump->previous);
-      jump->previous = stores;
-      prev->previous = concat_instructions(loads, jump);
+     // Instruction* jump = instr->previous;
+      // stores = concat_instructions(stores, jump->previous);
+      // jump->previous = stores;
+      // prev->previous = concat_instructions(loads, jump);
       
-      free(instr->opcode);
-      free(instr);
-      instr = jump;
+      // free(instr->opcode);
+      // free(instr);
+      // instr = jump;
     }
+    prev = instr;
+    instr = instr->previous;
+  }
 
+  prev = NULL;
+  instr = code;
+
+  while(instr != NULL){
+      if(strcmp(instr->opcode, "$load$") == 0){
+       
+
+      if(loads != NULL){
+        prev->previous = loads;
+      
+        while(loads->previous != NULL){
+          loads = loads->previous;
+        }
+        loads->previous = pre_load;
+        pre_load->previous = instr->previous;
+      }
+      else{
+        instr->opcode = strdup("nop");
+      }
+
+    }
     prev = instr;
     instr = instr->previous;
   }
 }
+
+

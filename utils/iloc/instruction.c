@@ -179,6 +179,9 @@ void print_instruction(Instruction* i) {
   else if (strcmp("sub", i->opcode) == 0) {
     printf("sub %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
   }
+  else if (strcmp("subI", i->opcode) == 0) {
+    printf("subI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+  }
   else if (strcmp("mult", i->opcode) == 0) {
     printf("mult %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
   }
@@ -214,6 +217,11 @@ void print_instruction(Instruction* i) {
   }
   else if (strcmp("halt", i->opcode) == 0) {
     printf("halt\n");
+  }
+   else if (strcmp("$load$", i->opcode) == 0) {
+    printf("$load$\n");
+  } else if (strcmp("nop", i->opcode) == 0) {
+    printf("nop\n");
   }
 }
 
