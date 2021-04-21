@@ -524,7 +524,6 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
 Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, Node* arguments, Node* function_call){
   char* function_label = search_deep_scope(scopes, function_id)->function_label;
   
-   
   //Instructions to save rsp and rfp on function frame
   Instruction* save_rsp = create_instruction("storeAI", "rsp", "rsp", "4", NULL);
   Instruction* save_rfp = create_instruction("storeAI", "rfp", "rsp", "8", save_rsp);
@@ -535,7 +534,6 @@ Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, N
 
   Instruction* jump_to_function = create_instruction("jumpI", function_label, NULL, NULL, save_params);
  
-
   //Generate instructions to  save return address
   int num_instructions = count_instructions(jump_to_function);
   char offset_rpc[12];
@@ -585,7 +583,6 @@ Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
   return previous_instructions;
 }
 
-
 void create_program_start_instr(Node* node, Table_Stack* scopes) {
   if (node == NULL)
     return;
@@ -603,8 +600,6 @@ void create_program_start_instr(Node* node, Table_Stack* scopes) {
     node->instr = concat_instructions(node->instr, jump);
   }
 }
-
-
 
 typedef struct sRegList {
   char* reg;
@@ -649,15 +644,6 @@ RegList* insert_if_not_exists(char* reg, RegList* list) {
   return list;
 }
 
-//    $load$
-//    save_rpc
-//    save_rsp
-//    save_rfp
-//    save_params
-//    jump_to_function
-//    put_return_on_temp
-
-
 void complete_holes(Instruction* code, Table_Stack* scopes) {
   if (code == NULL)
     return;
@@ -694,8 +680,6 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
         item = item->next;
       }
 
-      
-
       if(stores != NULL){
         char stack_offset[12];
         sprintf(stack_offset, "%d", 4*(i - 1));
@@ -708,20 +692,10 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
           stores = stores->previous;
         }
         stores->previous = instr->previous;
-        
       }
       else{
         instr->opcode = strdup("nop");
       }
-      
-     // Instruction* jump = instr->previous;
-      // stores = concat_instructions(stores, jump->previous);
-      // jump->previous = stores;
-      // prev->previous = concat_instructions(loads, jump);
-      
-      // free(instr->opcode);
-      // free(instr);
-      // instr = jump;
     }
     prev = instr;
     instr = instr->previous;
@@ -732,8 +706,7 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
 
   while(instr != NULL){
       if(strcmp(instr->opcode, "$load$") == 0){
-       
-
+      
       if(loads != NULL){
         prev->previous = loads;
       
@@ -746,8 +719,8 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
       else{
         instr->opcode = strdup("nop");
       }
-
     }
+
     prev = instr;
     instr = instr->previous;
   }
