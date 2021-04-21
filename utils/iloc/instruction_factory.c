@@ -563,7 +563,7 @@ Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, N
 
   
   free(new_register);
-  return load_hole;
+  return put_return_on_temp;
 }
 
 Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
