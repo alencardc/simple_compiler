@@ -551,17 +551,17 @@ Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, N
   //Concatenate the save return address instructions before save_rsp and save_rfp
   save_rsp->previous = save_return_addr;
 
+  Instruction* load_hole = create_instruction("$load$", NULL, NULL, NULL, jump_to_function);
+
   //loadAI rsp, 16 => r0 
   int return_offset = search_deep_scope(scopes, function_id)->return_offset;
   char return_offset_str[12];
   sprintf(return_offset_str, "%d", return_offset);
   char* return_register = get_new_register();
-  Instruction* put_return_on_temp = create_instruction("loadAI", "rsp", return_offset_str, return_register, jump_to_function);
+  Instruction* put_return_on_temp = create_instruction("loadAI", "rsp", return_offset_str, return_register, load_hole);
   function_call->temp = return_register;
 
-  Instruction* load_hole = create_instruction("$load$", NULL, NULL, NULL, put_return_on_temp);
   
-
   free(new_register);
   return load_hole;
 }
@@ -651,30 +651,44 @@ RegList* insert_if_not_exists(char* reg, RegList* list) {
   return list;
 }
 
+void free_reglist(RegList* list) {
+  if (list == NULL)
+    return;
+  free_reglist(list->next);
+  list->reg = NULL;
+  free(list);
+}
+
+RegList* find_used_registers(Instruction* list) {
+  Instruction* search = list;
+  RegList* regs = NULL;
+  
+  // Get used registers to be saved
+  while (search != NULL) {
+    regs = insert_if_not_exists(search->operand1, regs);
+    regs = insert_if_not_exists(search->operand2, regs);
+    regs = insert_if_not_exists(search->operand3, regs);
+    search = search->previous;
+  }
+  return regs;
+}
+
 void complete_holes(Instruction* code, Table_Stack* scopes) {
   if (code == NULL)
     return;
 
-  Instruction* loads = NULL;
-  Instruction* stores = NULL;
-  Instruction* pre_load = NULL;
   int return_offset = 0;
   Instruction* prev = NULL;
   Instruction* instr = code;
-
   while (instr != NULL) {
-    if (strcmp(instr->opcode, "$store$") == 0) {
-      
-      Instruction* search = instr->previous;
-      RegList* regs = NULL;
-      
-      while (search != NULL) {
-        regs = insert_if_not_exists(search->operand1, regs);
-        regs = insert_if_not_exists(search->operand2, regs);
-        regs = insert_if_not_exists(search->operand3, regs);
-        search = search->previous;
-      }
+    bool found_load = false;
+    if (strcmp(instr->opcode, "$load$") == 0) {
+      found_load = true;
+      RegList* regs = find_used_registers(instr->previous);
 
+      // Create load and store instructions
+      Instruction* loads = NULL;
+      Instruction* stores = NULL;
       RegList* item = regs;
       int i = 1;
       while (item != NULL) {
@@ -687,49 +701,54 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
         item = item->next;
       }
 
-      if(stores != NULL){
-        char stack_offset[12];
-        sprintf(stack_offset, "%d", 4*(i - 1));
-        stores = create_instruction("addI", "rsp", stack_offset, "rsp", stores);
-        pre_load = create_instruction("subI", "rsp", stack_offset, "rsp", NULL);
-        
-        prev->previous = stores;
+      // Offset to add/sub of rsp
+      char stack_offset[12];
+      sprintf(stack_offset, "%d", 4*(i - 1));
+
+      free_reglist(regs);
       
-        while(stores->previous != NULL){
-          stores = stores->previous;
-        }
-        stores->previous = instr->previous;
+      // Add load instructions on flag location
+      if (loads != NULL) {
+        Instruction* pre_load = create_instruction("subI", "rsp", stack_offset, "rsp", instr->previous);
+        loads = concat_instructions(loads, pre_load);
+        Instruction* pos_load = create_instruction("addI", "rsp", stack_offset, "rsp", loads);
+        prev->previous = pos_load;
+      } // else {
+      //   free(instr->opcode);
+      //   instr->opcode = strdup("nop");
+      // }
+      
+      // Find $store$
+      Instruction* store_prev = instr;
+      Instruction* store_search = instr->previous;
+      while (store_search != NULL && strcmp(store_search->opcode, "$store$") != 0) {
+        store_prev = store_search;
+        store_search = store_search->previous;
       }
-      else{
-        instr->opcode = strdup("nop");
+
+      // Add store instructions on flag location
+      if(store_search != NULL) {
+        if (stores != NULL) {
+          stores = create_instruction("addI", "rsp", stack_offset, "rsp", stores);
+          stores = concat_instructions(stores, store_search->previous);
+          store_prev->previous = stores;
+        }
+        store_search->previous = NULL;
+        free_instruction(store_search);
+        store_search = NULL;
       }
     }
-    prev = instr;
-    instr = instr->previous;
-  }
-
-  prev = NULL;
-  instr = code;
-
-  while(instr != NULL){
-      if(strcmp(instr->opcode, "$load$") == 0){
-      
-      if(loads != NULL){
-        prev->previous = loads;
-      
-        while(loads->previous != NULL){
-          loads = loads->previous;
-        }
-        loads->previous = pre_load;
-        pre_load->previous = instr->previous;
-      }
-      else{
-        instr->opcode = strdup("nop");
-      }
+    
+    // Continue loop searching for $load$
+    if (found_load) {
+      Instruction* aux = instr;
+      instr = instr->previous;
+      aux->previous = NULL;
+      free_instruction(aux);
+    } else {
+      prev = instr;
+      instr = instr->previous;
     }
-
-    prev = instr;
-    instr = instr->previous;
   }
 }
 

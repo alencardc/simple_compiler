@@ -109,8 +109,7 @@ void free_instruction(Instruction* instr) {
     return;
   
   //print_instruction(instr);
-  while (instr->previous != NULL) {
-    free_instruction(instr->previous);}
+  free_instruction(instr->previous);
 
   free(instr->label);
   free(instr->opcode);
@@ -137,7 +136,7 @@ Instruction* concat_instructions(Instruction* head, Instruction* new_instr) {
     return new_instr;
   if (new_instr == NULL) 
     return head;
-  
+    
   Instruction* temp = head;
   while (temp->previous != NULL) 
     temp = temp->previous;
@@ -221,16 +220,18 @@ void print_instruction(Instruction* i) {
   else if (strcmp("halt", i->opcode) == 0) {
     printf("halt\n");
   }
-   else if (strcmp("$load$", i->opcode) == 0) {
+  else if (strcmp("$load$", i->opcode) == 0) {
     printf("$load$\n");
+  }
+  else if (strcmp("$store$", i->opcode) == 0) {
+    printf("$store$\n");
   } else if (strcmp("nop", i->opcode) == 0) {
     printf("nop\n");
   }
 }
 
 void print_iloc_code(Instruction* head) {
-  
-  Instruction* instr = reverse_instr_list(head);
+  Instruction* instr = head;
   while (instr != NULL) {
     print_instruction(instr);
     instr = instr->previous;
