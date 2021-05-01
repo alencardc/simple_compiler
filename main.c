@@ -4,8 +4,11 @@
 */
 #include <stdio.h>
 #include "utils/iloc/instruction.h"
+#include "utils/asm/asm.h"
 extern int yyparse(void);
 extern int yylex_destroy(void);
+
+Instruction* iloc_code;
 
 void *arvore = NULL;
 void exporta (void *arvore);
@@ -15,6 +18,8 @@ int main (int argc, char **argv)
 {
   int ret = yyparse(); 
   //exporta (arvore);
+ 
+  iloc_to_asm(iloc_code);
   libera(arvore);
   arvore = NULL;
   yylex_destroy();

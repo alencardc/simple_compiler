@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS =
 
-SUBMITION_NUMBER = 5
+SUBMITION_NUMBER = 6
 
 UTIL_FILES := $(wildcard utils/**/*.c)
 UTIL_FILES := $(filter-out $(wildcard utils/tests/*.c), $(UTIL_FILES))
