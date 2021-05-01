@@ -18,8 +18,7 @@ int main (int argc, char **argv)
 {
   int ret = yyparse(); 
   //exporta (arvore);
- 
-  iloc_to_asm(iloc_code);
+  generate_asm_code(iloc_code);
   libera(arvore);
   arvore = NULL;
   yylex_destroy();
