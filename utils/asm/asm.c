@@ -59,6 +59,9 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
       x86_literal(iloc->operand1), 
       iloc->operand3);
       return asm_code;
+  } else if(strcmp(iloc->opcode, "loadAI") == 0){
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_offset(iloc->operand1, iloc->operand2), iloc->operand3);
+    return move;
   } else if(strcmp(iloc->opcode, "add") == 0){
     AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
     AsmInstruction* add = create_asm_instruction(NULL,"addl" ,iloc->operand2, iloc->operand3);
