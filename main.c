@@ -18,7 +18,9 @@ int main (int argc, char **argv)
 {
   int ret = yyparse(); 
   //exporta (arvore);
+  print_init_asm_code();
   generate_asm_code(iloc_code);
+  print_final_asm_code();
   libera(arvore);
   arvore = NULL;
   yylex_destroy();
