@@ -12,6 +12,12 @@ typedef struct sAsmInstruction{
 } AsmInstruction;
 
 
-AsmInstruction* create_asm_instruction(const char* label, const char* opcode, const char* src, const char* dst, AsmInstruction* next);
+AsmInstruction* create_asm_instruction(
+  const char* label, 
+  const char* opcode, 
+  const char* src, 
+  const char* dst, 
+  AsmInstruction* next
+);
 
 AsmInstruction* iloc_to_asm(Instruction* iloc);

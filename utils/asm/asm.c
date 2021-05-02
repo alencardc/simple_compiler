@@ -24,7 +24,7 @@ AsmInstruction* create_asm_instruction(
   return instruction;
 }
 
-AsmInstruction* iloc_to_asm(Instruction* iloc){
-    print_iloc_code(iloc);
-    return NULL;
+AsmInstruction* iloc_to_asm(Instruction* iloc) {
+  print_iloc_code(iloc);
+  return NULL;
 }

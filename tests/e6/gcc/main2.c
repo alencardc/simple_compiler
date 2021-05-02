@@ -1,0 +1,5 @@
+int myGlobal;
+
+int main() {
+  
+}
