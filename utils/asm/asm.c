@@ -5,28 +5,46 @@ AsmInstruction* create_asm_instruction(
   const char* label, 
   const char* opcode, 
   const char* src, 
-  const char* dst,
-  AsmInstruction* next
-) {
+  const char* dst) {
   AsmInstruction* instruction = (AsmInstruction*) malloc(sizeof(AsmInstruction));
 
   if (instruction == NULL) {
     return NULL;
   }
 
-  
   instruction->label = label != NULL ? strdup(label) : NULL;
   instruction->opcode = strdup(opcode);
   instruction->src = src != NULL ? strdup(src) : NULL;
   instruction->dst = dst != NULL ? strdup(dst) : dst;
-  instruction->next = next;
+  instruction->next = NULL;
+  instruction->prev = NULL;
   
   return instruction;
 }
 
+AsmInstruction* concat_asm_instructions(AsmInstruction* instr1, AsmInstruction* instr2){
+  if(instr1 == NULL)
+    return instr2;
+
+  if(instr2 == NULL)
+    return instr1;
+
+  AsmInstruction* instr1_temp = instr1;
+  while(instr1_temp->next != NULL)
+    instr1_temp = instr1_temp->next;
+
+  instr1_temp->next = instr2;
+  instr2->prev = instr1_temp;
+  
+  return instr1;
+}
+
 AsmInstruction* generate_asm_code(Instruction* iloc_code){
+  AsmInstruction* head = NULL;
+  
   while(iloc_code != NULL){
-    print_asm_instruction(iloc_to_asm(iloc_code));
+    AsmInstruction* new_asm = iloc_to_asm(iloc_code);
+    head = concat_asm_instructions(head, new_asm);
     iloc_code = iloc_code->previous;
   }
 }
@@ -36,19 +54,18 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
     AsmInstruction* asm_code = create_asm_instruction(NULL, 
       "movl", 
       x86_literal(iloc->operand1), 
-      iloc->operand3, 
-      NULL);
+      iloc->operand3);
       return asm_code;
   } else if(strcmp(iloc->opcode, "add") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3, NULL);
-    AsmInstruction* add = create_asm_instruction(NULL,"addl" ,iloc->operand2, iloc->operand3, NULL);
-    copy->next = add;
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
+    AsmInstruction* add = create_asm_instruction(NULL,"addl" ,iloc->operand2, iloc->operand3);
+    concat_asm_instructions(copy, add);
     return copy;
   } else if (strcmp(iloc->opcode, "i2i") == 0){
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3, NULL);
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
     return move;
   } else if(strcmp(iloc->opcode, "storeAI") == 0){
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, x86_offset(iloc->operand2, iloc->operand3), NULL);
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, x86_offset(iloc->operand2, iloc->operand3));
     return move;
   }
   return NULL;
