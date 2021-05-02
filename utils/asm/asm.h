@@ -12,16 +12,13 @@ typedef struct sAsmInstruction{
   char* src;
   char* dst; 
   struct sAsmInstruction* next;
+  struct sAsmInstruction* prev;
 } AsmInstruction;
 
 
-AsmInstruction* create_asm_instruction(
-  const char* label, 
-  const char* opcode, 
-  const char* src, 
-  const char* dst, 
-  AsmInstruction* next
-);
+
+AsmInstruction* create_asm_instruction(const char* label, const char* opcode, const char* src, const char* dst);
+AsmInstruction* concat_asm_instructions(AsmInstruction* instr1, AsmInstruction* instr2);
 AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_scope);
 AsmInstruction* iloc_to_asm(Instruction* iloc);
 

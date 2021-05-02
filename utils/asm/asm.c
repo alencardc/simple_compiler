@@ -5,32 +5,51 @@ AsmInstruction* create_asm_instruction(
   const char* label, 
   const char* opcode, 
   const char* src, 
-  const char* dst,
-  AsmInstruction* next
-) {
+  const char* dst) {
   AsmInstruction* instruction = (AsmInstruction*) malloc(sizeof(AsmInstruction));
 
   if (instruction == NULL) {
     return NULL;
   }
 
-  
   instruction->label = label != NULL ? strdup(label) : NULL;
   instruction->opcode = strdup(opcode);
   instruction->src = src != NULL ? strdup(src) : NULL;
   instruction->dst = dst != NULL ? strdup(dst) : dst;
-  instruction->next = next;
+  instruction->next = NULL;
+  instruction->prev = NULL;
   
   return instruction;
 }
 
-AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_scope){
+AsmInstruction* concat_asm_instructions(AsmInstruction* instr1, AsmInstruction* instr2){
+  if(instr1 == NULL)
+    return instr2;
+
+  if(instr2 == NULL)
+    return instr1;
+
+  AsmInstruction* instr1_temp = instr1;
+  while(instr1_temp->next != NULL)
+    instr1_temp = instr1_temp->next;
+
+  instr1_temp->next = instr2;
+  instr2->prev = instr1_temp;
+  
+  return instr1;
+}
+
+AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_scope) {
+  AsmInstruction* head = NULL;
+
   print_asm_globals_code(global_scope);
   
   while(iloc_code != NULL){
-    print_asm_instruction(iloc_to_asm(iloc_code));
+    AsmInstruction* new_asm = iloc_to_asm(iloc_code);
+    head = concat_asm_instructions(head, new_asm);
     iloc_code = iloc_code->previous;
   }
+  print_asm_instruction(head);
 }
 
 AsmInstruction* iloc_to_asm(Instruction* iloc){
@@ -38,49 +57,54 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
     AsmInstruction* asm_code = create_asm_instruction(NULL, 
       "movl", 
       x86_literal(iloc->operand1), 
-      iloc->operand3, 
-      NULL);
+      iloc->operand3);
       return asm_code;
   } else if(strcmp(iloc->opcode, "add") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3, NULL);
-    AsmInstruction* add = create_asm_instruction(NULL,"addl" ,iloc->operand2, iloc->operand3, NULL);
-    copy->next = add;
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
+    AsmInstruction* add = create_asm_instruction(NULL,"addl" ,iloc->operand2, iloc->operand3);
+    concat_asm_instructions(copy, add);
     return copy;
   } else if(strcmp(iloc->opcode, "sub") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3, NULL);
-    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,iloc->operand2, iloc->operand3, NULL);
-    copy->next = sub;
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
+    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,iloc->operand2, iloc->operand3);
+    concat_asm_instructions(copy, sub);
     return copy;
   } else if(strcmp(iloc->opcode, "mult") == 0){
     // Save eax and edx
-    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax", NULL);
-    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx", NULL);
-    AsmInstruction* movOp1 = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax", NULL);
-    AsmInstruction* mul = create_asm_instruction(NULL,"imull" ,iloc->operand2, "%eax", NULL);
-    AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3, NULL);
-    AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx", NULL);
-    AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax", NULL);
+    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax");
+    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx");
+    AsmInstruction* movOp1 = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax");
+    AsmInstruction* mul = create_asm_instruction(NULL,"imull" ,iloc->operand2, "%eax");
+    AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3);
+    AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx");
+    AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax");
     pushEax->next = pushEdx; pushEdx->next = movOp1; movOp1->next = mul;
     mul->next = movRes; movRes->next = popEdx; popEdx->next = popEax;
+
+    popEax->prev = popEdx; popEdx->prev = movRes; movRes->prev = mul; mul->prev = movOp1;
+    movOp1->prev = pushEdx; pushEdx->prev = pushEax;
     return pushEax;
   } else if(strcmp(iloc->opcode, "div") == 0){
     // Save eax and edx
-    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax", NULL);
-    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx", NULL);
-    AsmInstruction* dividend = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax", NULL);
-    AsmInstruction* cltd = create_asm_instruction(NULL, "cltd", NULL, NULL, NULL);
-    AsmInstruction* div = create_asm_instruction(NULL,"idivl" , iloc->operand2, NULL, NULL);
-    AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3, NULL);
-    AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx", NULL);
-    AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax", NULL);
+    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax");
+    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx");
+    AsmInstruction* dividend = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax");
+    AsmInstruction* cltd = create_asm_instruction(NULL, "cltd", NULL, NULL);
+    AsmInstruction* div = create_asm_instruction(NULL,"idivl" , iloc->operand2, NULL);
+    AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3);
+    AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx");
+    AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax");
     pushEax->next = pushEdx; pushEdx->next = dividend; dividend->next = cltd;
     cltd->next = div; div->next = movRes; movRes->next = popEdx; popEdx->next = popEax;
+    
+    popEax->prev = popEdx; popEdx->prev = movRes; movRes->prev = div; div->prev = cltd;
+    cltd->prev = dividend; dividend->prev = pushEdx; pushEdx->prev = pushEax;
     return pushEax;
   } else if (strcmp(iloc->opcode, "i2i") == 0){
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3, NULL);
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
     return move;
   } else if(strcmp(iloc->opcode, "storeAI") == 0){
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, x86_offset(iloc->operand2, iloc->operand3), NULL);
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, x86_offset(iloc->operand2, iloc->operand3));
     return move;
   }
   return NULL;
