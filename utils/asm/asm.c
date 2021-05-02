@@ -24,7 +24,9 @@ AsmInstruction* create_asm_instruction(
   return instruction;
 }
 
-AsmInstruction* generate_asm_code(Instruction* iloc_code){
+AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_scope){
+  print_asm_globals_code(global_scope);
+  
   while(iloc_code != NULL){
     iloc_to_asm(iloc_code);
     iloc_code = iloc_code->previous;
@@ -93,3 +95,30 @@ char* x86_reg(char* iloc_reg)
     return NULL;
   }
 };
+
+
+void print_asm_globals_code(Symbol_Entry** global_scope) {
+  bool isFirstGlobal = true;
+  for (int i = 0; i < TABLE_SIZE; i++) {
+    if (global_scope[i] != NULL) {
+      Symbol_Entry* entry = global_scope[i];
+      while (entry != NULL) {
+        if (entry->nature == VAR) {
+          if (isFirstGlobal == true) {
+            printf("  .text\n");
+            isFirstGlobal = false;
+          }
+          printf("  .globl %s\n", entry->key);
+          printf("  .data\n");
+          printf("  .align 4\n"); // depends on machine word length (?)
+          printf("  .type %s, @object\n", entry->key);
+          printf("  .size %s, %d\n", entry->key, entry->length);
+          printf("%s:\n", entry->key);
+          printf("  .long 0\n"); // in the future this will depend on type
+        }
+
+        entry = entry->next;
+      }
+    }
+  }
+}
