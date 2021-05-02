@@ -127,6 +127,14 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
   } else if(strcmp(iloc->opcode, "storeAI") == 0){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, x86_offset(iloc->operand2, iloc->operand3));
     return move;
+  } else if(strcmp(iloc->opcode, "jump") == 0){
+    char memory_addr[strlen(iloc->operand1) + 2];
+    sprintf(memory_addr, "*%s", iloc->operand1);
+    AsmInstruction* jmp = create_asm_instruction(NULL, "jmp", NULL, memory_addr);
+    return jmp;
+  } else if(strcmp(iloc->opcode, "jumpI") == 0){
+    AsmInstruction* jmp = create_asm_instruction(NULL, "jmp", NULL, iloc->operand1);
+    return jmp;
   }
   return NULL;
 }
