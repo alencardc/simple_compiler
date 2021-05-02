@@ -54,17 +54,19 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
 
 AsmInstruction* iloc_to_asm(Instruction* iloc){
   if(strcmp(iloc->opcode, "loadI") == 0){
-    AsmInstruction* asm_code = create_asm_instruction(NULL, 
-      "movl", 
-      x86_literal(iloc->operand1), 
-      iloc->operand3);
-      return asm_code;
+    AsmInstruction* asm_code = create_asm_instruction(NULL, "movl", x86_literal(iloc->operand1), iloc->operand3);
+    return asm_code;
   } else if(strcmp(iloc->opcode, "loadAI") == 0){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_offset(iloc->operand1, iloc->operand2), iloc->operand3);
     return move;
   } else if(strcmp(iloc->opcode, "add") == 0){
     AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
     AsmInstruction* add = create_asm_instruction(NULL,"addl" ,iloc->operand2, iloc->operand3);
+    concat_asm_instructions(copy, add);
+    return copy;
+  } else if(strcmp(iloc->opcode, "addI") == 0){
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
+    AsmInstruction* add = create_asm_instruction(NULL,"addl" , x86_literal(iloc->operand2), iloc->operand3);
     concat_asm_instructions(copy, add);
     return copy;
   } else if(strcmp(iloc->opcode, "sub") == 0){
@@ -106,6 +108,12 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
   } else if (strcmp(iloc->opcode, "i2i") == 0){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
     return move;
+  } else if(strcmp(iloc->opcode, "store") == 0){
+    char memory_addr[strlen(iloc->operand1) + 3];
+    sprintf(memory_addr, "(%s)", iloc->operand1);
+
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", memory_addr, iloc->operand2);
+    return move;
   } else if(strcmp(iloc->opcode, "storeAI") == 0){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, x86_offset(iloc->operand2, iloc->operand3));
     return move;
@@ -131,6 +139,7 @@ char* x86_literal(char* iloc_literal){
 }
 
 char* x86_offset(char* iloc_reg, char* offset){
+  // TODO Provavelmente isso aqui vai ter um leak de memória pq na criacao é feito strdup
   char* x86Reg = x86_reg(iloc_reg);
   char* x86Offset = (char*) malloc(sizeof(char) * (strlen(x86_reg(iloc_reg)) + strlen("-()") + strlen(offset) + 1));
 
