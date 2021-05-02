@@ -44,6 +44,9 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
     AsmInstruction* add = create_asm_instruction(NULL,"addl" ,iloc->operand2, iloc->operand3, NULL);
     copy->next = add;
     return copy;
+  } else if (strcmp(iloc->opcode, "i2i") == 0){
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3, NULL);
+    return move;
   }
   return NULL;
 }
