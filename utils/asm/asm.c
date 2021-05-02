@@ -17,15 +17,14 @@ AsmInstruction* create_asm_instruction(
   
   instruction->label = label != NULL ? strdup(label) : NULL;
   instruction->opcode = strdup(opcode);
-  instruction->src = strdup(src);
-  instruction->dst = strdup(dst);
+  instruction->src = src != NULL ? strdup(src) : NULL;
+  instruction->dst = dst != NULL ? strdup(dst) : dst;
   instruction->next = next;
   
   return instruction;
 }
 
 AsmInstruction* generate_asm_code(Instruction* iloc_code){
-
   while(iloc_code != NULL){
     iloc_to_asm(iloc_code);
     iloc_code = iloc_code->previous;
@@ -33,6 +32,7 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code){
 }
 
 AsmInstruction* iloc_to_asm(Instruction* iloc){
+ 
   AsmInstruction* asm_code;
   if(strcmp(iloc->opcode, "loadI") == 0){
     asm_code = create_asm_instruction(NULL, 
