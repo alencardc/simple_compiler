@@ -52,7 +52,7 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
     iloc_code = iloc_code->previous;
     prev = new_asm;
   }
-  print_asm_instruction(head);
+  print_asm_instructions(head);
 }
 
 AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
@@ -93,7 +93,7 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx");
     AsmInstruction* dividend = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax");
     AsmInstruction* cltd = create_asm_instruction(NULL, "cltd", NULL, NULL);
-    AsmInstruction* div = create_asm_instruction(NULL,"idivl" , iloc->operand2, NULL);
+    AsmInstruction* div = create_asm_instruction(NULL,"idivl" , NULL, iloc->operand2);
     AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3);
     AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx");
     AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax");
@@ -127,8 +127,26 @@ void print_asm_instruction(AsmInstruction* asm_code){
     return;
   }
 
-  printf("%s %s,%s\n", asm_code->opcode, asm_code->src, asm_code->dst);
-  print_asm_instruction(asm_code->next);
+  if(strcmp(asm_code->opcode, "final_proc") == 0){
+    printf(".cfi_endproc\n");
+  } else if(asm_code->src != NULL && asm_code->dst != NULL){
+     printf("\t%s %s,%s\n", asm_code->opcode, asm_code->src, asm_code->dst);
+  } else if (asm_code->src == NULL && asm_code->dst != NULL){
+    printf("\t%s %s\n", asm_code->opcode, asm_code->dst);
+  } else if (asm_code->src != NULL && asm_code->dst == NULL){
+    printf("\t%s %s\n", asm_code->opcode, asm_code->src);
+  } else if(asm_code->src == NULL && asm_code->dst == NULL){
+    printf("\t%s\n", asm_code->opcode);
+  } else{
+    printf("QUE PORRA QUE DEU AQUI: %s\n", asm_code->opcode);
+  }
+}
+
+void print_asm_instructions(AsmInstruction* asm_code){
+  while(asm_code != NULL){
+    print_asm_instruction(asm_code);
+    asm_code = asm_code->next;
+  }
 }
 
 char* x86_literal(char* iloc_literal){

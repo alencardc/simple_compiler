@@ -24,7 +24,7 @@ int main (int argc, char **argv)
   printf("\n\n");
 
   print_init_asm_code();
-  generate_asm_code(iloc_code, scopes);
+  generate_asm_code(iloc_code, scopes->table);
   print_final_asm_code();
 
   pop_scope(scopes);

@@ -24,6 +24,7 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev);
 AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_scope);
 
 
+void print_asm_instructions(AsmInstruction* asm_code);
 void print_asm_instruction(AsmInstruction* asm_code);
 void print_init_asm_code();
 void print_final_asm_code();
