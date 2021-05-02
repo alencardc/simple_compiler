@@ -74,6 +74,16 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
     AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,iloc->operand2, iloc->operand3);
     concat_asm_instructions(copy, sub);
     return copy;
+  } else if(strcmp(iloc->opcode, "subI") == 0){
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
+    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,x86_literal(iloc->operand2), iloc->operand3);
+    concat_asm_instructions(copy, sub);
+    return copy;
+  } else if(strcmp(iloc->opcode, "rsubI") == 0){
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand2, iloc->operand3);
+    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,iloc->operand2, iloc->operand3);
+    concat_asm_instructions(copy, sub);
+    return copy;
   } else if(strcmp(iloc->opcode, "mult") == 0){
     // Save eax and edx
     AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax");
