@@ -22,11 +22,13 @@ int main (int argc, char **argv)
   //exporta (arvore);
   print_iloc_code(iloc_code);
   printf("\n\n");
+
+  print_init_asm_code();
   generate_asm_code(iloc_code, scopes->table);
-  
-  // Main function declartion code
+  print_final_asm_code();
 
   pop_scope(scopes);
+
   libera(arvore);
   arvore = NULL;
   yylex_destroy();

@@ -41,27 +41,30 @@ AsmInstruction* concat_asm_instructions(AsmInstruction* instr1, AsmInstruction* 
 
 AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_scope) {
   AsmInstruction* head = NULL;
+  AsmInstruction* prev = NULL;
 
   print_asm_globals_code(global_scope);
   
   while(iloc_code != NULL){
-    AsmInstruction* new_asm = iloc_to_asm(iloc_code);
+    AsmInstruction* new_asm = iloc_to_asm(iloc_code, prev);
     head = concat_asm_instructions(head, new_asm);
+
     iloc_code = iloc_code->previous;
+    prev = new_asm;
   }
-  print_asm_instruction(head);
+  print_asm_instructions(head);
 }
 
-AsmInstruction* iloc_to_asm(Instruction* iloc){
+AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
   if(strcmp(iloc->opcode, "loadI") == 0){
-    AsmInstruction* asm_code = create_asm_instruction(NULL, "movl", x86_literal(iloc->operand1), iloc->operand3);
+    AsmInstruction* asm_code = create_asm_instruction(NULL, "movl", x86_literal(iloc->operand1), x86_reg(iloc->operand3));
     return asm_code;
   } else if(strcmp(iloc->opcode, "loadAI") == 0){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_offset(iloc->operand1, iloc->operand2), iloc->operand3);
     return move;
   } else if(strcmp(iloc->opcode, "add") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
-    AsmInstruction* add = create_asm_instruction(NULL,"addl" ,iloc->operand2, iloc->operand3);
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
+    AsmInstruction* add = create_asm_instruction(NULL,"addl" ,x86_reg(iloc->operand2), x86_reg(iloc->operand3));
     concat_asm_instructions(copy, add);
     return copy;
   } else if(strcmp(iloc->opcode, "addI") == 0){
@@ -105,7 +108,7 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
     AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx");
     AsmInstruction* dividend = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax");
     AsmInstruction* cltd = create_asm_instruction(NULL, "cltd", NULL, NULL);
-    AsmInstruction* div = create_asm_instruction(NULL,"idivl" , iloc->operand2, NULL);
+    AsmInstruction* div = create_asm_instruction(NULL,"idivl" , NULL, iloc->operand2);
     AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3);
     AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx");
     AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax");
@@ -116,7 +119,7 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
     cltd->prev = dividend; dividend->prev = pushEdx; pushEdx->prev = pushEax;
     return pushEax;
   } else if (strcmp(iloc->opcode, "i2i") == 0){
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
     return move;
   } else if(strcmp(iloc->opcode, "store") == 0){
     char memory_addr[strlen(iloc->operand1) + 3];
@@ -125,7 +128,7 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", memory_addr, iloc->operand2);
     return move;
   } else if(strcmp(iloc->opcode, "storeAI") == 0){
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, x86_offset(iloc->operand2, iloc->operand3));
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_offset(iloc->operand2, iloc->operand3));
     return move;
   } else if(strcmp(iloc->opcode, "jump") == 0){
     char memory_addr[strlen(iloc->operand1) + 2];
@@ -135,6 +138,15 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
   } else if(strcmp(iloc->opcode, "jumpI") == 0){
     AsmInstruction* jmp = create_asm_instruction(NULL, "jmp", NULL, iloc->operand1);
     return jmp;
+  } else if(strcmp(iloc->opcode, "halt") == 0){
+    char* last_temp = prev->dst == NULL? (prev->src == NULL? strdup("$0") : prev->src): prev->dst;
+    
+    AsmInstruction* return_asm = create_asm_instruction(NULL, "movl", last_temp, "%eax");
+    AsmInstruction* ret = create_asm_instruction(NULL, "ret", NULL, NULL);
+    AsmInstruction* final_proc = create_asm_instruction(NULL,"final_proc", ".cfi_endproc", NULL);
+    concat_asm_instructions(return_asm, ret);
+    concat_asm_instructions(ret, final_proc);
+    return return_asm;
   }
   return NULL;
 }
@@ -144,8 +156,26 @@ void print_asm_instruction(AsmInstruction* asm_code){
     return;
   }
 
-  printf("%s %s,%s\n", asm_code->opcode, asm_code->src, asm_code->dst);
-  print_asm_instruction(asm_code->next);
+  if(strcmp(asm_code->opcode, "final_proc") == 0){
+    printf(".cfi_endproc\n");
+  } else if(asm_code->src != NULL && asm_code->dst != NULL){
+     printf("\t%s %s,%s\n", asm_code->opcode, asm_code->src, asm_code->dst);
+  } else if (asm_code->src == NULL && asm_code->dst != NULL){
+    printf("\t%s %s\n", asm_code->opcode, asm_code->dst);
+  } else if (asm_code->src != NULL && asm_code->dst == NULL){
+    printf("\t%s %s\n", asm_code->opcode, asm_code->src);
+  } else if(asm_code->src == NULL && asm_code->dst == NULL){
+    printf("\t%s\n", asm_code->opcode);
+  } else{
+    printf("QUE PORRA QUE DEU AQUI: %s\n", asm_code->opcode);
+  }
+}
+
+void print_asm_instructions(AsmInstruction* asm_code){
+  while(asm_code != NULL){
+    print_asm_instruction(asm_code);
+    asm_code = asm_code->next;
+  }
 }
 
 char* x86_literal(char* iloc_literal){
@@ -181,10 +211,17 @@ char* x86_reg(char* iloc_reg)
   }
   else
   {
-    return NULL;
+    return iloc_reg;
   }
 };
 
+void print_init_asm_code(){
+  printf("\t.text\n\t.globl	main\n\t.type	main, @function\nmain:\n\t.LFB0:\n\t.cfi_startproc\n");
+}
+
+void print_final_asm_code(){
+  printf(".LFE0:\n\t.size	main, .-main\n");
+}
 
 void print_asm_globals_code(Symbol_Entry** global_scope) {
   bool isFirstGlobal = true;
