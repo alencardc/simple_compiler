@@ -26,28 +26,35 @@ AsmInstruction* create_asm_instruction(
 
 AsmInstruction* generate_asm_code(Instruction* iloc_code){
   while(iloc_code != NULL){
-    iloc_to_asm(iloc_code);
+    print_asm_instruction(iloc_to_asm(iloc_code));
     iloc_code = iloc_code->previous;
   }
 }
 
 AsmInstruction* iloc_to_asm(Instruction* iloc){
- 
-  AsmInstruction* asm_code;
   if(strcmp(iloc->opcode, "loadI") == 0){
-    asm_code = create_asm_instruction(NULL, 
+    AsmInstruction* asm_code = create_asm_instruction(NULL, 
       "movl", 
       x86_literal(iloc->operand1), 
-      x86_reg(iloc->operand3), 
+      iloc->operand3, 
       NULL);
-
-      print_asm_instruction(asm_code);
+      return asm_code;
+  } else if(strcmp(iloc->opcode, "add") == 0){
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3, NULL);
+    AsmInstruction* add = create_asm_instruction(NULL,"addl" ,iloc->operand2, iloc->operand3, NULL);
+    copy->next = add;
+    return copy;
   }
   return NULL;
 }
 
 void print_asm_instruction(AsmInstruction* asm_code){
-  printf("%s %s %s\n", asm_code->opcode, asm_code->src, asm_code->dst);
+  if(asm_code == NULL){
+    return;
+  }
+
+  printf("%s %s,%s\n", asm_code->opcode, asm_code->src, asm_code->dst);
+  print_asm_instruction(asm_code->next);
 }
 
 char* x86_literal(char* iloc_literal){
@@ -62,17 +69,21 @@ char* x86_reg(char* iloc_reg)
 {
   if (strcmp("r0", iloc_reg) == 0)
   {
-    return "%ebx";
+    return "%eax";
   } else if (strcmp("r1", iloc_reg) == 0)
   {
-    return "%ecx";
+    return "%ebx";
   } else if (strcmp("r2", iloc_reg) == 0)
   {
-    return "%edx";
+    return "%ecx";
   } else if (strcmp("r3", iloc_reg) == 0)
   {
-    return "%esi";
+    return "%edx";
   } else if (strcmp("r4", iloc_reg) == 0)
+  {
+    return "%esi";
+  }
+  else if (strcmp("r5", iloc_reg) == 0)
   {
     return "%edi";
   }
