@@ -4,6 +4,7 @@ parser.tab.c
 parser.output
 **/**.o
 etapa*
+**/**.s
 
 saidas/*
 submit

@@ -13,7 +13,7 @@ extern int get_line_number(void);
 extern Instruction* iloc_code;
 char* function_id = NULL;
 bool is_function_block = false;
-Table_Stack* scopes = NULL;
+extern Table_Stack* scopes;
 
 extern void *arvore;
 
@@ -162,8 +162,6 @@ root: programa {
   create_program_start_instr($1, scopes);
   $1->instr = reverse_instr_list($1->instr);
   iloc_code =  $1->instr;
-  //print_iloc_code($1->instr); 
-  pop_scope(scopes); 
 }
 
 programa: global_decl_list programa { $$ = $2; };
