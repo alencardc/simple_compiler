@@ -20,6 +20,8 @@ int main (int argc, char **argv)
 {
   int ret = yyparse(); 
   //exporta (arvore);
+  print_iloc_code(iloc_code);
+  printf("\n\n");
   generate_asm_code(iloc_code, scopes->table);
   
   // Main function declartion code

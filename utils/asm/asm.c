@@ -53,26 +53,26 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
     return copy;
   } else if(strcmp(iloc->opcode, "mult") == 0){
     // Save eax and edx
-    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushq", NULL, "%eax", NULL);
-    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushq", NULL, "%edx", NULL);
+    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax", NULL);
+    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx", NULL);
     AsmInstruction* movOp1 = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax", NULL);
     AsmInstruction* mul = create_asm_instruction(NULL,"imull" ,iloc->operand2, "%eax", NULL);
     AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3, NULL);
-    AsmInstruction* popEdx = create_asm_instruction(NULL, "popq", NULL, "%edx", NULL);
-    AsmInstruction* popEax = create_asm_instruction(NULL, "popq", NULL, "%eax", NULL);
+    AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx", NULL);
+    AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax", NULL);
     pushEax->next = pushEdx; pushEdx->next = movOp1; movOp1->next = mul;
     mul->next = movRes; movRes->next = popEdx; popEdx->next = popEax;
     return pushEax;
   } else if(strcmp(iloc->opcode, "div") == 0){
     // Save eax and edx
-    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushq", NULL, "%eax", NULL);
-    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushq", NULL, "%edx", NULL);
+    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax", NULL);
+    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx", NULL);
     AsmInstruction* dividend = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax", NULL);
     AsmInstruction* cltd = create_asm_instruction(NULL, "cltd", NULL, NULL, NULL);
     AsmInstruction* div = create_asm_instruction(NULL,"idivl" , iloc->operand2, NULL, NULL);
     AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3, NULL);
-    AsmInstruction* popEdx = create_asm_instruction(NULL, "popq", NULL, "%edx", NULL);
-    AsmInstruction* popEax = create_asm_instruction(NULL, "popq", NULL, "%eax", NULL);
+    AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx", NULL);
+    AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax", NULL);
     pushEax->next = pushEdx; pushEdx->next = dividend; dividend->next = cltd;
     cltd->next = div; div->next = movRes; movRes->next = popEdx; popEdx->next = popEax;
     return pushEax;
