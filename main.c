@@ -22,6 +22,8 @@ int main (int argc, char **argv)
   //exporta (arvore);
   generate_asm_code(iloc_code, scopes->table);
   
+  // Main function declartion code
+
   pop_scope(scopes);
   libera(arvore);
   arvore = NULL;
