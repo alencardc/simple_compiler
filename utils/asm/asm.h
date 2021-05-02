@@ -20,3 +20,4 @@ void print_asm_instruction(AsmInstruction* asm_code);
 
 char* x86_literal(char* iloc_literal);
 char* x86_reg(char* iloc_reg);
+char* x86_offset(char* iloc_reg, char* offset);

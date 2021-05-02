@@ -47,6 +47,9 @@ AsmInstruction* iloc_to_asm(Instruction* iloc){
   } else if (strcmp(iloc->opcode, "i2i") == 0){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3, NULL);
     return move;
+  } else if(strcmp(iloc->opcode, "storeAI") == 0){
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", iloc->operand1, x86_offset(iloc->operand2, iloc->operand3), NULL);
+    return move;
   }
   return NULL;
 }
@@ -68,29 +71,17 @@ char* x86_literal(char* iloc_literal){
   return literal;
 }
 
+char* x86_offset(char* iloc_reg, char* offset){
+  char* x86Reg = x86_reg(iloc_reg);
+  char* x86Offset = (char*) malloc(sizeof(char) * (strlen(x86_reg(iloc_reg)) + strlen("-()") + strlen(offset) + 1));
+
+  sprintf(x86Offset, "-%s(%s)", offset, x86Reg);
+  return x86Offset;
+}
+
 char* x86_reg(char* iloc_reg)
 {
-  if (strcmp("r0", iloc_reg) == 0)
-  {
-    return "%eax";
-  } else if (strcmp("r1", iloc_reg) == 0)
-  {
-    return "%ebx";
-  } else if (strcmp("r2", iloc_reg) == 0)
-  {
-    return "%ecx";
-  } else if (strcmp("r3", iloc_reg) == 0)
-  {
-    return "%edx";
-  } else if (strcmp("r4", iloc_reg) == 0)
-  {
-    return "%esi";
-  }
-  else if (strcmp("r5", iloc_reg) == 0)
-  {
-    return "%edi";
-  }
-  else if (strcmp("rfp", iloc_reg) == 0)
+  if (strcmp("rfp", iloc_reg) == 0)
   {
     return "%rbp";
   }
