@@ -33,6 +33,9 @@ char* x86_literal(char* iloc_literal);
 char* x86_reg(char* iloc_reg);
 char* x86_offset(char* iloc_reg, char* offset);
 
+bool is64bitRegister(char* reg);
+bool haveAny64BitRegister(char* reg1, char* reg2);
+
 void print_asm_globals_code(Symbol_Entry** global_scope);
 
 #endif // __ASM_H__

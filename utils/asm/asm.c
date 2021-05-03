@@ -104,7 +104,13 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     cltd->prev = dividend; dividend->prev = pushEdx; pushEdx->prev = pushEax;
     return pushEax;
   } else if (strcmp(iloc->opcode, "i2i") == 0){
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
+    char* x86_reg1 = x86_reg(iloc->operand1);
+    char* x86_reg2 = x86_reg(iloc->operand3);
+    if(haveAny64BitRegister(x86_reg1, x86_reg2)){
+      AsmInstruction* move = create_asm_instruction(NULL, "movq", x86_reg1, x86_reg2);
+      return move;
+    }
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg1, x86_reg2);
     return move;
   } else if(strcmp(iloc->opcode, "storeAI") == 0){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_offset(iloc->operand2, iloc->operand3));
@@ -113,9 +119,11 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     char* last_temp = prev->dst == NULL? (prev->src == NULL? strdup("$0") : prev->src): prev->dst;
     
     AsmInstruction* return_asm = create_asm_instruction(NULL, "movl", last_temp, "%eax");
+    AsmInstruction* popq = create_asm_instruction(NULL, "popq", NULL, "%rbp");
     AsmInstruction* ret = create_asm_instruction(NULL, "ret", NULL, NULL);
     AsmInstruction* final_proc = create_asm_instruction(NULL,"final_proc", ".cfi_endproc", NULL);
-    concat_asm_instructions(return_asm, ret);
+    concat_asm_instructions(return_asm, popq);
+    concat_asm_instructions(popq, ret);
     concat_asm_instructions(ret, final_proc);
     return return_asm;
   }
@@ -221,6 +229,18 @@ char* x86_reg(char* iloc_reg)
     return iloc_reg;
   }
 };
+
+bool haveAny64BitRegister(char* reg1, char* reg2){
+  return is64bitRegister(reg1) || is64bitRegister(reg2);
+}
+
+bool is64bitRegister(char* reg){
+  if(strcmp(reg, "%rbp") == 0)
+    return true;
+  if(strcmp(reg, "%rsp") == 0)
+    return true;
+  return false;
+}
 
 void print_init_asm_code(){
   printf("\t.text\n\t.globl	main\n\t.type	main, @function\nmain:\n\t.LFB0:\n\t.cfi_startproc\n");

@@ -512,7 +512,7 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   free(function_label);
 
   if (strcmp(function_id, "main") == 0){
-    Instruction* init_rsp = create_instruction("i2i", "rfp", NULL, "rsp", label_start);
+    Instruction* init_rsp = create_instruction("i2i", "rsp", NULL, "rfp", label_start);
     return init_rsp;
   }
 
