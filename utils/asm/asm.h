@@ -35,4 +35,6 @@ char* x86_offset(char* iloc_reg, char* offset);
 
 void print_asm_globals_code(Symbol_Entry** global_scope);
 
+AsmInstruction* create_asm_cmp_code(Instruction* iloc_cmp, const char* jmp_type);
+
 #endif // __ASM_H__

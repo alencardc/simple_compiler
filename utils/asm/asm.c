@@ -147,7 +147,20 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     concat_asm_instructions(return_asm, ret);
     concat_asm_instructions(ret, final_proc);
     return return_asm;
+  } else if(strcmp(iloc->opcode, "cmp_LT") == 0) {
+    return create_asm_cmp_code(iloc, "jl");
+  } else if(strcmp(iloc->opcode, "cmp_LE") == 0) {
+    return create_asm_cmp_code(iloc, "jle");
+  } else if(strcmp(iloc->opcode, "cmp_EQ") == 0) {
+    return create_asm_cmp_code(iloc, "je");
+  } else if(strcmp(iloc->opcode, "cmp_NE") == 0) {
+    return create_asm_cmp_code(iloc, "jne");
+  } else if(strcmp(iloc->opcode, "cmp_GT") == 0) {
+    return create_asm_cmp_code(iloc, "jg");
+  } else if(strcmp(iloc->opcode, "cmp_GE") == 0) {
+    return create_asm_cmp_code(iloc, "jge");
   }
+
   return NULL;
 }
 
@@ -247,4 +260,17 @@ void print_asm_globals_code(Symbol_Entry** global_scope) {
       }
     }
   }
+}
+
+AsmInstruction* create_asm_cmp_code(Instruction* iloc_cmp, const char* jmp_type) {
+  AsmInstruction* cmp = NULL;
+  Instruction* cbr = iloc_cmp->previous;
+  if (strcmp("cbr", cbr->opcode) == 0) {
+    cmp = create_asm_instruction(NULL, "cmp", iloc_cmp->operand1, iloc_cmp->operand2);
+    AsmInstruction* jmp_true = create_asm_instruction(NULL, jmp_type, NULL, cbr->operand2);
+    AsmInstruction* jmp_false = create_asm_instruction(NULL, "jmp", NULL, cbr->operand3);
+    concat_asm_instructions(cmp, jmp_true);
+    concat_asm_instructions(jmp_true, jmp_false);
+  }
+  return cmp;
 }
