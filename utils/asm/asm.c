@@ -179,6 +179,43 @@ char* x86_reg(char* iloc_reg)
   {
     return "%rsp";
   }
+  //TEMPORÁRIO APENAS PARA TESTAR!!!!!!!!!!!!!!!!!
+  else if(strcmp("r0", iloc_reg) == 0){
+    return "%ecx";
+  }
+  else if(strcmp("r1", iloc_reg) == 0){
+    return "%ebx";
+  }
+  else if(strcmp("r2", iloc_reg) == 0){
+    return "%esi";
+  }
+  else if(strcmp("r3", iloc_reg) == 0){
+    return "%edi";
+  }
+  else if(strcmp("r4", iloc_reg) == 0){
+    return "%r8d";
+  }
+  else if(strcmp("r5", iloc_reg) == 0){
+    return "%r9d";
+  }
+  else if(strcmp("r6", iloc_reg) == 0){
+    return "%r10d";
+  }
+  else if(strcmp("r7", iloc_reg) == 0){
+    return "%r11d";
+  }
+  else if(strcmp("r8", iloc_reg) == 0){
+    return "%r12d";
+  }
+  else if(strcmp("r9", iloc_reg) == 0){
+    return "%r13d";
+  }
+  else if(strcmp("r10", iloc_reg) == 0){
+    return "%r14d";
+  }
+  else if(strcmp("r11", iloc_reg) == 0){
+    return "%r15d";
+  }
   else
   {
     return iloc_reg;
