@@ -159,6 +159,10 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     return create_asm_cmp_code(iloc, "jg");
   } else if(strcmp(iloc->opcode, "cmp_GE") == 0) {
     return create_asm_cmp_code(iloc, "jge");
+  } else if(strcmp(iloc->opcode, "nop") == 0) {
+    if (iloc->label != NULL) {
+      return create_asm_instruction(iloc->label, NULL, NULL, NULL);
+    }
   }
 
   return NULL;
