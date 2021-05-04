@@ -81,8 +81,16 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     concat_asm_instructions(copy, add);
     return copy;
   } else if(strcmp(iloc->opcode, "addI") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
-    AsmInstruction* add = create_asm_instruction(NULL,"addl" , x86_literal(iloc->operand2), x86_reg(iloc->operand3));
+    char* x86_reg1 = x86_reg(iloc->operand1);
+    char* x86_reg2 = x86_reg(iloc->operand3);
+    if(haveAny64BitRegister(x86_reg1, x86_reg2)){
+      AsmInstruction* copy = create_asm_instruction(NULL, "movq", x86_reg1, x86_reg2);
+      AsmInstruction* add = create_asm_instruction(NULL,"addq" , x86_literal(iloc->operand2), x86_reg2);
+      concat_asm_instructions(copy, add);
+      return copy;
+    }
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg1, x86_reg2);
+    AsmInstruction* add = create_asm_instruction(NULL,"addl" , x86_literal(iloc->operand2), x86_reg2);
     concat_asm_instructions(copy, add);
     return copy;
   } else if(strcmp(iloc->opcode, "sub") == 0){
