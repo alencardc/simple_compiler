@@ -85,8 +85,16 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     concat_asm_instructions(copy, add);
     return copy;
   } else if(strcmp(iloc->opcode, "addI") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
-    AsmInstruction* add = create_asm_instruction(NULL,"addl" , x86_literal(iloc->operand2), x86_reg(iloc->operand3));
+    char* x86_reg1 = x86_reg(iloc->operand1);
+    char* x86_reg2 = x86_reg(iloc->operand3);
+    if(haveAny64BitRegister(x86_reg1, x86_reg2)){
+      AsmInstruction* copy = create_asm_instruction(NULL, "movq", x86_reg1, x86_reg2);
+      AsmInstruction* add = create_asm_instruction(NULL,"addq" , x86_literal(iloc->operand2), x86_reg2);
+      concat_asm_instructions(copy, add);
+      return copy;
+    }
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg1, x86_reg2);
+    AsmInstruction* add = create_asm_instruction(NULL,"addl" , x86_literal(iloc->operand2), x86_reg2);
     concat_asm_instructions(copy, add);
     return copy;
   } else if(strcmp(iloc->opcode, "sub") == 0){
@@ -106,13 +114,13 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     return copy;
   } else if(strcmp(iloc->opcode, "mult") == 0){
     // Save eax and edx
-    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax");
-    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx");
+    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushq", NULL, "%rax");
+    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushq", NULL, "%rdx");
     AsmInstruction* movOp1 = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), "%eax");
     AsmInstruction* mul = create_asm_instruction(NULL,"imull" ,x86_reg(iloc->operand2), "%eax");
     AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", x86_reg(iloc->operand3));
-    AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx");
-    AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax");
+    AsmInstruction* popEdx = create_asm_instruction(NULL, "popq", NULL, "%rdx");
+    AsmInstruction* popEax = create_asm_instruction(NULL, "popq", NULL, "%rax");
     pushEax->next = pushEdx; pushEdx->next = movOp1; movOp1->next = mul;
     mul->next = movRes; movRes->next = popEdx; popEdx->next = popEax;
 
@@ -121,14 +129,14 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     return pushEax;
   } else if(strcmp(iloc->opcode, "div") == 0){
     // Save eax and edx
-    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax");
-    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx");
+    AsmInstruction* pushEax = create_asm_instruction(NULL, "pushq", NULL, "%rax");
+    AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushq", NULL, "%rdx");
     AsmInstruction* dividend = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), "%eax");
     AsmInstruction* cltd = create_asm_instruction(NULL, "cltd", NULL, NULL);
     AsmInstruction* div = create_asm_instruction(NULL,"idivl" , NULL, x86_reg(iloc->operand2));
     AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", x86_reg(iloc->operand3));
-    AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx");
-    AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax");
+    AsmInstruction* popEdx = create_asm_instruction(NULL, "popq", NULL, "%rdx");
+    AsmInstruction* popEax = create_asm_instruction(NULL, "popq", NULL, "%rax");
     pushEax->next = pushEdx; pushEdx->next = dividend; dividend->next = cltd;
     cltd->next = div; div->next = movRes; movRes->next = popEdx; popEdx->next = popEax;
     
@@ -166,6 +174,15 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     AsmInstruction* jmp = create_asm_instruction(NULL, "jmp", NULL, iloc->operand1);
     return jmp;
   } else if(strcmp(iloc->opcode, "halt") == 0){
+    //Last instruction is mul or div
+    if(prev != NULL && strcmp(prev->opcode, "pushq") == 0){
+      //Go to the instruction of mult/div
+      while(prev->next != NULL && (strcmp(prev->opcode, "imull") != 0 && strcmp(prev->opcode, "idivl") != 0)){
+        prev = prev->next;
+      }
+      //Take the next instruction that has the temp
+      prev = prev->next;
+    }
     char* last_temp = prev->dst == NULL? (prev->src == NULL? strdup("$0") : prev->src): prev->dst;
     
     AsmInstruction* return_asm = create_asm_instruction(NULL, "movl", last_temp, "%eax");
