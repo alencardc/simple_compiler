@@ -73,6 +73,10 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     AsmInstruction* asm_code = create_asm_instruction(NULL, "movl", x86_literal(iloc->operand1), x86_reg(iloc->operand3));
     return asm_code;
   } else if(strcmp(iloc->opcode, "loadAI") == 0){
+    if (strcmp(iloc->operand1, "rbss") == 0 && iloc->comment != NULL) { // Global
+      AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_global(iloc->comment), x86_reg(iloc->operand3));
+      return move;
+    }
     AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_offset(iloc->operand1, iloc->operand2), x86_reg(iloc->operand3));
     return move;
   } else if(strcmp(iloc->opcode, "add") == 0){
@@ -147,6 +151,10 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", memory_addr, x86_reg(iloc->operand2));
     return move;
   } else if(strcmp(iloc->opcode, "storeAI") == 0){
+    if (strcmp(iloc->operand2, "rbss") == 0 && iloc->comment != NULL) { // Global
+      AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_global(iloc->comment));
+      return move;
+    }
     AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_offset(iloc->operand2, iloc->operand3));
     return move;
   } else if(strcmp(iloc->opcode, "jump") == 0){
@@ -297,6 +305,36 @@ char* x86_reg(char* iloc_reg)
     return iloc_reg;
   }
 };
+
+char* x86_global(char* global) {
+  if (global == NULL)
+    return NULL;
+  
+  char* src = global;
+  int offset = 0;
+  if (global[0] == '/') {
+    src += 2;
+    offset = 2;
+  }
+  char* global_var = malloc(sizeof(global) + sizeof("(%rip)") - offset);
+  strcpy(global_var, src);
+  strcat(global_var, "(%rip)");
+  return global_var;
+}
+
+int get_reg_num(const char* iloc_reg) {
+  if (strcmp("rfp", iloc_reg) == 0
+    || strcmp("rbss", iloc_reg) == 0
+    || strcmp("rsp", iloc_reg) == 0) 
+  {
+    return -1;
+  }
+  
+  char str_num[16];
+  strcpy(str_num, iloc_reg + 1);
+  int reg_num = atoi(str_num);
+  return reg_num;
+}
 
 bool haveAny64BitRegister(char* reg1, char* reg2){
   return is64bitRegister(reg1) || is64bitRegister(reg2);

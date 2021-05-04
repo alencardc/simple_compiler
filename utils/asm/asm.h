@@ -32,6 +32,7 @@ void print_final_asm_code();
 char* x86_literal(char* iloc_literal);
 char* x86_reg(char* iloc_reg);
 char* x86_offset(char* iloc_reg, char* offset);
+char* x86_global(char* global);
 
 bool is64bitRegister(char* reg);
 bool haveAny64BitRegister(char* reg1, char* reg2);

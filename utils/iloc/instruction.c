@@ -80,6 +80,7 @@ Instruction* create_instruction(
   instruction->operand1 = arg1 != NULL ? strdup(arg1) : NULL;
   instruction->operand2 = arg2 != NULL ? strdup(arg2) : NULL;
   instruction->operand3 = arg3 != NULL ? strdup(arg3) : NULL;
+  instruction->comment = NULL;
   instruction->previous = prev;
   
   return instruction;
@@ -99,6 +100,7 @@ Instruction* create_label(const char* label, Instruction* prev) {
   instruction->operand1 = NULL;
   instruction->operand2 = NULL;
   instruction->operand3 = NULL;
+  instruction->comment = NULL;
   instruction->previous = prev;
   
   return instruction;
@@ -116,6 +118,7 @@ void free_instruction(Instruction* instr) {
   free(instr->operand1);
   free(instr->operand2);
   free(instr->operand3);
+  free(instr->comment);
   free(instr);
   instr = NULL;
   return;
@@ -155,13 +158,13 @@ void print_instruction(Instruction* i) {
     printf("%s: %s\n", i->label, i->opcode != NULL ? i->opcode : "");
   }
   else if (strcmp("loadAI", i->opcode) == 0) {
-    printf("loadAI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+    printf("loadAI %s, %s => %s %s\n", i->operand1, i->operand2, i->operand3, i->comment == NULL ? "" : i->comment);
   }
   else if (strcmp("store", i->opcode) == 0) {
     printf("store %s => %s\n", i->operand1, i->operand2);
   }  
   else if (strcmp("storeAI", i->opcode) == 0) {
-    printf("storeAI %s => %s, %s\n", i->operand1, i->operand2, i->operand3);
+    printf("storeAI %s => %s, %s %s\n", i->operand1, i->operand2, i->operand3, i->comment == NULL ? "" : i->comment);
   }  
   else if (strcmp("loadI", i->opcode) == 0) {
     printf("loadI %s => %s\n", i->operand1, i->operand3);

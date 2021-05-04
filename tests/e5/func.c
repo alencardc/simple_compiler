@@ -1,4 +1,4 @@
-int g;
+int globalzona;
 
 int foo(int n) {
   int a;
@@ -9,6 +9,6 @@ int foo(int n) {
 int main() {
   int a;
   a = 123;
-  g = foo(999);
+  globalzona = foo(999);
   return 25;
 }

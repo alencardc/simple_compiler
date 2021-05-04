@@ -22,6 +22,7 @@ typedef struct sInstruction {
   char* operand1;
   char* operand2;
   char* operand3;
+  char* comment;
   struct sInstruction* previous;
 } Instruction;
 

@@ -43,6 +43,9 @@ void create_instr_identifier(Node* node, Table_Stack* scopes) {
 
   if (entry->global == true) {
     node->instr = create_instruction("loadAI", "rbss", offset, r, NULL);
+    node->instr->comment = malloc(sizeof(entry->key) + 2);
+    node->instr->comment = strcat(node->instr->comment, "//");
+    node->instr->comment = strcat(node->instr->comment, entry->key);
   } else {
     node->instr = create_instruction("loadAI", "rfp", offset, r, NULL);
   }
@@ -457,6 +460,12 @@ void create_instr_assignment(Node* head, Node* id, Table_Stack* scopes, Node* ex
   
   //storeAI temp => rbss|rfp,offset
   Instruction* assignment_instr = create_instruction("storeAI", exp->temp, base_register, offset, exp->instr);
+  if (var_entry->global) {
+    assignment_instr->comment = malloc(sizeof(var_entry->key) + 2);
+    assignment_instr->comment = strcat(assignment_instr->comment, "//");
+    assignment_instr->comment = strcat(assignment_instr->comment, var_entry->key);
+  }
+
   head->instr = assignment_instr;
   free(base_register);
 }
