@@ -81,32 +81,32 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     concat_asm_instructions(copy, add);
     return copy;
   } else if(strcmp(iloc->opcode, "addI") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
-    AsmInstruction* add = create_asm_instruction(NULL,"addl" , x86_literal(iloc->operand2), iloc->operand3);
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
+    AsmInstruction* add = create_asm_instruction(NULL,"addl" , x86_literal(iloc->operand2), x86_reg(iloc->operand3));
     concat_asm_instructions(copy, add);
     return copy;
   } else if(strcmp(iloc->opcode, "sub") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
-    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,iloc->operand2, iloc->operand3);
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
+    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,x86_reg(iloc->operand2), x86_reg(iloc->operand3));
     concat_asm_instructions(copy, sub);
     return copy;
   } else if(strcmp(iloc->opcode, "subI") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand1, iloc->operand3);
-    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,x86_literal(iloc->operand2), iloc->operand3);
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
+    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,x86_literal(iloc->operand2), x86_reg(iloc->operand3));
     concat_asm_instructions(copy, sub);
     return copy;
   } else if(strcmp(iloc->opcode, "rsubI") == 0){
-    AsmInstruction* copy = create_asm_instruction(NULL, "movl", iloc->operand2, iloc->operand3);
-    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,iloc->operand2, iloc->operand3);
+    AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_literal(iloc->operand2), x86_reg(iloc->operand3));
+    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,x86_reg(iloc->operand1), x86_reg(iloc->operand3));
     concat_asm_instructions(copy, sub);
     return copy;
   } else if(strcmp(iloc->opcode, "mult") == 0){
     // Save eax and edx
     AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax");
     AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx");
-    AsmInstruction* movOp1 = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax");
-    AsmInstruction* mul = create_asm_instruction(NULL,"imull" ,iloc->operand2, "%eax");
-    AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3);
+    AsmInstruction* movOp1 = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), "%eax");
+    AsmInstruction* mul = create_asm_instruction(NULL,"imull" ,x86_reg(iloc->operand2), "%eax");
+    AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", x86_reg(iloc->operand3));
     AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx");
     AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax");
     pushEax->next = pushEdx; pushEdx->next = movOp1; movOp1->next = mul;
@@ -119,10 +119,10 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     // Save eax and edx
     AsmInstruction* pushEax = create_asm_instruction(NULL, "pushl", NULL, "%eax");
     AsmInstruction* pushEdx = create_asm_instruction(NULL, "pushl", NULL, "%edx");
-    AsmInstruction* dividend = create_asm_instruction(NULL, "movl", iloc->operand1, "%eax");
+    AsmInstruction* dividend = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), "%eax");
     AsmInstruction* cltd = create_asm_instruction(NULL, "cltd", NULL, NULL);
-    AsmInstruction* div = create_asm_instruction(NULL,"idivl" , NULL, iloc->operand2);
-    AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", iloc->operand3);
+    AsmInstruction* div = create_asm_instruction(NULL,"idivl" , NULL, x86_reg(iloc->operand2));
+    AsmInstruction* movRes = create_asm_instruction(NULL, "movl", "%eax", x86_reg(iloc->operand3));
     AsmInstruction* popEdx = create_asm_instruction(NULL, "popl", NULL, "%edx");
     AsmInstruction* popEax = create_asm_instruction(NULL, "popl", NULL, "%eax");
     pushEax->next = pushEdx; pushEdx->next = dividend; dividend->next = cltd;
@@ -141,17 +141,17 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg1, x86_reg2);
     return move;
   } else if(strcmp(iloc->opcode, "store") == 0){
-    char memory_addr[strlen(iloc->operand1) + 3];
-    sprintf(memory_addr, "(%s)", iloc->operand1);
+    char memory_addr[strlen(x86_reg(iloc->operand1)) + 3];
+    sprintf(memory_addr, "(%s)", x86_reg(iloc->operand1));
 
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", memory_addr, iloc->operand2);
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", memory_addr, x86_reg(iloc->operand2));
     return move;
   } else if(strcmp(iloc->opcode, "storeAI") == 0){
     AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_offset(iloc->operand2, iloc->operand3));
     return move;
   } else if(strcmp(iloc->opcode, "jump") == 0){
-    char memory_addr[strlen(iloc->operand1) + 2];
-    sprintf(memory_addr, "*%s", iloc->operand1);
+    char memory_addr[strlen(x86_reg(iloc->operand1)) + 2];
+    sprintf(memory_addr, "*%s", x86_reg(iloc->operand1));
     AsmInstruction* jmp = create_asm_instruction(NULL, "jmp", NULL, memory_addr);
     return jmp;
   } else if(strcmp(iloc->opcode, "jumpI") == 0){
@@ -371,7 +371,7 @@ AsmInstruction* create_asm_cmp_code(Instruction* iloc_cmp, const char* jmp_type)
   AsmInstruction* cmp = NULL;
   Instruction* cbr = iloc_cmp->previous;
   if (strcmp("cbr", cbr->opcode) == 0) {
-    cmp = create_asm_instruction(NULL, "cmp", iloc_cmp->operand1, iloc_cmp->operand2);
+    cmp = create_asm_instruction(NULL, "cmp", x86_reg(iloc_cmp->operand1), x86_reg(iloc_cmp->operand2));
     AsmInstruction* jmp_true = create_asm_instruction(NULL, jmp_type, NULL, cbr->operand2);
     AsmInstruction* jmp_false = create_asm_instruction(NULL, "jmp", NULL, cbr->operand3);
     concat_asm_instructions(cmp, jmp_true);
