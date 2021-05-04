@@ -45,6 +45,16 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
 
   print_asm_globals_code(global_scope);
 
+  //Find first jmp
+  while(iloc_code != NULL && strcmp(iloc_code->opcode, "jumpI") != 0){
+    iloc_code = iloc_code->previous;
+  }
+
+  //Pusqh rbp and save rsp
+  head = create_asm_instruction(NULL, "pushq", "%rbp", NULL);
+  AsmInstruction* saveRsp = create_asm_instruction(NULL, "movq", "%rsp", "-4096(%rsp)");
+  head = concat_asm_instructions(head, saveRsp);
+
   while(iloc_code != NULL){
     AsmInstruction* new_asm = iloc_to_asm(iloc_code, prev);
     head = concat_asm_instructions(head, new_asm);
@@ -55,7 +65,7 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
   print_asm_instructions(head);
   //update_asm_return_addr(head);
 
-  print_asm_instructions(head);
+  //print_asm_instructions(head);
 }
 
 AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
@@ -122,7 +132,13 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     cltd->prev = dividend; dividend->prev = pushEdx; pushEdx->prev = pushEax;
     return pushEax;
   } else if (strcmp(iloc->opcode, "i2i") == 0){
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
+    char* x86_reg1 = x86_reg(iloc->operand1);
+    char* x86_reg2 = x86_reg(iloc->operand3);
+    if(haveAny64BitRegister(x86_reg1, x86_reg2)){
+      AsmInstruction* move = create_asm_instruction(NULL, "movq", x86_reg1, x86_reg2);
+      return move;
+    }
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_reg1, x86_reg2);
     return move;
   } else if(strcmp(iloc->opcode, "store") == 0){
     char memory_addr[strlen(x86_reg(iloc->operand1)) + 3];
@@ -145,9 +161,13 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     char* last_temp = prev->dst == NULL? (prev->src == NULL? strdup("$0") : prev->src): prev->dst;
     
     AsmInstruction* return_asm = create_asm_instruction(NULL, "movl", last_temp, "%eax");
+    AsmInstruction* restore_rsp = create_asm_instruction(NULL, "movq", "-4096(%rbp)", "%rsp");
+    AsmInstruction* popq = create_asm_instruction(NULL, "popq", NULL, "%rbp");
     AsmInstruction* ret = create_asm_instruction(NULL, "ret", NULL, NULL);
     AsmInstruction* final_proc = create_asm_instruction(NULL,"final_proc", ".cfi_endproc", NULL);
-    concat_asm_instructions(return_asm, ret);
+    concat_asm_instructions(return_asm, restore_rsp);
+    concat_asm_instructions(restore_rsp, popq);
+    concat_asm_instructions(popq, ret);
     concat_asm_instructions(ret, final_proc);
     return return_asm;
   } else if(strcmp(iloc->opcode, "cmp_LT") == 0) {
@@ -235,11 +255,60 @@ char* x86_reg(char* iloc_reg)
   {
     return "%rsp";
   }
+  //TEMPORÁRIO APENAS PARA TESTAR!!!!!!!!!!!!!!!!!
+  else if(strcmp("r0", iloc_reg) == 0){
+    return "%ecx";
+  }
+  else if(strcmp("r1", iloc_reg) == 0){
+    return "%ebx";
+  }
+  else if(strcmp("r2", iloc_reg) == 0){
+    return "%esi";
+  }
+  else if(strcmp("r3", iloc_reg) == 0){
+    return "%edi";
+  }
+  else if(strcmp("r4", iloc_reg) == 0){
+    return "%r8d";
+  }
+  else if(strcmp("r5", iloc_reg) == 0){
+    return "%r9d";
+  }
+  else if(strcmp("r6", iloc_reg) == 0){
+    return "%r10d";
+  }
+  else if(strcmp("r7", iloc_reg) == 0){
+    return "%r11d";
+  }
+  else if(strcmp("r8", iloc_reg) == 0){
+    return "%r12d";
+  }
+  else if(strcmp("r9", iloc_reg) == 0){
+    return "%r13d";
+  }
+  else if(strcmp("r10", iloc_reg) == 0){
+    return "%r14d";
+  }
+  else if(strcmp("r11", iloc_reg) == 0){
+    return "%r15d";
+  }
   else
   {
     return iloc_reg;
   }
 };
+
+bool haveAny64BitRegister(char* reg1, char* reg2){
+  return is64bitRegister(reg1) || is64bitRegister(reg2);
+}
+
+bool is64bitRegister(char* reg){
+  if(strcmp(reg, "%rbp") == 0)
+    return true;
+  if(strcmp(reg, "%rsp") == 0)
+    return true;
+  return false;
+}
 
 void print_init_asm_code(){
   printf("\t.text\n\t.globl	main\n\t.type	main, @function\nmain:\n\t.LFB0:\n\t.cfi_startproc\n");
