@@ -45,6 +45,16 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
 
   print_asm_globals_code(global_scope);
 
+  //Find first jmp
+  while(iloc_code != NULL && strcmp(iloc_code->opcode, "jumpI") != 0){
+    iloc_code = iloc_code->previous;
+  }
+
+  //Pusqh rbp and save rsp
+  head = create_asm_instruction(NULL, "pushq", "%rbp", NULL);
+  AsmInstruction* saveRsp = create_asm_instruction(NULL, "movq", "%rsp", "-4096(%rsp)");
+  head = concat_asm_instructions(head, saveRsp);
+
   while(iloc_code != NULL){
     AsmInstruction* new_asm = iloc_to_asm(iloc_code, prev);
     head = concat_asm_instructions(head, new_asm);
@@ -55,7 +65,7 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
   print_asm_instructions(head);
   //update_asm_return_addr(head);
 
-  print_asm_instructions(head);
+  //print_asm_instructions(head);
 }
 
 AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
@@ -151,10 +161,12 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     char* last_temp = prev->dst == NULL? (prev->src == NULL? strdup("$0") : prev->src): prev->dst;
     
     AsmInstruction* return_asm = create_asm_instruction(NULL, "movl", last_temp, "%eax");
+    AsmInstruction* restore_rsp = create_asm_instruction(NULL, "movq", "-4096(%rbp)", "%rsp");
     AsmInstruction* popq = create_asm_instruction(NULL, "popq", NULL, "%rbp");
     AsmInstruction* ret = create_asm_instruction(NULL, "ret", NULL, NULL);
     AsmInstruction* final_proc = create_asm_instruction(NULL,"final_proc", ".cfi_endproc", NULL);
-    concat_asm_instructions(return_asm, popq);
+    concat_asm_instructions(return_asm, restore_rsp);
+    concat_asm_instructions(restore_rsp, popq);
     concat_asm_instructions(popq, ret);
     concat_asm_instructions(ret, final_proc);
     return return_asm;
