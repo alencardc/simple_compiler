@@ -44,6 +44,7 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
   AsmInstruction* prev = NULL;
 
   print_asm_globals_code(global_scope);
+  print_init_asm_code();
 
   //Find first jmp
   while(iloc_code != NULL && strcmp(iloc_code->opcode, "jumpI") != 0){
@@ -66,6 +67,7 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
   //update_asm_return_addr(head);
 
   //print_asm_instructions(head);
+  print_final_asm_code();
 }
 
 AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
@@ -89,7 +91,11 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     char* x86_reg2 = x86_reg(iloc->operand3);
     if(haveAny64BitRegister(x86_reg1, x86_reg2)){
       AsmInstruction* copy = create_asm_instruction(NULL, "movq", x86_reg1, x86_reg2);
-      AsmInstruction* add = create_asm_instruction(NULL,"addq" , x86_literal(iloc->operand2), x86_reg2);
+      AsmInstruction* add;
+      if (strcmp(iloc->operand3, "rsp") == 0)
+        add = create_asm_instruction(NULL,"subq" , x86_literal(iloc->operand2), x86_reg2);
+      else
+        add = create_asm_instruction(NULL,"addq" , x86_literal(iloc->operand2), x86_reg2);
       concat_asm_instructions(copy, add);
       return copy;
     }
@@ -104,7 +110,11 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     return copy;
   } else if(strcmp(iloc->opcode, "subI") == 0){
     AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
-    AsmInstruction* sub = create_asm_instruction(NULL,"subl" ,x86_literal(iloc->operand2), x86_reg(iloc->operand3));
+    AsmInstruction* sub;
+    if (strcmp(iloc->operand3, "rsp") == 0)
+      sub = create_asm_instruction(NULL,"addl" ,x86_literal(iloc->operand2), x86_reg(iloc->operand3));
+    else
+      sub = create_asm_instruction(NULL,"subl" ,x86_literal(iloc->operand2), x86_reg(iloc->operand3));
     concat_asm_instructions(copy, sub);
     return copy;
   } else if(strcmp(iloc->opcode, "rsubI") == 0){
@@ -189,11 +199,9 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     AsmInstruction* restore_rsp = create_asm_instruction(NULL, "movq", "-4096(%rbp)", "%rsp");
     AsmInstruction* popq = create_asm_instruction(NULL, "popq", NULL, "%rbp");
     AsmInstruction* ret = create_asm_instruction(NULL, "ret", NULL, NULL);
-    AsmInstruction* final_proc = create_asm_instruction(NULL,"final_proc", ".cfi_endproc", NULL);
     concat_asm_instructions(return_asm, restore_rsp);
     concat_asm_instructions(restore_rsp, popq);
     concat_asm_instructions(popq, ret);
-    concat_asm_instructions(ret, final_proc);
     return return_asm;
   } else if(strcmp(iloc->opcode, "cmp_LT") == 0) {
     return create_asm_cmp_code(iloc, "jl");
@@ -279,47 +287,34 @@ char* x86_reg(char* iloc_reg)
   else if (strcmp("rbss", iloc_reg) == 0)
   {
     return "%rsp";
-  }
-  //TEMPORÁRIO APENAS PARA TESTAR!!!!!!!!!!!!!!!!!
-  else if(strcmp("r0", iloc_reg) == 0){
-    return "%ecx";
-  }
-  else if(strcmp("r1", iloc_reg) == 0){
-    return "%ebx";
-  }
-  else if(strcmp("r2", iloc_reg) == 0){
-    return "%esi";
-  }
-  else if(strcmp("r3", iloc_reg) == 0){
-    return "%edi";
-  }
-  else if(strcmp("r4", iloc_reg) == 0){
-    return "%r8d";
-  }
-  else if(strcmp("r5", iloc_reg) == 0){
-    return "%r9d";
-  }
-  else if(strcmp("r6", iloc_reg) == 0){
-    return "%r10d";
-  }
-  else if(strcmp("r7", iloc_reg) == 0){
-    return "%r11d";
-  }
-  else if(strcmp("r8", iloc_reg) == 0){
-    return "%r12d";
-  }
-  else if(strcmp("r9", iloc_reg) == 0){
-    return "%r13d";
-  }
-  else if(strcmp("r10", iloc_reg) == 0){
-    return "%r14d";
-  }
-  else if(strcmp("r11", iloc_reg) == 0){
-    return "%r15d";
-  }
-  else
-  {
-    return iloc_reg;
+  } else {
+    int reg_num = get_reg_num(iloc_reg);
+    switch (reg_num % 12) {
+      case 0:
+        return "%ecx";
+      case 1:
+        return "%ebx";
+      case 2:
+        return "%esi";
+      case 3:
+        return "%edi";
+      case 4:
+        return "%r8d";
+      case 5:
+        return "%r9d";
+      case 6:
+        return "%r10d";
+      case 7:
+        return "%r11d";
+      case 8:
+        return "%r12d";
+      case 9:
+        return "%r13d";
+      case 10:
+        return "%r14d";
+      case 11:
+        return "%r15d";
+    }
   }
 };
 
@@ -370,7 +365,7 @@ void print_init_asm_code(){
 }
 
 void print_final_asm_code(){
-  printf(".LFE0:\n\t.size	main, .-main\n");
+  printf(".cfi_endproc\n.LFE0:\n\t.size	main, .-main\n");
 }
 
 void print_asm_globals_code(Symbol_Entry** global_scope) {
@@ -426,7 +421,7 @@ AsmInstruction* create_asm_cmp_code(Instruction* iloc_cmp, const char* jmp_type)
   AsmInstruction* cmp = NULL;
   Instruction* cbr = iloc_cmp->previous;
   if (strcmp("cbr", cbr->opcode) == 0) {
-    cmp = create_asm_instruction(NULL, "cmp", x86_reg(iloc_cmp->operand1), x86_reg(iloc_cmp->operand2));
+    cmp = create_asm_instruction(NULL, "cmp", x86_reg(iloc_cmp->operand2), x86_reg(iloc_cmp->operand1));
     AsmInstruction* jmp_true = create_asm_instruction(NULL, jmp_type, NULL, cbr->operand2);
     AsmInstruction* jmp_false = create_asm_instruction(NULL, "jmp", NULL, cbr->operand3);
     concat_asm_instructions(cmp, jmp_true);

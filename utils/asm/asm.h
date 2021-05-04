@@ -34,6 +34,8 @@ char* x86_reg(char* iloc_reg);
 char* x86_offset(char* iloc_reg, char* offset);
 char* x86_global(char* global);
 
+int get_reg_num(const char* iloc_reg) ;
+
 bool is64bitRegister(char* reg);
 bool haveAny64BitRegister(char* reg1, char* reg2);
 

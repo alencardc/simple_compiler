@@ -20,12 +20,10 @@ int main (int argc, char **argv)
 {
   int ret = yyparse(); 
   //exporta (arvore);
-   print_iloc_code(iloc_code);
+   //print_iloc_code(iloc_code);
    printf("\n\n");
 
-  print_init_asm_code();
   generate_asm_code(iloc_code, scopes->table);
-  print_final_asm_code();
 
   pop_scope(scopes);
 
