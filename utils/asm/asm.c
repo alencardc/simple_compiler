@@ -13,7 +13,7 @@ AsmInstruction* create_asm_instruction(
   }
 
   instruction->label = label != NULL ? strdup(label) : NULL;
-  instruction->opcode = strdup(opcode);
+  instruction->opcode = opcode != NULL ? strdup(opcode) : NULL;
   instruction->src = src != NULL ? strdup(src) : NULL;
   instruction->dst = dst != NULL ? strdup(dst) : dst;
   instruction->next = NULL;
@@ -44,7 +44,7 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
   AsmInstruction* prev = NULL;
 
   print_asm_globals_code(global_scope);
-  
+
   while(iloc_code != NULL){
     AsmInstruction* new_asm = iloc_to_asm(iloc_code, prev);
     head = concat_asm_instructions(head, new_asm);
@@ -52,7 +52,7 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
     iloc_code = iloc_code->previous;
     prev = new_asm;
   }
-  //print_asm_instructions(head);
+  print_asm_instructions(head);
   //update_asm_return_addr(head);
 
   print_asm_instructions(head);
@@ -176,6 +176,12 @@ void print_asm_instruction(AsmInstruction* asm_code){
     return;
   }
 
+  if (asm_code->label != NULL)
+    printf("\t%s:\n", asm_code->label);
+  
+  if (asm_code->opcode == NULL)
+    return;
+
   if(strcmp(asm_code->opcode, "final_proc") == 0){
     printf(".cfi_endproc\n");
   } else if(asm_code->src != NULL && asm_code->dst != NULL){
@@ -187,7 +193,7 @@ void print_asm_instruction(AsmInstruction* asm_code){
   } else if(asm_code->src == NULL && asm_code->dst == NULL){
     printf("\t%s\n", asm_code->opcode);
   } else{
-    printf("QUE PORRA QUE DEU AQUI: %s\n", asm_code->opcode);
+    printf("Error: %s\n", asm_code->opcode);
   }
 }
 
@@ -251,16 +257,16 @@ void print_asm_globals_code(Symbol_Entry** global_scope) {
       while (entry != NULL) {
         if (entry->nature == VAR) {
           if (isFirstGlobal == true) {
-            printf("  .text\n");
+            printf("\t.text\n");
             isFirstGlobal = false;
           }
-          printf("  .globl %s\n", entry->key);
-          printf("  .data\n");
-          printf("  .align 4\n"); // depends on machine word length (?)
-          printf("  .type %s, @object\n", entry->key);
-          printf("  .size %s, %d\n", entry->key, entry->length);
+          printf("\t.globl %s\n", entry->key);
+          printf("\t.data\n");
+          printf("\t.align 4\n"); // depends on machine word length (?)
+          printf("\t.type %s, @object\n", entry->key);
+          printf("\t.size %s, %d\n", entry->key, entry->length);
           printf("%s:\n", entry->key);
-          printf("  .long 0\n"); // in the future this will depend on type
+          printf("\t.long 0\n"); // in the future this will depend on type
         }
 
         entry = entry->next;
