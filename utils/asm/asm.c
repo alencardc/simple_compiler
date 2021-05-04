@@ -63,7 +63,7 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     AsmInstruction* asm_code = create_asm_instruction(NULL, "movl", x86_literal(iloc->operand1), x86_reg(iloc->operand3));
     return asm_code;
   } else if(strcmp(iloc->opcode, "loadAI") == 0){
-    AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_offset(iloc->operand1, iloc->operand2), iloc->operand3);
+    AsmInstruction* move = create_asm_instruction(NULL, "movl", x86_offset(iloc->operand1, iloc->operand2), x86_reg(iloc->operand3));
     return move;
   } else if(strcmp(iloc->opcode, "add") == 0){
     AsmInstruction* copy = create_asm_instruction(NULL, "movl", x86_reg(iloc->operand1), x86_reg(iloc->operand3));
