@@ -1,9 +1,9 @@
-int foo() {
-  return 42;
+int foo(int a, int b) {
+  return 31;
 }
 
 int main() {
-  return foo();
+  return foo(1,2);
 }
 
 // int main() {
@@ -23,6 +23,19 @@ int main() {
 //   return a;
 // }
 
+
+// int main() {
+//   int i;
+//   int n <= 5;
+//   int a <= 1;
+//   i = 7;
+//   if (i <= n) {
+//     i = i+1;
+//     return i;
+//   }
+
+//   return a;
+// }
 
 // int main() {
 //   int i;
