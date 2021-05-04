@@ -52,6 +52,9 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
     iloc_code = iloc_code->previous;
     prev = new_asm;
   }
+  //print_asm_instructions(head);
+  //update_asm_return_addr(head);
+
   print_asm_instructions(head);
 }
 
@@ -169,7 +172,7 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
 }
 
 void print_asm_instruction(AsmInstruction* asm_code){
-  if(asm_code == NULL){
+  if(asm_code == NULL) {
     return;
   }
 
@@ -263,6 +266,29 @@ void print_asm_globals_code(Symbol_Entry** global_scope) {
         entry = entry->next;
       }
     }
+  }
+}
+
+void update_asm_return_addr(AsmInstruction* head) {
+  AsmInstruction* item = head;
+  while (item != NULL) {
+    bool is_mov_rpc = strcmp(item->opcode, "movl") == 0 && strcmp(item->src, "rpc") == 0;
+    bool is_next_add = strcmp(item->next->opcode, "addl") == 0;
+    if (is_mov_rpc && is_next_add) {
+      AsmInstruction* add_rpc = item->next;
+      AsmInstruction* jmp = add_rpc->next;
+      int instr_count = 1;
+      while (jmp != NULL && strcmp(jmp->opcode, "jmp") != 0 && jmp->dst[0] != '*') {
+        jmp = jmp->next;
+        instr_count++;
+      }
+      if (jmp != NULL) {
+        char offset_str[18];
+        sprintf(offset_str, "$%d", instr_count*5);
+        add_rpc->dst = strdup(offset_str);
+      }
+    }
+    item = item->next;
   }
 }
 
