@@ -595,8 +595,12 @@ Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
       current_argument = NULL;
     }
   }
-  
-  return previous_instructions;
+
+  char rsp_offset[12];
+  sprintf(rsp_offset, "%d", 2* (offset - 4));
+  Instruction* sub_rsp = create_instruction("addI", "rsp", rsp_offset, "rsp", previous_instructions);
+        
+  return sub_rsp;
 }
 
 void create_program_start_instr(Node* node, Table_Stack* scopes) {
@@ -712,7 +716,7 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
 
       // Offset to add/sub of rsp
       char stack_offset[12];
-      sprintf(stack_offset, "%d", 4*(i - 1));
+      sprintf(stack_offset, "%d", 2*4*(i - 1));
 
       free_reglist(regs);
       
