@@ -279,10 +279,6 @@ char* x86_reg(char* iloc_reg)
   {
     return "%rbp";
   }
-  if (strcmp("rpc", iloc_reg) == 0)
-  {
-    return "%pc";
-  }
   else if (strcmp("rsp", iloc_reg) == 0)
   {
     return "%rsp";
