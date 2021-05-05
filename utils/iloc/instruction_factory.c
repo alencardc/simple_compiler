@@ -530,7 +530,9 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   char rsp_offset_str[12];
   sprintf(rsp_offset_str, "%d", rsp_offset);
   
-  Instruction* att_rfp = create_instruction("i2i", "rsp", NULL, "rfp", label_start);
+  //MONKEY CODEEEEEEEEE
+  Instruction* att_rsp_before = create_instruction("subI", "rsp", rsp_offset_str,  "rsp", label_start);
+  Instruction* att_rfp = create_instruction("i2i", "rsp", NULL, "rfp", att_rsp_before);
   Instruction* att_rsp = create_instruction("addI", "rsp", rsp_offset_str,  "rsp", att_rfp);
 
   return att_rsp;  
@@ -597,8 +599,12 @@ Instruction* create_params_save(Node* arguments, Table_Stack* scopes){
       current_argument = NULL;
     }
   }
-  
-  return previous_instructions;
+
+  char rsp_offset[12];
+  sprintf(rsp_offset, "%d", 2* (offset - 4));
+  Instruction* sub_rsp = create_instruction("addI", "rsp", rsp_offset, "rsp", previous_instructions);
+        
+  return sub_rsp;
 }
 
 void create_program_start_instr(Node* node, Table_Stack* scopes) {
@@ -714,7 +720,7 @@ void complete_holes(Instruction* code, Table_Stack* scopes) {
 
       // Offset to add/sub of rsp
       char stack_offset[12];
-      sprintf(stack_offset, "%d", 4*(i - 1));
+      sprintf(stack_offset, "%d", 2*4*(i - 1));
 
       free_reglist(regs);
       
