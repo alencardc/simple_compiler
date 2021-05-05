@@ -1,9 +1,9 @@
-int foo(int a, int b) {
-  return 31;
+int foo() {
+  return 42;
 }
 
 int main() {
-  return foo(1,2);
+  return foo();
 }
 
 // int main() {

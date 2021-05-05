@@ -516,7 +516,6 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
 Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   char* function_label = get_new_label();
   Instruction* label_start = create_label(function_label, NULL);
-  label_start->comment = strdup("//funcdecl");
 
   Symbol_Entry* function_entry = search_deep_scope(scopes, function_id);
   function_entry->function_label = strdup(function_label);
@@ -526,7 +525,7 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
     Instruction* init_rsp = create_instruction("i2i", "rsp", NULL, "rfp", label_start);
     return init_rsp;
   }
-
+  label_start->comment = strdup("//funcdecl");
   int rsp_offset = scopes->offset;
   char rsp_offset_str[12];
   sprintf(rsp_offset_str, "%d", rsp_offset);
