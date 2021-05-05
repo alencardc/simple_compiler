@@ -155,7 +155,7 @@ void print_instruction(Instruction* i) {
     return;
 
   if (i->label != NULL) {
-    printf("%s: %s\n", i->label, i->opcode != NULL ? i->opcode : "");
+    printf("%s: %s %s\n", i->label, i->opcode != NULL ? i->opcode : "", i->comment == NULL ? "" : i->comment);
   }
   else if (strcmp("loadAI", i->opcode) == 0) {
     printf("loadAI %s, %s => %s %s\n", i->operand1, i->operand2, i->operand3, i->comment == NULL ? "" : i->comment);
@@ -200,7 +200,7 @@ void print_instruction(Instruction* i) {
     printf("jump -> %s\n", i->operand1);
   }  
   else if (strcmp("jumpI", i->opcode) == 0) {
-    printf("jumpI -> %s\n", i->operand1);
+    printf("jumpI -> %s %s\n", i->operand1, i->comment == NULL ? "" : i->comment);
   }
   else if (strcmp("cmp_LT", i->opcode) == 0) {
     printf("cmp_LT %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);

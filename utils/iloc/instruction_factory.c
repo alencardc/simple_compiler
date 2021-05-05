@@ -515,6 +515,7 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
 Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   char* function_label = get_new_label();
   Instruction* label_start = create_label(function_label, NULL);
+  label_start->comment = strdup("//funcdecl");
 
   Symbol_Entry* function_entry = search_deep_scope(scopes, function_id);
   function_entry->function_label = strdup(function_label);
@@ -547,6 +548,7 @@ Instruction* create_function_call_code(char* function_id, Table_Stack* scopes, N
   save_params = concat_instructions(save_params, save_rfp);
 
   Instruction* jump_to_function = create_instruction("jumpI", function_label, NULL, NULL, save_params);
+  jump_to_function->comment = strdup("//funccall");
  
   //Generate instructions to  save return address
   int num_instructions = count_instructions(jump_to_function);

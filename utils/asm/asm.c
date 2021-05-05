@@ -181,7 +181,11 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     AsmInstruction* jmp = create_asm_instruction(NULL, "jmp", NULL, memory_addr);
     return jmp;
   } else if(strcmp(iloc->opcode, "jumpI") == 0){
-    AsmInstruction* jmp = create_asm_instruction(NULL, "jmp", NULL, iloc->operand1);
+    AsmInstruction* jmp;
+    if (iloc->comment!= NULL && strcmp(iloc->comment, "//funccall") == 0) 
+      jmp = create_asm_instruction(NULL, "call", NULL, iloc->operand1);
+    else
+      jmp = create_asm_instruction(NULL, "jmp", NULL, iloc->operand1);
     return jmp;
   } else if(strcmp(iloc->opcode, "halt") == 0){
     //Last instruction is mul or div
