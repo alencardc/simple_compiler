@@ -197,7 +197,7 @@ void print_instruction(Instruction* i) {
     printf("cbr %s -> %s, %s\n", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("jump", i->opcode) == 0) {
-    printf("jump -> %s\n", i->operand1);
+    printf("jump -> %s %s\n", i->operand1, i->comment == NULL ? "" : i->comment);
   }  
   else if (strcmp("jumpI", i->opcode) == 0) {
     printf("jumpI -> %s %s\n", i->operand1, i->comment == NULL ? "" : i->comment);

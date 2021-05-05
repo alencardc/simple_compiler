@@ -178,7 +178,11 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
   } else if(strcmp(iloc->opcode, "jump") == 0){
     char memory_addr[strlen(x86_reg(iloc->operand1)) + 2];
     sprintf(memory_addr, "*%s", x86_reg(iloc->operand1));
-    AsmInstruction* jmp = create_asm_instruction(NULL, "jmp", NULL, memory_addr);
+    AsmInstruction* jmp;
+    if (iloc->comment != NULL && strcmp(iloc->comment, "//funcend") == 0)
+      jmp = create_asm_instruction(NULL, "jmp", NULL, "*%r15");
+    else
+      jmp = create_asm_instruction(NULL, "jmp", NULL, memory_addr);
     return jmp;
   } else if(strcmp(iloc->opcode, "jumpI") == 0){
     AsmInstruction* jmp;
@@ -221,6 +225,11 @@ AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){
     return create_asm_cmp_code(iloc, "jge");
   } else if(strcmp(iloc->opcode, "nop") == 0) {
     if (iloc->label != NULL) {
+      if (iloc->comment != NULL && strcmp(iloc->comment, "//funcdecl") == 0) {
+        AsmInstruction* label = create_asm_instruction(iloc->label, NULL, NULL, NULL);
+        AsmInstruction* pop = create_asm_instruction(NULL, "popq", NULL, "%r15");
+        return concat_asm_instructions(label, pop);
+      }
       return create_asm_instruction(iloc->label, NULL, NULL, NULL);
     }
   }

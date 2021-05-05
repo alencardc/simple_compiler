@@ -505,6 +505,7 @@ void create_instr_return(Node* return_node, Node* exp, Table_Stack* scopes) {
   Instruction* rsp_store = create_instruction("i2i", rsp_reg, NULL,  "rsp", rfp_load);
   Instruction* rfp_store = create_instruction("i2i", rfp_reg, NULL, "rfp", rsp_store);
   Instruction* jump = create_instruction("jump", ret_addr_reg, NULL, NULL, rfp_store);
+  jump->comment = strdup("//funcend");
 
   return_node->instr = jump;
   free(ret_addr_reg);
