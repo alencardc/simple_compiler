@@ -529,7 +529,9 @@ Instruction* create_start_function_code(char* function_id, Table_Stack* scopes){
   char rsp_offset_str[12];
   sprintf(rsp_offset_str, "%d", rsp_offset);
   
-  Instruction* att_rfp = create_instruction("i2i", "rsp", NULL, "rfp", label_start);
+  //MONKEY CODEEEEEEEEE
+  Instruction* att_rsp_before = create_instruction("subI", "rsp", rsp_offset_str,  "rsp", label_start);
+  Instruction* att_rfp = create_instruction("i2i", "rsp", NULL, "rfp", att_rsp_before);
   Instruction* att_rsp = create_instruction("addI", "rsp", rsp_offset_str,  "rsp", att_rfp);
 
   return att_rsp;  
