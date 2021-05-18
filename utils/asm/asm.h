@@ -29,10 +29,10 @@ void print_asm_instruction(AsmInstruction* asm_code);
 void print_init_asm_code();
 void print_final_asm_code();
 
-char* x86_literal(char* iloc_literal);
-char* x86_reg(char* iloc_reg);
-char* x86_offset(char* iloc_reg, char* offset);
-char* x86_global(char* global);
+char* asm_literal(char* iloc_literal);
+char* asm_reg(char* iloc_reg);
+char* asm_offset(char* iloc_reg, char* offset);
+char* asm_global(char* global);
 
 int get_reg_num(const char* iloc_reg) ;
 
