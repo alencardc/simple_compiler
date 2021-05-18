@@ -4,14 +4,15 @@ AsmInstruction* optimize_asm_code(AsmInstruction* asm_code){
     AsmInstruction* current_code = asm_code;
     while(current_code != NULL){
         //Search for mov src -> src
-        optimize_mov(current_code);
+        optimize_redundant_mov(current_code);
+        optimize_literal_constants_reg(current_code);
         current_code = current_code->next;
     }
 
     return asm_code;
 }
 
-void optimize_mov(AsmInstruction* current_code){
+void optimize_redundant_mov(AsmInstruction* current_code){
     if(current_code->opcode == NULL){
         return;
     }
@@ -24,6 +25,38 @@ void optimize_mov(AsmInstruction* current_code){
             remove_instruction(current_code);
         }
     }
+}
+
+void optimize_literal_constants_reg(AsmInstruction* current_code){
+    if(current_code->opcode == NULL || current_code->src == NULL || current_code->dst == NULL)
+        return;
+
+    if(strcmp(current_code->opcode, "movl") == 0){
+        if(current_code->src[0] == '$'){
+            char* const_literal = current_code->src;
+            char* prov_const_reg = strdup(current_code->dst);
+            AsmInstruction* temp = current_code->next;
+            while(temp != NULL){
+                //If reg is used as a dst after that, it wasnt a const reg
+                if(temp->dst != NULL && strcmp(temp->dst, prov_const_reg) == 0){
+                    free(prov_const_reg);
+                    return;
+                }
+                temp = temp->next;
+            }
+
+            remove_instruction(current_code);
+            temp = current_code->next;
+            while(temp != NULL){
+                if(temp->src != NULL && strcmp(temp->src, prov_const_reg) == 0){
+                    free(temp->src);
+                    temp->src = const_literal;
+                }
+                temp = temp->next;
+            }
+        }
+    }
+
 }
 
 void remove_instruction(AsmInstruction* asm_code){
