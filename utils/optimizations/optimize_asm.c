@@ -6,6 +6,7 @@ AsmInstruction* optimize_asm_code(AsmInstruction* asm_code){
         //Search for mov src -> src
         optimize_redundant_mov(current_code);
         optimize_literal_constants_reg(current_code);
+        optimize_inc_dec(current_code);
         current_code = current_code->next;
     }
 
@@ -57,6 +58,27 @@ void optimize_literal_constants_reg(AsmInstruction* current_code){
         }
     }
 
+}
+
+void optimize_inc_dec(AsmInstruction* asm_code){
+    if(asm_code == NULL || asm_code->opcode == NULL 
+        || asm_code->src == NULL || asm_code->dst == NULL)
+        return;
+    
+    if(strcmp(asm_code->src, "$1") == 0){
+        if(strcmp(asm_code->opcode, "subl") == 0){
+            free(asm_code->opcode);
+            free(asm_code->src);
+            asm_code->opcode = strdup("dec");
+            asm_code->src = NULL;
+        }
+        else if(strcmp(asm_code->opcode, "addl") == 0){
+            free(asm_code->opcode);
+            free(asm_code->src);
+            asm_code->opcode = strdup("inc");
+            asm_code->src = NULL;
+        }
+    }
 }
 
 void remove_instruction(AsmInstruction* asm_code){
