@@ -63,11 +63,13 @@ AsmInstruction* generate_asm_code(Instruction* iloc_code, Symbol_Entry** global_
     iloc_code = iloc_code->previous;
     prev = new_asm;
   }
-  print_asm_instructions(head);
+ 
   //update_asm_return_addr(head);
 
   //print_asm_instructions(head);
-  print_final_asm_code();
+  
+
+  return head;
 }
 
 AsmInstruction* iloc_to_asm(Instruction* iloc, AsmInstruction* prev){

@@ -3,6 +3,7 @@
   Não modifique este arquivo.
 */
 #include <stdio.h>
+#include "utils/optimizations/optimize_asm.h"
 #include "utils/optimizations/optimize_iloc.h"
 #include "utils/iloc/instruction.h"
 #include "utils/symbols_table/table_stack.h"
@@ -31,14 +32,18 @@ int main (int argc, char **argv)
     
   int ret = yyparse(); 
   //exporta (arvore);
+  //print_iloc_code(iloc_code);
   printf("\n\n");
 
   if(argc == 2 && strcmp(argv[1], "-O") == 0){
     iloc_code = optimize_iloc_code(iloc_code);
   }
 
-  generate_asm_code(iloc_code, scopes->table);
+  AsmInstruction* asm_code = generate_asm_code(iloc_code, scopes->table);
+  asm_code = optimize_asm_code(asm_code);
 
+  print_asm_instructions(asm_code);
+  print_final_asm_code();
   pop_scope(scopes);
 
   libera(arvore);
