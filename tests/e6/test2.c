@@ -1,27 +1,27 @@
-int foo() {
-  return 42;
-}
+// int foo() {
+//   return 42;
+// }
 
-int main() {
-  return foo();
-}
+// int main() {
+//   return foo();
+// }
 
 // int main() {
 //   return 1 + 5*2/2 + (1+1)*2;
 // }
 
-// int main() {
-//   int i;
-//   int n <= 5;
-//   int a <= 1;
-//   i = 1;
-//   while (i <= n) do {
-//     a = a * i;
-//     i = i+1;
-//   }
+int main() {
+  int i;
+  int n <= 5;
+  int a <= 1;
+  i = 1;
+  while (i <= n) do {
+    a = a * i;
+    i = i+1;
+  }
 
-//   return a;
-// }
+  return a;
+}
 
 
 // int main() {
