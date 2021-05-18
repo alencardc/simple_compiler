@@ -155,82 +155,87 @@ void print_instruction(Instruction* i) {
     return;
 
   if (i->label != NULL) {
-    printf("%s: %s\n", i->label, i->opcode != NULL ? i->opcode : "");
+    printf("%s: %s", i->label, i->opcode != NULL ? i->opcode : "");
   }
   else if (strcmp("loadAI", i->opcode) == 0) {
-    printf("loadAI %s, %s => %s %s\n", i->operand1, i->operand2, i->operand3, i->comment == NULL ? "" : i->comment);
+    printf("loadAI %s, %s => %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("store", i->opcode) == 0) {
-    printf("store %s => %s\n", i->operand1, i->operand2);
+    printf("store %s => %s", i->operand1, i->operand2);
   }  
   else if (strcmp("storeAI", i->opcode) == 0) {
-    printf("storeAI %s => %s, %s %s\n", i->operand1, i->operand2, i->operand3, i->comment == NULL ? "" : i->comment);
+    printf("storeAI %s => %s, %s", i->operand1, i->operand2, i->operand3);
   }  
   else if (strcmp("loadI", i->opcode) == 0) {
-    printf("loadI %s => %s\n", i->operand1, i->operand3);
+    printf("loadI %s => %s", i->operand1, i->operand3);
   }
   else if (strcmp("rsubI", i->opcode) == 0) {
-    printf("rsubI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+    printf("rsubI %s, %s => %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("i2i", i->opcode) == 0) {
-    printf("i2i %s => %s\n", i->operand1, i->operand3);
+    printf("i2i %s => %s", i->operand1, i->operand3);
   }
   else if (strcmp("add", i->opcode) == 0) {
-    printf("add %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+    printf("add %s, %s => %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("addI", i->opcode) == 0) {
-    printf("addI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+    printf("addI %s, %s => %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("sub", i->opcode) == 0) {
-    printf("sub %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+    printf("sub %s, %s => %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("subI", i->opcode) == 0) {
-    printf("subI %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+    printf("subI %s, %s => %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("mult", i->opcode) == 0) {
-    printf("mult %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+    printf("mult %s, %s => %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("div", i->opcode) == 0) {
-    printf("div %s, %s => %s\n", i->operand1, i->operand2, i->operand3);
+    printf("div %s, %s => %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("cbr", i->opcode) == 0) {
-    printf("cbr %s -> %s, %s\n", i->operand1, i->operand2, i->operand3);
+    printf("cbr %s -> %s, %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("jump", i->opcode) == 0) {
-    printf("jump -> %s\n", i->operand1);
+    printf("jump -> %s", i->operand1);
   }  
   else if (strcmp("jumpI", i->opcode) == 0) {
-    printf("jumpI -> %s\n", i->operand1);
+    printf("jumpI -> %s", i->operand1);
   }
   else if (strcmp("cmp_LT", i->opcode) == 0) {
-    printf("cmp_LT %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);
+    printf("cmp_LT %s, %s -> %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("cmp_LE", i->opcode) == 0) {
-    printf("cmp_LE %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);
+    printf("cmp_LE %s, %s -> %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("cmp_EQ", i->opcode) == 0) {
-    printf("cmp_EQ %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);
+    printf("cmp_EQ %s, %s -> %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("cmp_NE", i->opcode) == 0) {
-    printf("cmp_NE %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);
+    printf("cmp_NE %s, %s -> %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("cmp_GT", i->opcode) == 0) {
-    printf("cmp_GT %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);
+    printf("cmp_GT %s, %s -> %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("cmp_GE", i->opcode) == 0) {
-    printf("cmp_GE %s, %s -> %s\n", i->operand1, i->operand2, i->operand3);
+    printf("cmp_GE %s, %s -> %s", i->operand1, i->operand2, i->operand3);
   }
   else if (strcmp("halt", i->opcode) == 0) {
-    printf("halt\n");
+    printf("halt");
   }
   else if (strcmp("$load$", i->opcode) == 0) {
-    printf("$load$\n");
+    printf("$load$");
   }
   else if (strcmp("$store$", i->opcode) == 0) {
-    printf("$store$\n");
+    printf("$store$");
   } else if (strcmp("nop", i->opcode) == 0) {
-    printf("nop\n");
+    printf("nop");
   }
+
+  if (i->comment != NULL)
+    printf("  %s", i->comment);
+  
+  printf("\n");
 }
 
 void print_iloc_code(Instruction* head) {
