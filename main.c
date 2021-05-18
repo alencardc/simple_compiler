@@ -40,7 +40,9 @@ int main (int argc, char **argv)
   }
 
   AsmInstruction* asm_code = generate_asm_code(iloc_code, scopes->table);
-  asm_code = optimize_asm_code(asm_code);
+  if(argc == 2 && strcmp(argv[1], "-O") == 0){
+    asm_code = optimize_asm_code(asm_code);
+  }
 
   print_asm_instructions(asm_code);
   print_final_asm_code();
