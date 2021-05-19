@@ -9,6 +9,7 @@ AsmInstruction* optimize_asm_code(AsmInstruction* asm_code){
         optimize_inc_dec(current_code);
         optimize_jmp_to_next_instruction(current_code);
         optimize_mult_div_stack_op(current_code);
+optimize_intermediary_registers(current_code);
         current_code = current_code->next;
     }
 
@@ -112,6 +113,43 @@ void optimize_jmp_to_next_instruction(AsmInstruction* asm_code){
         }
     }
 }
+
+void optimize_intermediary_registers(AsmInstruction* asm_code){
+    if(asm_code == NULL || asm_code->opcode == NULL 
+        || asm_code->src == NULL || asm_code->dst == NULL)
+        return;
+    
+    if(strcmp(asm_code->opcode, "movl") == 0){
+        char* dst_register = asm_code->dst;
+        char* new_src = asm_code->src;
+
+        //Exclude access to memory from otimizations, we just optimize regs
+        if(strstr(dst_register, "rbp") != NULL ||
+        strstr(dst_register, "rip") != NULL ||
+        strstr(dst_register, "rsp") != NULL)
+            return;
+
+        AsmInstruction* temp = asm_code->next;
+        while(temp != NULL){
+                //If reg is used as a dst after that, it wasnt a intermediaryt reg
+                if(temp->dst != NULL && strcmp(temp->dst, dst_register) == 0){
+                    return;
+                }
+                temp = temp->next;
+        }
+        temp = asm_code->next;
+
+        while(temp != NULL){
+            if(temp->src != NULL && strcmp(temp->src, dst_register) == 0){
+                    free(temp->src);
+                    temp->src = strdup(new_src);
+                }
+                temp = temp->next;
+        }
+        remove_instruction(asm_code);
+    }
+}
+
 void remove_instruction(AsmInstruction* asm_code){
     AsmInstruction* previous = asm_code->prev;
     AsmInstruction* next = asm_code->next;

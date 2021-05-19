@@ -8,5 +8,6 @@ void optimize_literal_constants_reg(AsmInstruction* current_code);
 void optimize_inc_dec(AsmInstruction* asm_code);
 void optimize_jmp_to_next_instruction(AsmInstruction* asm_code);
 void optimize_mult_div_stack_op(AsmInstruction* current_code);
+void optimize_intermediary_registers(AsmInstruction* asm_code);
 
 void remove_instruction(AsmInstruction* asm_code);
