@@ -8,10 +8,28 @@ AsmInstruction* optimize_asm_code(AsmInstruction* asm_code){
         optimize_literal_constants_reg(current_code);
         optimize_inc_dec(current_code);
         optimize_jmp_to_next_instruction(current_code);
+        optimize_mult_div_stack_op(current_code);
         current_code = current_code->next;
     }
 
     return asm_code;
+}
+
+void optimize_mult_div_stack_op(AsmInstruction* current_code){
+    if(current_code->opcode == NULL){
+        return;
+    }
+
+    if(strcmp(current_code->opcode, "imull") == 0
+        || strcmp(current_code->opcode, "idivl") == 0){
+        AsmInstruction* mult_or_div = current_code;
+        //Remove pushq before imull/idivl
+        remove_instruction(current_code->prev->prev); //First push makes second push only
+        remove_instruction(current_code->prev->prev); //2 instruction ahead 
+        //Remove popq after imull/idivl
+        remove_instruction(current_code->next->next); //First pop makes second pop only
+        remove_instruction(current_code->next->next); //2 instruction ahead        
+    }
 }
 
 void optimize_redundant_mov(AsmInstruction* current_code){
