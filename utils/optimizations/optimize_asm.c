@@ -7,6 +7,7 @@ AsmInstruction* optimize_asm_code(AsmInstruction* asm_code){
         optimize_redundant_mov(current_code);
         optimize_literal_constants_reg(current_code);
         optimize_inc_dec(current_code);
+        optimize_jmp_to_next_instruction(current_code);
         current_code = current_code->next;
     }
 
@@ -81,6 +82,18 @@ void optimize_inc_dec(AsmInstruction* asm_code){
     }
 }
 
+void optimize_jmp_to_next_instruction(AsmInstruction* asm_code){
+    if(asm_code == NULL || asm_code->opcode == NULL 
+        || asm_code->dst == NULL)
+        return;
+
+    if(strcmp(asm_code->opcode, "jmp") == 0){
+        AsmInstruction* next_instruction = asm_code->next;
+        if(strcmp(next_instruction->label, asm_code->dst) == 0){
+            remove_instruction(asm_code);
+        }
+    }
+}
 void remove_instruction(AsmInstruction* asm_code){
     AsmInstruction* previous = asm_code->prev;
     AsmInstruction* next = asm_code->next;
