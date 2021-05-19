@@ -52,6 +52,9 @@ void optimize_literal_constants_reg(AsmInstruction* current_code){
     if(current_code->opcode == NULL || current_code->src == NULL || current_code->dst == NULL)
         return;
 
+    if(strcmp(current_code->dst, "%eax") == 0)
+        return;
+
     if(strcmp(current_code->opcode, "movl") == 0){
         if(current_code->src[0] == '$'){
             char* const_literal = current_code->src;
@@ -123,10 +126,11 @@ void optimize_intermediary_registers(AsmInstruction* asm_code){
         char* dst_register = asm_code->dst;
         char* new_src = asm_code->src;
 
-        //Exclude access to memory from otimizations, we just optimize regs
+        //Exclude access to memory and final eax from otimizations, we just optimize regs
         if(strstr(dst_register, "rbp") != NULL ||
         strstr(dst_register, "rip") != NULL ||
-        strstr(dst_register, "rsp") != NULL)
+        strstr(dst_register, "rsp") != NULL ||
+        strstr(dst_register, "eax") != NULL)
             return;
 
         AsmInstruction* temp = asm_code->next;
