@@ -33,12 +33,10 @@ int main (int argc, char **argv)
   int ret = yyparse(); 
   //exporta (arvore);
   //print_iloc_code(iloc_code);
-  printf("\n\n");
 
   if(argc == 2 && strcmp(argv[1], "-O") == 0){
     iloc_code = optimize_iloc_code(iloc_code);
   }
-  //print_iloc_code(iloc_code);
 
   AsmInstruction* asm_code = generate_asm_code(iloc_code, scopes->table);
   if(argc == 2 && strcmp(argv[1], "-O") == 0){
@@ -56,5 +54,5 @@ int main (int argc, char **argv)
 }
 
 void print_command_line_helper(){
-  printf("To compile with optimizations use the -O flag.\nUsage: ./etapa7 -O nomearquivo\n");
+  printf("To compile with optimizations use the -O flag.\nUsage: ./etapa7 -O <filename>\n");
 }
