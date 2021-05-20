@@ -23,6 +23,7 @@ Para comparar o desempenho obtido a partir da aplicação das otimizações, rep
 A partir do uso de tais otimizações, foi possível deixar o código mais curto, o que é exemplificado a partir dos dois códigos a seguir:
 
 **Cálculo de fatorial**
+Arquivo `fatorial_while.c` na raiz do projeto.
 ```c
 int fatorial;
  
@@ -40,6 +41,7 @@ int main(){
 Compilando sem otimizações, o assembly gerado tem 60 linhas. Caso usemos a flag -O para ligar as otimizações, o assembly resultante tem 45 linhas. O que representa uma redução de 25% do código gerado.
 
 **Cálculo da duração total em ms de um evento com n palestra**
+Arquivo `event_duration.c` na raiz do projeto.
 ```c
 int main() {
   // Duração em ms de um evento com n palestras de duração dada em horas
