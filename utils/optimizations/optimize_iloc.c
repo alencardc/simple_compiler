@@ -6,7 +6,7 @@
 #include "hashtable.h"
 
 Instruction* optimize_iloc_code(Instruction* iloc_code) {
-    printf("Optimizing iloc code....\n");
+    // printf("Optimizing iloc code....\n");
     //Super optimized iloc_code
     optimize_iloc_expressions(iloc_code);
     iloc_code = iloc_remove_deleted(iloc_code);
